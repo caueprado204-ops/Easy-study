@@ -356,6 +356,23 @@ select,.inp{border:1.5px solid var(--line);border-radius:10px;padding:7px 10px;b
 .vests5 .pg h3{font-size:clamp(24px,2.4vw,32px)}
 @media (max-width:1050px){.vests5{grid-template-columns:repeat(2,minmax(0,1fr))!important}.easier{grid-template-columns:1fr}.ez-grid,.ez-chat{grid-column:1/-1}}
 @media (max-width:760px){.easier{padding:28px 18px}.ez-grid{grid-template-columns:1fr}.vests5{grid-template-columns:1fr!important}}
+.fig{margin:16px 0 0;border:1.5px solid var(--line);border-radius:18px;background:var(--cream);padding:14px;overflow-x:auto}
+.fig svg{display:block;width:100%;max-width:640px;height:auto;margin:0 auto}
+.fig figcaption{font-size:12.5px;color:var(--muted);margin-top:8px;text-align:center}
+@media (max-width:640px){.fig{padding:10px}.fig svg{min-width:520px}.fig::after{content:"arraste para o lado para ver a figura inteira";display:block;font-size:11px;color:var(--muted);text-align:center;margin-top:4px}}
+.reader>*{min-width:0}.lesson-card{min-width:0;max-width:100%}
+.tabwrap{overflow-x:auto;margin-top:14px}
+.mtab{border-collapse:collapse;min-width:420px;width:100%;font-size:14px}
+.mtab caption{text-align:left;font-weight:700;padding:0 0 6px}
+.mtab th{background:var(--ink);color:var(--white);padding:7px 10px;font-weight:700;border:0}
+.mtab td{padding:7px 10px;border-bottom:1.5px solid var(--hair);vertical-align:top}
+.mtab tr:nth-child(even) td{background:var(--panel)}
+.sabia{margin-top:14px;border-left:5px solid var(--pink);background:var(--rose);border-radius:0 14px 14px 0;padding:10px 14px;font-size:14px}
+.provabox{border:1.5px solid var(--line);border-radius:18px;background:var(--sky);padding:16px 18px;margin-top:14px}
+.provabox h3{font-family:var(--display);text-transform:uppercase;font-size:15px;margin-bottom:6px}
+.provabox p{margin:0}
+.lerbox{margin-top:16px}
+.lerbox h3{font-size:15px;margin-bottom:8px}
 /* ---------- contas e planos ---------- */
 .auth-wrap{max-width:1080px;margin:0 auto;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:14px;background:var(--cream);border-radius:6px;padding:14px}
 .auth-side{background:var(--violet);color:var(--white);border-radius:24px;padding:30px;position:relative;overflow:hidden;display:flex;flex-direction:column;gap:16px;min-height:520px}
@@ -422,7 +439,7 @@ select,.inp{border:1.5px solid var(--line);border-radius:10px;padding:7px 10px;b
   .panel{border-radius:0;padding:16px 16px calc(96px + env(safe-area-inset-bottom,0px));min-height:100vh}
   .nav{position:fixed;left:0;right:0;bottom:0;z-index:20;flex-direction:row;padding:8px 10px calc(8px + env(safe-area-inset-bottom,0px));background:var(--shell);overflow-x:auto;justify-content:flex-start;gap:4px}
   .nav .tip,.nav .sep{display:none}
-  .hero,.subjects,.reader{grid-template-columns:1fr}
+  .hero,.subjects{grid-template-columns:1fr}.reader{grid-template-columns:minmax(0,1fr)}
   .toc{position:static;flex-direction:row;overflow-x:auto;padding-bottom:4px} .toc button{flex:none}
   .search{order:5;width:100%}
   .me div{display:none}
@@ -986,6 +1003,10 @@ ex:["Um viajante diz que a comida de outro país é 'nojenta' por ser diferente 
 
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.js"></script>
+<script src="conteudo/figuras.js"></script>
+<script src="conteudo/extras-natureza.js"></script>
+<script src="conteudo/extras-exatas-linguagens.js"></script>
+<script src="conteudo/extras-humanas.js"></script>
 <script>
 /* ---------- matérias ---------- */
 const SUBJ = {
@@ -1001,6 +1022,9 @@ const SUBJ = {
 };
 const SUBJECT_KEYS=Object.keys(SUBJ);
 const subjColor=s=>(SUBJ[s]||{}).c||({"Inglês":"var(--ice)","Ciências da Natureza":"var(--butter)","Ciências Humanas":"var(--mint)"}[s]||"var(--hair)");
+// Conteúdo extra dos módulos (seções, figuras, tabelas, como cai na prova, fontes abertas)
+(function(){const EX=window.EXTRA||{};for(const s of Object.keys(MOD))MOD[s].forEach((m,i)=>{const x=EX[s+"#"+i]||EX[s+":"+m.t];if(!x)return;
+  if(x.s)m.s=m.s.concat(x.s);if(x.fig)m.fig=[].concat(x.fig);if(x.tab)m.tab=[].concat(x.tab);if(x.prova)m.prova=x.prova;if(x.ler)m.ler=x.ler;if(x.sabia)m.sabia=x.sabia;});})();
 const ALL_MODS=SUBJECT_KEYS.flatMap(s=>(MOD[s]||[]).map((m,i)=>({...m,s,i,id:s+"#"+i})));
 const MODMAP={}; ALL_MODS.forEach(m=>MODMAP[m.id]=m);
 
@@ -1351,6 +1375,9 @@ function modRow(m,showSubj){
       <span class="meta">${showSubj?`<span class="chip">${esc(m.s)}</span>`:""}<span class="bar"><i style="width:${r/n*100}%"></i></span><span class="small muted num">${r}/${n} seções</span></span></span>
     <span class="btn sm ${done?"ghost":""}">${done?"Revisar":r?"Continuar":"Começar"}</span></button>`;
 }
+function proseHTML(p){return String(p).split(/\n\n+/).map(par=>`<p>${esc(par).replace(/\*\*(.+?)\*\*/g,"<strong>$1</strong>")}</p>`).join("");}
+function figHTML(f){const fn=(window.FIGS||{})[f.id];if(!fn)return "";return `<figure class="fig">${fn()}<figcaption>${esc(f.cap||"")}</figcaption></figure>`;}
+function tabHTML(t){return `<div class="tabwrap"><table class="mtab">${t.title?`<caption>${esc(t.title)}</caption>`:""}<thead><tr>${t.head.map(h=>`<th>${esc(h)}</th>`).join("")}</tr></thead><tbody>${t.rows.map(r=>`<tr>${r.map(c=>`<td>${esc(c)}</td>`).join("")}</tr>`).join("")}</tbody></table></div>`;}
 function vReader(m){
   const secs=m.sec||m.s&&MOD[m.s][m.i].s; const mm=MOD[m.s][m.i]; const total=mm.s.length;
   const sec=Math.min(modState.sec,total); const read=S.read[m.id]||{};
@@ -1360,17 +1387,22 @@ function vReader(m){
   let body;
   if(!isFinal){
     const [h,p]=mm.s[sec];
-    body=`<div class="lesson-card"><div class="eyebrow">Seção ${sec+1} de ${total}</div><h2>${esc(h)}</h2><div class="prose"><p>${esc(p)}</p></div>
+    const figs=(mm.fig||[]).filter(f=>f.at===sec).map(f=>figHTML(f)).join("");
+    const tabs=(mm.tab||[]).filter(t=>t.at===sec).map(t=>tabHTML(t)).join("");
+    const sabia=sec===0&&mm.sabia?`<div class="sabia"><b>Você sabia?</b> ${esc(mm.sabia)}</div>`:"";
+    body=`<div class="lesson-card"><div class="eyebrow">Seção ${sec+1} de ${total}</div><h2>${esc(h)}</h2><div class="prose">${proseHTML(p)}</div>${figs}${tabs}${sabia}
       <div class="lnav-row"><button class="btn ghost sm" data-sec="${sec-1}" ${sec===0?"disabled":""}>Anterior</button><button class="btn" data-sec="${sec+1}">${sec===total-1?"Revisão e prática":"Próxima seção"}</button></div></div>`;
   } else {
     const qs=modQuestions(m); const qi=Math.min(modState.qi,Math.max(0,qs.length-1)); const qq=qs[qi];
     body=`<div class="lesson-card"><div class="eyebrow">Revisão e prática</div><h2>Feche o módulo</h2>
+      ${mm.prova?`<div class="provabox"><h3>Como cai na prova</h3><p>${esc(mm.prova)}</p></div>`:""}
       <div class="keybox"><h3>Conceitos-chave</h3><ul>${mm.k.map(x=>`<li>${esc(x)}</li>`).join("")}</ul></div>
       <div class="exbox"><h3>Exemplo resolvido</h3><p style="margin:0 0 8px"><b>${esc(mm.ex[0])}</b></p>
         <details><summary style="cursor:pointer;font-weight:700;color:var(--violet)">Ver resolução</summary><p style="margin:8px 0 0">${esc(mm.ex[1])}</p></details></div>
       ${qs.length?`<h3 style="margin:22px 0 10px;font-size:18px">Questões do ENEM sobre este módulo <span class="small muted num">(${qi+1} de ${qs.length})</span></h3>${qCardHTML(qq,"train")}
         <div class="qnav"><button class="btn ghost sm" data-mq="${qi-1}" ${qi===0?"disabled":""}>Anterior</button><button class="btn sm" data-mq="${qi+1}" ${qi>=qs.length-1?"disabled":""}>Próxima questão</button></div>`
       :m.s==="Redação"?`<div class="lnav-row"><button class="btn violet" data-go="redacao">Escrever uma redação agora</button></div>`:QREADY!==true?`<p class="muted">Carregando questões…</p>`:""}
+      ${mm.ler?`<div class="lerbox"><h3>Para ler mais (fontes abertas e confiáveis)</h3><div class="linklist">${mm.ler.map(([t,u])=>`<a href="${esc(u)}" target="_blank" rel="noopener"><span class="ic" style="background:var(--ice)">↗</span>${esc(t)}</a>`).join("")}</div></div>`:""}
       <div class="lnav-row" style="border-top:1.5px solid var(--hair);padding-top:16px;margin-top:22px">
         <button class="btn ghost sm" data-sec="${total-1}">Voltar à última seção</button>
         ${S.modDone[m.id]?`<span class="done-tag" style="align-self:center">Módulo concluído</span>`:`<button class="btn" data-moddone="${m.id}">Concluir módulo (+30 XP)</button>`}
