@@ -1004,6 +1004,10 @@ ex:["Um viajante diz que a comida de outro país é 'nojenta' por ser diferente 
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.js"></script>
 <script src="conteudo/figuras.js"></script>
+<script src="conteudo/figuras-bio.js"></script>
+<script src="conteudo/biologia-1.js"></script>
+<script src="conteudo/biologia-2.js"></script>
+<script src="conteudo/biologia-3.js"></script>
 <script src="conteudo/extras-natureza.js"></script>
 <script src="conteudo/extras-exatas-linguagens.js"></script>
 <script src="conteudo/extras-humanas.js"></script>
@@ -1022,6 +1026,19 @@ const SUBJ = {
 };
 const SUBJECT_KEYS=Object.keys(SUBJ);
 const subjColor=s=>(SUBJ[s]||{}).c||({"Inglês":"var(--ice)","Ciências da Natureza":"var(--butter)","Ciências Humanas":"var(--mint)"}[s]||"var(--hair)");
+// Biologia completa: módulos novos intercalados com os originais (ordem do ensino médio)
+const BIO_MAPA={0:1,1:2,2:16,3:21,4:14,5:19,6:8}; // índice antigo -> novo
+(function(){const N=window.BIO_NOVOS,o=MOD["Biologia"];if(!N||!o||o.length!==7)return;
+  const ren={2:"Genética I: Mendel e grupos sanguíneos",3:"Ecologia: energia, ciclos e relações",4:"Fisiologia humana I: digestão, circulação e respiração",5:"Evolução: teorias e seleção natural",6:"Vírus, bactérias e saúde"};
+  const ord=["seres",0,1,"metab","dna","repro","histo","sistem",6,"protofungos","botan1","botan2","zoo1","zoo2",4,"fisio2",2,"gen2","biotec",5,"popul",3,"biomas"];
+  const novo=ord.map(k=>typeof k==="number"?Object.assign(o[k],ren[k]?{t:ren[k]}:{},k===4?{d:"Digestão, circulação, respiração e imunidade."}:{}):N[k]);
+  if(novo.every(Boolean))MOD["Biologia"]=novo;})();
+function migrarBio(st){ // progresso salvo antes da reorganização de Biologia
+  if(!st||st.bioV>=2)return; st.bioV=2; if(MOD["Biologia"].length<23)return;
+  const mv=k=>{const m=/^Biologia#(\d+)$/.exec(k);return m&&BIO_MAPA[m[1]]!==undefined?"Biologia#"+BIO_MAPA[m[1]]:k;};
+  for(const f of ["read","modDone","lessons"]){const obj=st[f];if(!obj)continue;const n={};for(const k of Object.keys(obj))n[mv(k)]=obj[k];st[f]=n;}
+  if(st.lastMod)st.lastMod=mv(st.lastMod);
+}
 // Conteúdo extra dos módulos (seções, figuras, tabelas, como cai na prova, fontes abertas)
 (function(){const EX=window.EXTRA||{};for(const s of Object.keys(MOD))MOD[s].forEach((m,i)=>{const x=EX[s+"#"+i]||EX[s+":"+m.t];if(!x)return;
   if(x.s)m.s=m.s.concat(x.s);if(x.fig)m.fig=[].concat(x.fig);if(x.tab)m.tab=[].concat(x.tab);if(x.prova)m.prova=x.prova;if(x.ler)m.ler=x.ler;if(x.sabia)m.sabia=x.sabia;});})();
@@ -1057,6 +1074,7 @@ const PLAYLISTS=[{n:"Lo-fi para estudar",q:"lofi study",c:"var(--lilac)"},{n:"Cl
 const KEY="easystudy.v1";
 let S={name:"Cauê",entered:false,act:{},ans:{},watched:{},read:{},modDone:{},lessons:{},routine:[],exams:DEFAULT_EXAMS,sims:[],essays:[],spotify:"",sim:null,essayDraft:"",essayTheme:ESSAY_THEMES[0]};
 try{const raw=localStorage.getItem(KEY)||localStorage.getItem("jaleco.v1");if(raw)S=Object.assign(S,JSON.parse(raw));}catch(e){}
+migrarBio(S);
 function save(){S.__t=Date.now();try{localStorage.setItem(userKey(),JSON.stringify(S));}catch(e){}if(typeof agendarNuvem==="function")agendarNuvem();}
 const pad=n=>String(n).padStart(2,"0");
 const dkey=d=>d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate());
@@ -1969,6 +1987,7 @@ async function carregarConta(user){
   const cloud=g.data?.dados&&Object.keys(g.data.dados).length?g.data.dados:null;
   const cloudT=g.data?Date.parse(g.data.atualizado_em):0, localT=local?.__t||0;
   S=Object.assign(base,(cloud&&cloudT>=localT)?cloud:(local||cloud||{}));
+  migrarBio(S);
   S.name=ACC.perfil.nome||S.name||"Estudante";S.entered=true;
   save();
 }
