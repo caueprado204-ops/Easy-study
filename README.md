@@ -61,6 +61,12 @@ Quando o Gemini fica sem cota, a Easier passa sozinha para o Groq.
 
 Não confunda com o Groq acima. O Grok é a IA da xAI e é cobrado por uso. Para ativar, crie uma chave em **console.x.ai**, adicione `XAI_API_KEY` na Vercel (Production) e reimplante. Por padrão ele entra depois do Gemini e do Groq; para usá-lo primeiro, defina `AI_PROVIDER=grok,gemini,groq`.
 
+### Videoaulas dentro do site
+
+A aba Videoaulas e o card "Videoaula" de cada módulo tocam o vídeo do YouTube aqui mesmo (player incorporado). A função `api/videos.js` procura primeiro no canal **Khan Academy Brasil** (Biologia, Química, Física e Matemática) e, se não achar, busca no YouTube em geral. Cada tema fica 7 dias em cache na Vercel.
+
+Funciona sem configuração, mas para ficar mais estável crie uma chave gratuita da **YouTube Data API v3** no Google Cloud Console e adicione `YOUTUBE_API_KEY` na Vercel (Production). A cota gratuita (10 mil unidades por dia, cerca de 100 buscas) sobra, por causa do cache.
+
 ### Correção automática de redação (sem IA)
 
 O corretor de redação também tem uma **correção automática** que funciona sempre, mesmo sem nenhuma chave: confere tamanho, parágrafos, informalidade, repertório, conectivos, palavras repetidas e os 5 elementos da proposta de intervenção. A ortografia e a gramática são revisadas pelo serviço público gratuito do [LanguageTool](https://languagetool.org). Se a Easier estiver com muita demanda, essa correção aparece no lugar.

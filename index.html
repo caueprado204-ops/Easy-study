@@ -238,6 +238,29 @@ td .sub{display:block;font-size:12px;color:var(--muted)}
 .lesson .thumb .h-big{font-size:18px;max-width:80%}
 .lesson .body{padding:12px 14px 14px;display:flex;flex-direction:column;gap:8px;flex:1}
 .lesson .body .foot{margin-top:auto;display:flex;gap:8px;flex-wrap:wrap}
+.lesson .thumb.has-img{background-size:cover!important;background-position:center!important;cursor:pointer}
+.lesson .thumb.has-img::before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,0) 35%,rgba(0,0,0,.72))}
+.lesson .thumb.has-img .h-big{color:#fff;position:relative}
+.lesson .thumb .play{border:0;cursor:pointer;z-index:1}
+.lesson .vsrc{font-size:12px;color:var(--muted)}
+.vmodal{position:fixed;inset:0;z-index:80;background:rgba(20,18,30,.72);display:grid;place-items:center;padding:16px}
+.vmodal[hidden]{display:none}
+.vbox{background:var(--white);border-radius:22px;width:min(980px,100%);max-height:calc(100vh - 32px);overflow:auto;border:1.5px solid var(--line)}
+.vhead{display:flex;gap:12px;align-items:flex-start;justify-content:space-between;padding:16px 18px 10px}
+.vhead h3{font-size:18px;margin:2px 0 0}
+.vclose{border:1.5px solid var(--line);background:var(--white);border-radius:50%;width:38px;height:38px;cursor:pointer;font-size:20px;line-height:1;flex:none}
+.vplayer{position:relative;aspect-ratio:16/9;background:#000;margin:0 18px;border-radius:14px;overflow:hidden}
+.vplayer iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+.vplayer .vmsg{position:absolute;inset:0;display:grid;place-items:center;color:#fff;text-align:center;padding:20px}
+.vinfo{padding:12px 18px;display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.valts{padding:0 18px 18px;display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:10px}
+.valt{border:1.5px solid var(--line);border-radius:12px;background:var(--white);padding:0;text-align:left;cursor:pointer;overflow:hidden;font:inherit}
+.valt.on{border-color:var(--violet);box-shadow:0 0 0 2px var(--violet)}
+.valt img{display:block;width:100%;aspect-ratio:16/9;object-fit:cover}
+.valt span{display:block;padding:6px 8px;font-size:12px;line-height:1.3}
+.vprev{display:block;position:relative;border-radius:12px;overflow:hidden;border:1.5px solid var(--line);aspect-ratio:16/9;background:var(--ink) center/cover;cursor:pointer;width:100%;padding:0}
+.vprev i{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:48px;height:48px;border-radius:50%;background:var(--orange);display:grid;place-items:center}
+.vprev b{position:absolute;left:0;right:0;bottom:0;padding:18px 10px 8px;color:#fff;font-size:12px;text-align:left;background:linear-gradient(180deg,transparent,rgba(0,0,0,.75))}
 .done-tag{font-size:12px;font-weight:700;color:var(--ok)}
 
 /* questões */
@@ -469,6 +492,7 @@ select,.inp{border:1.5px solid var(--line);border-radius:10px;padding:7px 10px;b
     </main>
   </div>
 </div>
+<div class="vmodal" id="vmodal" hidden role="dialog" aria-modal="true" aria-label="Videoaula"><div class="vbox" id="vbox"></div></div>
 <div class="toast" id="toast" hidden></div>
 
 <script>
@@ -1286,6 +1310,8 @@ function render(){
   const map={planos:vPlanos,conta:vConta,painel:vPainel,modulos:vModulos,aulas:vAulas,questoes:vQuestoes,simulados:vSimulados,redacao:vRedacao,rotina:vRotina,foco:vFoco};
   document.getElementById("view").innerHTML=map[VIEW]();
   if(VIEW==="foco")paintPomo();
+  if(VIEW==="aulas")prepararThumbs();
+  if(VIEW==="modulos"&&modState.id&&MODMAP[modState.id]&&!VCACHE[modState.id])getVideos(modState.id).then(c=>{const el=document.querySelector(".vprev[data-play]");if(c&&el&&el.dataset.play===modState.id)el.outerHTML=vPrevHTML(modState.id);});
 }
 function subjProgress(s){const ms=MOD[s]||[];const done=ms.filter((m,i)=>S.modDone[s+"#"+i]).length;const st=qStats().by[s];return{done,total:ms.length,acc:st?Math.round(st.ok/st.t*100):null,qn:st?st.t:0};}
 function nextModule(s){const ms=MOD[s]||[];const i=ms.findIndex((m,i)=>!S.modDone[s+"#"+i]);return s+"#"+(i<0?0:i);}
@@ -1445,6 +1471,7 @@ function vReader(m){
       </div>
     </div>
     <aside class="side">
+      <div class="card"><h4>Videoaula</h4>${vPrevHTML(m.id)}<p class="small muted" style="margin:8px 0 0">${KHAN_SUBJ.includes(m.s)?"Khan Academy Brasil":"Aula do YouTube"}, sem sair do Easy Study.</p></div>
       <div class="card"><h4>Tire uma dúvida</h4>
         <form class="ask" id="askForm"><input class="inp" id="askInput" placeholder="Ex.: o que é codominância?" value="${esc(modState.ask)}"><button class="btn sm" ${modState.askBusy?"disabled":""}>Perguntar</button></form>
         <div id="askOut">${modState.askOut?`<div class="ai-out small">${mdBlock(modState.askOut)}</div>`:""}</div>
@@ -1510,6 +1537,51 @@ async function askQuestion(){
   modState.askBusy=false; if(VIEW==="modulos")render();
 }
 
+/* videoaulas: player dentro do site (Khan Academy Brasil primeiro, depois YouTube em geral) */
+const VKEY="easystudy.videos.v1";let VCACHE={};try{VCACHE=JSON.parse(localStorage.getItem(VKEY)||"{}");}catch(e){}
+const KHAN_SUBJ=["Biologia","Química","Física","Matemática"];
+const VPEND={};let vState={id:null,i:0};
+function vQuery(m){const t=m.t.replace(/\s+(I|II|III)(?=[:\s]|$)/g,"").replace(/\s+—\s+/g,": ");const parts=t.split(":");
+  return {q:t.replace(/:/g,""),alt:(parts[1]||parts[0]).trim(),geral:`${t.replace(/:/g,"")} ${m.s==="Redação"?"redação":m.s} aula ${(SUBJ[m.s]||{}).ch||""}`.trim(),khan:KHAN_SUBJ.includes(m.s)?1:0};}
+function getVideos(id){
+  const c=VCACHE[id];if(c&&c.videos?.length&&Date.now()-c.t<14*864e5)return Promise.resolve(c);
+  if(VPEND[id])return VPEND[id];
+  const m=MODMAP[id];if(!m)return Promise.resolve(null);const vq=vQuery(m);
+  return VPEND[id]=fetch(`/api/videos?q=${encodeURIComponent(vq.q)}&alt=${encodeURIComponent(vq.alt)}&geral=${encodeURIComponent(vq.geral)}&khan=${vq.khan}`)
+    .then(r=>r.ok?r.json():null).then(j=>{delete VPEND[id];if(j&&j.videos?.length){VCACHE[id]={...j,t:Date.now()};try{localStorage.setItem(VKEY,JSON.stringify(VCACHE));}catch(e){}return VCACHE[id];}return null;})
+    .catch(()=>{delete VPEND[id];return null;});
+}
+const ytThumb=v=>`https://i.ytimg.com/vi/${v.id}/mqdefault.jpg`;
+function abrirVideo(id){vState={id,i:0};const box=document.getElementById("vmodal");box.hidden=false;document.body.style.overflow="hidden";paintVideo(true);
+  getVideos(id).then(()=>{if(vState.id===id)paintVideo();});}
+function fecharVideo(){const box=document.getElementById("vmodal");box.hidden=true;document.getElementById("vbox").innerHTML="";document.body.style.overflow="";vState={id:null,i:0};if(VIEW==="aulas"||VIEW==="modulos")render();}
+function paintVideo(loading){
+  const id=vState.id,m=MODMAP[id];if(!m)return;const c=VCACHE[id],vs=c?.videos||[],v=vs[vState.i];
+  const busca=ytURL(m.t,m.s);
+  document.getElementById("vbox").innerHTML=`<div class="vhead"><div><span class="chip" style="background:${subjColor(m.s)}">${esc(m.s)}</span><h3>${esc(m.t)}</h3></div><button class="vclose" data-vclose aria-label="Fechar">×</button></div>
+  <div class="vplayer">${v?`<iframe src="https://www.youtube-nocookie.com/embed/${v.id}?rel=0&modestbranding=1&autoplay=1&hl=pt-BR&cc_lang_pref=pt" title="${esc(v.titulo)}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>`
+    :`<div class="vmsg">${loading&&!c?"Procurando a melhor videoaula…":`<div>Não conseguimos carregar a videoaula agora.<br><a class="btn sm lime" style="margin-top:12px" href="${busca}" target="_blank" rel="noopener">Procurar no YouTube</a></div>`}</div>`}</div>
+  ${v?`<div class="vinfo"><div style="flex:1;min-width:200px"><b>${esc(v.titulo)}</b><div class="small muted">${esc(v.canal||"")}${v.dur?" · "+esc(v.dur):""}${c.fonte==="khan"?" · Khan Academy Brasil":""}</div></div>
+    ${S.watched[id]?`<span class="done-tag">Assistida</span>`:`<button class="btn sm" data-watch="${esc(id)}">Marcar assistida (+10 XP)</button>`}
+    <button class="btn sm ghost" data-vclose data-mod="${esc(id)}">Ler módulo</button></div>
+  ${vs.length>1?`<div class="small muted" style="padding:0 18px 8px;font-weight:700">Outras aulas sobre o tema</div><div class="valts">${vs.map((x,i)=>`<button class="valt ${i===vState.i?"on":""}" data-vpick="${i}"><img src="${ytThumb(x)}" alt="" loading="lazy"><span>${esc(x.titulo)}</span></button>`).join("")}</div>`:""}`:""}`;
+}
+function vPrevHTML(id){const c=VCACHE[id],v=c?.videos?.[0];
+  return `<button class="vprev" data-play="${esc(id)}" style="${v?`background-image:url(${ytThumb(v)})`:""}" aria-label="Assistir videoaula"><i><svg width="16" height="16" viewBox="0 0 24 24" fill="#FFF"><path d="M7 4l14 8-14 8z"/></svg></i><b>${v?esc(v.titulo):"Assistir videoaula aqui"}</b></button>`;}
+let vObs=null;
+function prepararThumbs(){
+  if(vObs)vObs.disconnect();const fila=[];let ativos=0;
+  const roda=()=>{while(ativos<2&&fila.length){const el=fila.shift();const id=el.dataset.thumb;ativos++;getVideos(id).then(c=>{ativos--;const v=c?.videos?.[0];
+    if(v&&el.isConnected){el.classList.add("has-img");el.style.backgroundImage=`url(${ytThumb(v)})`;const src=el.closest(".lesson")?.querySelector(".vsrc");if(src)src.textContent=(c.fonte==="khan"?"Khan Academy Brasil":v.canal||"YouTube")+(v.dur?" · "+v.dur:"");}roda();});}};
+  const els=[...document.querySelectorAll("[data-thumb]")];
+  els.forEach(el=>{const v=VCACHE[el.dataset.thumb]?.videos?.[0];if(v){el.classList.add("has-img");el.style.backgroundImage=`url(${ytThumb(v)})`;}});
+  if(!("IntersectionObserver" in window))return;
+  vObs=new IntersectionObserver(en=>{en.forEach(x=>{if(x.isIntersecting){vObs.unobserve(x.target);if(!VCACHE[x.target.dataset.thumb]){fila.push(x.target);roda();}}});},{rootMargin:"200px"});
+  els.forEach(el=>vObs.observe(el));
+}
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&vState.id)fecharVideo();});
+document.addEventListener("click",e=>{if(e.target.id==="vmodal"){fecharVideo();return;}const th=e.target.closest("[data-thumb]");if(th&&!e.target.closest("button"))abrirVideo(th.dataset.thumb);});
+
 /* aulas */
 let aulaFilter="Todas";
 const ytURL=(t,s)=>"https://www.youtube.com/results?search_query="+encodeURIComponent(t+" "+(SUBJ[s]?.ch||"")+" vestibular");
@@ -1518,11 +1590,11 @@ function vAulas(){
   return `<div class="row-head" style="margin-top:4px"><h1 class="h-sec">Videoaulas</h1><span class="small muted num">${w}/${ALL_MODS.length} assistidas</span></div>
   <div class="pills" style="margin-bottom:16px">${["Todas",...SUBJECT_KEYS].map(s=>`<button class="pill ${s===aulaFilter?"on":""}" data-aula="${esc(s)}">${esc(s)}</button>`).join("")}</div>
   <div class="grid lessons">${list.map(t=>`
-    <article class="lesson"><div class="thumb" style="background:${subjColor(t.s)}"><a class="play" href="${ytURL(t.t,t.s)}" target="_blank" rel="noopener" aria-label="Assistir ${esc(t.t)} no YouTube"><svg width="16" height="16" viewBox="0 0 24 24" fill="#FFF"><path d="M7 4l14 8-14 8z"/></svg></a><h3 class="h-big">${esc(t.t)}</h3></div>
-      <div class="body"><div><span class="chip">${esc(t.s)}</span></div><div class="small muted">${esc(t.d)}</div><div class="small">Canal sugerido: <b>${esc(SUBJ[t.s].ch)}</b></div>
-        <div class="foot"><a class="btn sm" href="${ytURL(t.t,t.s)}" target="_blank" rel="noopener">Assistir</a><button class="btn sm ghost" data-mod="${t.id}">Ler módulo</button>
+    <article class="lesson"><div class="thumb" data-thumb="${esc(t.id)}" data-play="${esc(t.id)}" style="background:${subjColor(t.s)}"><button class="play" data-play="${esc(t.id)}" aria-label="Assistir ${esc(t.t)}"><svg width="16" height="16" viewBox="0 0 24 24" fill="#FFF"><path d="M7 4l14 8-14 8z"/></svg></button><h3 class="h-big">${esc(t.t)}</h3></div>
+      <div class="body"><div><span class="chip">${esc(t.s)}</span></div><div class="small muted">${esc(t.d)}</div><div class="vsrc">${KHAN_SUBJ.includes(t.s)?"Khan Academy Brasil":"YouTube · "+esc(SUBJ[t.s].ch)}</div>
+        <div class="foot"><button class="btn sm" data-play="${esc(t.id)}">Assistir</button><button class="btn sm ghost" data-mod="${t.id}">Ler módulo</button>
           ${S.watched[t.id]?`<span class="done-tag" style="align-self:center">Assistida</span>`:`<button class="btn sm ghost" data-watch="${esc(t.id)}">Marcar assistida</button>`}</div></div></article>`).join("")}</div>
-  <p class="note" style="margin-top:14px">O YouTube abre em outra aba com a busca da aula no canal sugerido. Vídeos não podem tocar dentro desta página.</p>`;
+  <p class="note" style="margin-top:14px">As videoaulas tocam aqui mesmo. Biologia, Química, Física e Matemática vêm do canal Khan Academy Brasil; nas outras matérias, buscamos a aula mais relevante no YouTube.</p>`;
 }
 
 /* questões */
@@ -1889,6 +1961,9 @@ document.addEventListener("click",e=>{
   if(d.landing!==undefined){showLanding(true);try{history.replaceState(null,"","#inicio");}catch(e){}return;}
   if(d.go){e.preventDefault();go(d.go);return;}
   if(d.area){areaFilter=d.area;render();return;}
+  if(d.vclose!==undefined){fecharVideo();if(d.mod)openModule(d.mod);return;}
+  if(d.vpick!==undefined){vState.i=+d.vpick;paintVideo();return;}
+  if(d.play){e.preventDefault();abrirVideo(d.play);return;}
   if(d.mod){openModule(d.mod);return;}
   if(d.modhome!==undefined){modState={...modState,s:null,id:null,search:""};render();return;}
   if(d.subjopen){modState={...modState,s:d.subjopen,id:null,search:""};go("modulos");return;}
@@ -1899,7 +1974,7 @@ document.addEventListener("click",e=>{
   if(d.subject){qf={s:d.subject,y:"Todos",pend:false};rebuildQ();go("questoes");return;}
   if(d.openq){qf={s:"Todas",y:"Todos",pend:false};rebuildQ(d.openq);go("questoes");return;}
   if(d.aula){aulaFilter=d.aula;render();return;}
-  if(d.watch){S.watched[d.watch]=1;addXP(10);render();toast("+10 XP");return;}
+  if(d.watch){S.watched[d.watch]=1;addXP(10);render();if(vState.id)paintVideo();toast("+10 XP");return;}
   if(d.clearsearch!==undefined){modState.search="";document.getElementById("searchInput").value="";render();return;}
   if(d.ans!==undefined){const q=QMAP[d.qid],i=+d.ans;
     if(d.mode==="train"){if(S.ans[q.id]!==undefined)return;S.ans[q.id]=i;addXP(i===q.k?10:5,"q");render();}
