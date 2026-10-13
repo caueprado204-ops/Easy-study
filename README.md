@@ -84,11 +84,10 @@ O login, os perfis (curso foco, faculdade, vestibulares e metas), o progresso na
 
 Tabelas: `perfis`, `assinaturas` (plano de cada aluno), `progresso` e `uso_ia` (consumo do mês). Todas com RLS: o aluno só lê os próprios dados e não consegue mudar o próprio plano nem o consumo.
 
-Limites por mês (iguais no site e em `api/easier.js`):
+Não há plano grátis: a conta nova começa sem plano e só a aba Planos e Minha conta ficam liberadas até o plano ser ativado. Limites por mês (iguais no site e em `api/easier.js`):
 
 | Plano | Preço | Usos da Easier | Correções de redação com IA |
 |---|---|---|---|
-| Grátis | R$ 0 | 30 | 2 |
 | Foco | R$ 24,90 | 200 | 10 |
 | Medicina Pro | R$ 44,90 | 350 | 20 |
 
@@ -101,7 +100,7 @@ update public.assinaturas set plano = 'foco', valido_ate = current_date + 31, at
 where user_id = (select id from auth.users where email = 'email-do-aluno@exemplo.com');
 ```
 
-Troque `foco` por `medicina` para o Medicina Pro. Quando `valido_ate` passa, o aluno volta automaticamente ao Grátis.
+Troque `foco` por `medicina` para o Medicina Pro. Quando `valido_ate` passa, a plataforma volta a ficar bloqueada até a renovação (o progresso continua salvo).
 
 Contato para assinar: preencha `CONTATO` no `index.html` com seu WhatsApp (só números, com 55 e DDD) e/ou e-mail.
 

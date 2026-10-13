@@ -34,7 +34,6 @@ function limited(ip) {
 /* ---------- Contas e limites por plano (Supabase) ---------- */
 // Os mesmos números aparecem na aba Planos do site.
 const PLANOS = {
-  gratis: { usos: 30, redacoes: 2 },
   foco: { usos: 200, redacoes: 10 },
   medicina: { usos: 350, redacoes: 20 },
 };
@@ -56,8 +55,8 @@ async function usuarioDoToken(token) {
 async function planoDoUsuario(id) {
   const r = await fetch(`${SB_URL}/rest/v1/assinaturas?user_id=eq.${id}&select=plano,valido_ate`, { headers: sbHeaders() });
   const [a] = r.ok ? await r.json() : [];
-  if (!a || !PLANOS[a.plano]) return "gratis";
-  if (a.valido_ate && new Date(a.valido_ate + "T23:59:59-03:00") < new Date()) return "gratis";
+  if (!a || !PLANOS[a.plano]) return null; // sem plano ativo
+  if (a.valido_ate && new Date(a.valido_ate + "T23:59:59-03:00") < new Date()) return null; // plano vencido
   return a.plano;
 }
 async function rpc(nome, body) {
@@ -96,7 +95,11 @@ export default async function handler(req, res) {
     }
     const b0 = typeof req.body === "string" ? safeJSON(req.body) : req.body || {};
     const tipo = b0?.tipo === "redacao" ? "redacao" : "uso";
-    const plano = await planoDoUsuario(user.id).catch(() => "gratis");
+    const plano = await planoDoUsuario(user.id).catch(() => null);
+    if (!plano) {
+      res.status(403).json({ code: "no_plan" });
+      return;
+    }
     const lim = PLANOS[plano];
     const c = await rpc("consumir_ia", { p_user: user.id, p_tipo: tipo, p_limite_usos: lim.usos, p_limite_redacoes: lim.redacoes });
     if (!c) {

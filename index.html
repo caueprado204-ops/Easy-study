@@ -361,6 +361,8 @@ select,.inp{border:1.5px solid var(--line);border-radius:10px;padding:7px 10px;b
 .plan-cards ul{margin:0;padding-left:18px;font-size:13.5px;display:flex;flex-direction:column;gap:4px}
 .plan-cards .l-cta{margin-top:auto;padding:12px}
 .cur-plan{margin-top:auto;align-self:flex-start;background:var(--white);color:var(--ink);border-radius:999px;padding:7px 14px;font-weight:700;font-size:13px}
+.paywall{background:var(--lime);margin-bottom:14px}
+.plan-cards{grid-template-columns:repeat(2,minmax(0,1fr))!important;max-width:900px}
 .usage-card{display:flex;flex-direction:column;gap:12px;margin-bottom:14px}
 .ubs{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
 .ub .bar{margin-top:4px}
@@ -1058,7 +1060,7 @@ function renderLanding(){
         <span class="half" style="right:-40px;top:40px"></span><span class="half" style="right:60px;top:40px;opacity:.7"></span>
         <h1 class="h-big">Plataforma<br><em>de estudos</em><br>para quem quer<br>Medicina</h1>
         <p>ENEM, FUVEST, Unicamp, Unesp e Provão Paulista: módulos completos, questões reais e uma rotina que cabe na sua semana.</p>
-        <button class="l-cta" ${ACC?"data-enter":"data-enter-signup"}>${ACC?"Continuar estudando":"Criar conta grátis"}</button>
+        <button class="l-cta" ${ACC?"data-enter":"data-enter-signup"}>${ACC?"Continuar estudando":"Criar minha conta"}</button>
       </div>
       <div class="l-small"><span>60 módulos em<br>9 matérias</span><hr><span>${nq} questões reais do ENEM</span></div>
       <div class="l-photo" aria-hidden="true">
@@ -1120,8 +1122,8 @@ function showLanding(on){
   window.scrollTo({top:0});
 }
 const NAV_ORDER=["painel","modulos","aulas","questoes","simulados","redacao","rotina","foco","planos","conta"];
-function buildNav(){document.getElementById("nav").innerHTML=NAV_ORDER.map(k=>`<button data-go="${k}" aria-label="${LABEL[k]}" class="${k===VIEW?"on":""}">${svg(I[k])}<span class="tip">${LABEL[k]}</span></button>`).join("")+`<span class="sep"></span><button class="navbtn" data-logout aria-label="Sair da conta">${svg('<path d="M15 4h4v16h-4"/><path d="M10 8l-4 4 4 4M6 12h10"/>')}<span class="tip">Sair da conta</span></button>`;}
-function go(v){VIEW=v;buildNav();render();try{history.replaceState(null,"","#"+v);}catch(e){}window.scrollTo({top:0});}
+function buildNav(){const livre=!ACC||planoAtual();document.getElementById("nav").innerHTML=NAV_ORDER.filter(k=>livre||VIEWS_SEM_PLANO.includes(k)).map(k=>`<button data-go="${k}" aria-label="${LABEL[k]}" class="${k===VIEW?"on":""}">${svg(I[k])}<span class="tip">${LABEL[k]}</span></button>`).join("")+`<span class="sep"></span><button class="navbtn" data-logout aria-label="Sair da conta">${svg('<path d="M15 4h4v16h-4"/><path d="M10 8l-4 4 4 4M6 12h10"/>')}<span class="tip">Sair da conta</span></button>`;}
+function go(v){if(ACC&&!planoAtual()&&!VIEWS_SEM_PLANO.includes(v)){toast("Assine um plano para liberar a plataforma.");v="planos";}VIEW=v;buildNav();render();try{history.replaceState(null,"","#"+v);}catch(e){}window.scrollTo({top:0});}
 function paintTop(){
   const el=document.getElementById("topStreak"); if(!el) return;
   el.innerHTML=FLAME+`<span class="num">${streak()} ${streak()===1?"dia":"dias"}</span>`;
@@ -1174,7 +1176,7 @@ function getSample(){
 }
 // Mensagem amigável para o aluno; o motivo técnico fica só no console do navegador.
 const errMsg=e=>{if(e&&(e.detail||e.code))console.warn("[Easier]",e.code,e.detail||"");return errCopy(e&&e.code);};
-const errCopy=c=>({not_granted:"Você não autorizou a Easier nesta página. Recarregue e permita para usar este recurso.",rate_limited:"A Easier está com muita demanda agora. Espere um minutinho e tente de novo.",no_key:"A Easier está em manutenção no momento. Tente de novo mais tarde.",limit_reached:"Você usou todos os usos da Easier do seu plano neste mês. Veja a aba Planos para continuar. A correção automática de redação continua liberada.",login_required:"Entre na sua conta para usar a Easier."}[c]||"A Easier está com muita demanda agora. Tente de novo em instantes.");
+const errCopy=c=>({not_granted:"Você não autorizou a Easier nesta página. Recarregue e permita para usar este recurso.",rate_limited:"A Easier está com muita demanda agora. Espere um minutinho e tente de novo.",no_key:"A Easier está em manutenção no momento. Tente de novo mais tarde.",limit_reached:"Você usou todos os usos da Easier do seu plano neste mês. Eles renovam no dia 1º, ou você pode mudar para o Medicina Pro na aba Planos. A correção automática de redação continua liberada.",login_required:"Entre na sua conta para usar a Easier.",no_plan:"Seu plano não está ativo. Assine um plano na aba Planos para usar a Easier."}[c]||"A Easier está com muita demanda agora. Tente de novo em instantes.");
 function mdBlock(t){
   const lines=esc(t).split("\n"); let out="",inList=false;
   const inline=s=>s.replace(/\*\*(.+?)\*\*/g,"<strong>$1</strong>").replace(/(^|\s)\*(?!\s)(.+?)\*/g,"$1<em>$2</em>");
@@ -1843,9 +1845,8 @@ const SUPA_URL="https://gqncndoiuitharlgrznr.supabase.co";
 const SUPA_KEY="sb_publishable_eTHs4clz9v_Q3mxicuKsmQ_H66lKv2z";
 // Os mesmos limites estão no servidor (api/easier.js)
 const PLANS={
-  gratis:{nome:"Grátis",preco:0,usos:30,redacoes:2,cls:"pg-v",desc:"Para conhecer a plataforma e manter a constância.",itens:["Todos os módulos, questões e simulados","Correção automática de redação ilimitada","30 usos da Easier por mês","2 correções de redação com a Easier por mês"]},
-  foco:{nome:"Foco",preco:24.90,usos:200,redacoes:10,cls:"pg-p",desc:"Para quem estuda todo dia e quer a Easier por perto.",itens:["Tudo do plano Grátis","200 usos da Easier por mês","10 correções de redação com a Easier por mês","Aulas completas e dúvidas sem aperto"]},
-  medicina:{nome:"Medicina Pro",preco:44.90,usos:350,redacoes:20,cls:"pg-v",desc:"Para a reta final de Medicina, com redação toda semana.",itens:["Tudo do plano Foco","350 usos da Easier por mês","20 correções de redação com a Easier por mês","Ideal para treinar uma redação a cada 2 dias"]}
+  foco:{nome:"Foco",preco:24.90,usos:200,redacoes:10,cls:"pg-v",desc:"Para quem estuda todo dia e quer a Easier por perto.",itens:["Todos os módulos, questões, simulados e rotina","Correção automática de redação ilimitada","200 usos da Easier por mês","10 correções de redação com a Easier por mês","Aulas completas e dúvidas sem aperto"]},
+  medicina:{nome:"Medicina Pro",preco:44.90,usos:350,redacoes:20,cls:"pg-p",desc:"Para a reta final de Medicina, com redação toda semana.",itens:["Tudo do plano Foco","350 usos da Easier por mês","20 correções de redação com a Easier por mês","Ideal para treinar uma redação a cada 2 dias"]}
 };
 // Contato para assinar (preencha com o seu WhatsApp, só números com DDI e DDD, e/ou e-mail)
 const CONTATO={whatsapp:"",email:""};
@@ -1857,7 +1858,8 @@ let sb=null, ACC=null, authMode="login", authMsg="", authBusy=false, cloudTimer=
 try{ if(window.supabase) sb=window.supabase.createClient(SUPA_URL,SUPA_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}}); }catch(e){console.warn("[contas]",e);}
 const brl=v=>v===0?"R$ 0":"R$ "+v.toFixed(2).replace(".",",");
 const mesAtual=()=>{const d=new Date();return d.getFullYear()+"-"+pad(d.getMonth()+1);};
-const planoAtual=()=>{const p=ACC?.assinatura;if(!p||!PLANS[p.plano])return "gratis";if(p.valido_ate&&new Date(p.valido_ate+"T23:59:59-03:00")<new Date())return "gratis";return p.plano;};
+const planoAtual=()=>{const p=ACC?.assinatura;if(!p||!PLANS[p.plano])return null;if(p.valido_ate&&new Date(p.valido_ate+"T23:59:59-03:00")<new Date())return null;return p.plano;};
+const VIEWS_SEM_PLANO=["planos","conta"];
 
 function userKey(){return ACC?.user?.id?KEY+":"+ACC.user.id:KEY;}
 function loadLocalFor(id){try{const raw=localStorage.getItem(KEY+":"+id);return raw?JSON.parse(raw):null;}catch(e){return null;}}
@@ -1871,7 +1873,7 @@ async function carregarConta(user){
     sb.from("progresso").select("dados,atualizado_em").eq("user_id",user.id).maybeSingle()
   ]);
   ACC.perfil=p.data||{nome:user.user_metadata?.nome||"",curso_foco:"Medicina",faculdade:"",vestibulares:[],meta_horas_semana:20,meta_texto:""};
-  ACC.assinatura=a.data||{plano:"gratis"};
+  ACC.assinatura=a.data||{plano:"nenhum"};
   if(u.data)ACC.uso=u.data;
   // progresso: usa o mais recente entre nuvem e este aparelho
   const base={name:"",entered:true,act:{},ans:{},watched:{},read:{},modDone:{},lessons:{},routine:[],exams:DEFAULT_EXAMS,sims:[],essays:[],spotify:"",sim:null,essayDraft:"",essayTheme:ESSAY_THEMES[0]};
@@ -1917,8 +1919,8 @@ function renderAuth(){
       <fieldset class="vests"><legend>Vestibulares que vou prestar</legend>${VESTS.map((v,i)=>`<label class="chk"><input type="checkbox" value="${v}" ${i<2?"checked":""}> ${v}</label>`).join("")}</fieldset>
       <div class="two"><label>Meta de estudo (horas por semana)<input class="inp" id="cHoras" type="number" min="1" max="100" value="20"></label><label>Ano da prova<select class="inp" id="cAno"><option>2026</option><option>2027</option><option>2028</option></select></label></div>
       <label>Minha meta<textarea class="inp" id="cMeta" rows="2" maxlength="250" placeholder="Ex.: passar em Medicina na USP e tirar 900+ na redação"></textarea></label>
-      <button class="l-cta" ${authBusy?"disabled":""}>${authBusy?"Criando conta…":"Criar conta grátis"}</button>
-      <p class="note" style="margin:0">Ao criar a conta você começa no plano Grátis. Dá para mudar de plano quando quiser.</p></form>
+      <button class="l-cta" ${authBusy?"disabled":""}>${authBusy?"Criando conta…":"Criar conta"}</button>
+      <p class="note" style="margin:0">Depois de criar a conta, você escolhe o plano Foco ou Medicina Pro para liberar a plataforma.</p></form>
       <datalist id="faculList">${FACULDADES.map(f=>`<option value="${f}">`).join("")}</datalist>`;
   else if(authMode==="recuperar") body=`<form id="resetForm" class="form"><p class="small" style="margin:0">Enviaremos um link para você criar uma nova senha.</p>
       <label>E-mail<input class="inp" id="rEmail" type="email" autocomplete="email" required></label>
@@ -1951,7 +1953,7 @@ async function cadastrar(dados){authBusy=true;authMsg="";renderAuth();
   if(!data.session){authMode="login";authMsg="✓ Conta criada! Enviamos um link de confirmação para "+dados.email+". Confirme e depois entre.";renderAuth();}}
 async function sair(){try{await salvarNuvem();}catch(e){}await sb.auth.signOut();ACC=null;S={name:"",entered:false,act:{},ans:{},watched:{},read:{},modDone:{},lessons:{},routine:[],exams:DEFAULT_EXAMS,sims:[],essays:[],spotify:"",sim:null,essayDraft:"",essayTheme:ESSAY_THEMES[0]};hideAuth();showLanding(true);try{history.replaceState(null,"","#inicio");}catch(e){}toast("Você saiu da conta.");}
 
-function abrirApp(){hideAuth();showLanding(false);buildNav();paintTop();render();try{history.replaceState(null,"","#"+VIEW);}catch(e){}}
+function abrirApp(){if(!planoAtual()&&!VIEWS_SEM_PLANO.includes(VIEW))VIEW="planos";hideAuth();showLanding(false);buildNav();paintTop();render();try{history.replaceState(null,"","#"+VIEW);}catch(e){}}
 
 document.addEventListener("submit",async e=>{const f=e.target;
   if(f.id==="loginForm"){e.preventDefault();e.stopImmediatePropagation();entrar(lEmail.value.trim(),lSenha.value);}
@@ -1985,22 +1987,23 @@ function planCardsHTML(ctaLanding){
   const atual=ACC?planoAtual():null;
   return `<div class="progs plan-cards">${Object.entries(PLANS).map(([k,p])=>`
     <div class="pg ${p.cls}">
-      <div class="tags">${k==="foco"?"<span>Mais escolhido</span>":""}<span>${p.usos} usos/mês</span><span>${p.redacoes} redações/mês</span></div>
+      <div class="tags">${k==="medicina"?"<span>Mais completo</span>":""}<span>${p.usos} usos/mês</span><span>${p.redacoes} redações/mês</span></div>
       <h3>${p.nome}</h3>
       <div class="price"><b class="num">${brl(p.preco)}</b>${p.preco?"<span>/mês</span>":""}</div>
       <p>${p.desc}</p>
       <ul>${p.itens.map(i=>`<li>${esc(i)}</li>`).join("")}</ul>
-      ${ctaLanding?`<button class="l-cta" data-enter-signup>${p.preco?"Começar grátis":"Criar conta grátis"}</button>`
+      ${ctaLanding?`<button class="l-cta" data-enter-signup>Assinar ${p.nome}</button>`
         :atual===k?`<span class="cur-plan">Seu plano atual</span>`:p.preco?`<button class="l-cta" data-assinar="${k}">Assinar ${p.nome}</button>`:""}
     </div>`).join("")}</div>`;
 }
 function vPlanos(){
-  const k=planoAtual(),p=PLANS[k],u=ACC?.uso||{usos:0,redacoes:0};
-  return `<div class="row-head" style="margin-top:4px"><h1 class="h-sec">Planos</h1><span class="small muted">Os limites renovam todo dia 1º</span></div>
-  <div class="card usage-card">
-    <div><span class="chip dark">${esc(p.nome)}</span>${ACC?.assinatura?.valido_ate&&k!=="gratis"?`<span class="small muted" style="margin-left:8px">válido até ${new Date(ACC.assinatura.valido_ate+"T12:00").toLocaleDateString("pt-BR")}</span>`:""}</div>
-    ${usageBars(u,p)}
-  </div>
+  const k=planoAtual(),p=k?PLANS[k]:null,u=ACC?.uso||{usos:0,redacoes:0};
+  const venc=ACC?.assinatura?.valido_ate&&ACC.assinatura.plano!=="nenhum"&&!k;
+  return `<div class="row-head" style="margin-top:4px"><h1 class="h-sec">${k?"Planos":"Escolha seu plano"}</h1><span class="small muted">Os limites da Easier renovam todo dia 1º</span></div>
+  ${k?`<div class="card usage-card">
+    <div><span class="chip dark">${esc(p.nome)}</span>${ACC?.assinatura?.valido_ate?`<span class="small muted" style="margin-left:8px">válido até ${new Date(ACC.assinatura.valido_ate+"T12:00").toLocaleDateString("pt-BR")}</span>`:""}</div>
+    ${usageBars(u,p)}</div>`
+  :`<div class="card paywall"><b>${venc?"Seu plano venceu.":"Falta só um passo."}</b> <span class="small">${venc?"Renove para voltar a estudar com tudo que você já fez salvo na sua conta.":"Assine um plano para liberar módulos, questões, simulados, redação, rotina e a Easier. Seu progresso fica salvo na conta."}</span></div>`}
   ${planCardsHTML(false)}
   <div id="assinarBox"></div>
   <div class="card" style="margin-top:14px"><b>O que conta como uso da Easier</b>
@@ -2017,13 +2020,13 @@ function assinarHTML(k){
   box.innerHTML=`<div class="card" style="margin-top:14px;border-color:var(--violet)"><h3 style="font-size:17px;margin-bottom:6px">Assinar o plano ${esc(p.nome)}</h3>
     ${temContato?`<p class="small" style="margin:0 0 10px">Fale com a equipe, faça o pagamento por Pix e seu plano é liberado em até 24 horas na sua conta (${esc(ACC?.user?.email||"")}).</p>
       <div style="display:flex;gap:8px;flex-wrap:wrap">${CONTATO.whatsapp?`<a class="btn" href="https://wa.me/${CONTATO.whatsapp}?text=${msg}" target="_blank" rel="noopener">Falar no WhatsApp</a>`:""}${CONTATO.email?`<span class="chip" style="padding:6px 10px;user-select:all">${esc(CONTATO.email)}</span>`:""}</div>`
-      :`<p class="small" style="margin:0">As assinaturas pagas abrem em breve. Por enquanto, aproveite o plano Grátis.</p>`}</div>`;
+      :`<p class="small" style="margin:0">As assinaturas abrem em breve. Deixe sua conta criada que avisamos você.</p>`}</div>`;
   box.scrollIntoView({behavior:"smooth",block:"nearest"});
 }
 
 /* ---------- aba Minha conta ---------- */
 function vConta(){
-  const pf=ACC?.perfil||{},k=planoAtual(),p=PLANS[k];
+  const pf=ACC?.perfil||{},k=planoAtual(),p=k?PLANS[k]:null;
   const vs=pf.vestibulares||[];
   return `<div class="row-head" style="margin-top:4px"><h1 class="h-sec">Minha conta</h1><button class="btn sm ghost" data-logout>Sair da conta</button></div>
   <div class="grid forms" style="margin-top:0">
@@ -2037,9 +2040,8 @@ function vConta(){
       <label>Minha meta<textarea class="inp" id="pMeta" rows="2" maxlength="300">${esc(pf.meta_texto||"")}</textarea></label>
       <button class="btn" style="align-self:flex-start">Salvar perfil</button></form>
     <div class="card form"><h3 style="font-size:17px">Plano e consumo</h3>
-      <div><span class="chip dark">${esc(p.nome)}</span></div>
-      ${usageBars(ACC?.uso||{},p)}
-      <button class="btn sm violet" data-go="planos" style="align-self:flex-start">Ver planos</button>
+      ${p?`<div><span class="chip dark">${esc(p.nome)}</span></div>${usageBars(ACC?.uso||{},p)}`:`<p class="small" style="margin:0">Nenhum plano ativo.</p>`}
+      <button class="btn sm violet" data-go="planos" style="align-self:flex-start">${p?"Ver planos":"Assinar um plano"}</button>
       <h3 style="font-size:17px;margin-top:8px">Acesso</h3>
       <p class="small" style="margin:0">E-mail: <b>${esc(ACC?.user?.email||"")}</b></p>
       <p class="small muted" style="margin:0">Seu progresso é salvo na nuvem e aparece em qualquer aparelho em que você entrar.</p>
@@ -2054,7 +2056,7 @@ function metaSemana(){
 }
 function contaStripHTML(){
   if(!ACC)return "";
-  const k=planoAtual(),p=PLANS[k],u=ACC.uso||{},m=metaSemana(),pf=ACC.perfil||{};
+  const k=planoAtual();if(!k)return "";const p=PLANS[k],u=ACC.uso||{},m=metaSemana(),pf=ACC.perfil||{};
   return `<div class="acc-strip">
     <div class="acc-who"><span class="avatar">${esc((pf.nome||"E").trim()[0]?.toUpperCase()||"E")}</span><div><b>${esc(pf.nome||"Estudante")}</b><div class="small muted">${esc(pf.curso_foco||"Medicina")}${pf.faculdade?" · "+esc(pf.faculdade):""}</div></div></div>
     <div class="acc-stat"><span class="small muted">Plano</span><b>${esc(p.nome)}</b></div>
