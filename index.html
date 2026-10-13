@@ -1014,8 +1014,9 @@ function getSample(){
   }
   return samplePromise;
 }
-const errMsg=e=>errCopy(e&&e.code)+(e&&e.detail?" (detalhe: "+e.detail+")":"");
-const errCopy=c=>({not_granted:"Você não autorizou a Easier nesta página. Recarregue e permita para usar este recurso.",rate_limited:"Muitos pedidos seguidos. Espere um minuto e tente de novo.",no_key:"A Easier ainda não foi configurada neste site (falta a chave da API no servidor)."}[c]||"Não foi possível falar com a Easier agora. Tente de novo em instantes.");
+// Mensagem amigável para o aluno; o motivo técnico fica só no console do navegador.
+const errMsg=e=>{if(e&&(e.detail||e.code))console.warn("[Easier]",e.code,e.detail||"");return errCopy(e&&e.code);};
+const errCopy=c=>({not_granted:"Você não autorizou a Easier nesta página. Recarregue e permita para usar este recurso.",rate_limited:"A Easier está com muita demanda agora. Espere um minutinho e tente de novo.",no_key:"A Easier está em manutenção no momento. Tente de novo mais tarde."}[c]||"A Easier está com muita demanda agora. Tente de novo em instantes.");
 function mdBlock(t){
   const lines=esc(t).split("\n"); let out="",inList=false;
   const inline=s=>s.replace(/\*\*(.+?)\*\*/g,"<strong>$1</strong>").replace(/(^|\s)\*(?!\s)(.+?)\*/g,"$1<em>$2</em>");
