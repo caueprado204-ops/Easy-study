@@ -2,10 +2,12 @@
 // Função serverless da Vercel: recebe um prompt do site e devolve a resposta em
 // texto, em streaming. As chaves ficam só no servidor (variáveis de ambiente).
 //
-// Provedores:
-//   - Google Gemini (plano gratuito): defina GEMINI_API_KEY
-//   - Anthropic (pago):               defina ANTHROPIC_API_KEY
-// Se as duas existirem, AI_PROVIDER escolhe ("gemini" ou "anthropic"); o padrão é Gemini.
+// Provedores (configure quantos quiser; a Easier usa o primeiro disponível e,
+// se ele estiver sem cota ou fora do ar, passa automaticamente para o próximo):
+//   - Google Gemini (gratuito): GEMINI_API_KEY
+//   - Groq (gratuito):          GROQ_API_KEY
+//   - Anthropic (pago):         ANTHROPIC_API_KEY
+// AI_PROVIDER define a ordem, por exemplo "gemini,groq,anthropic" (esse é o padrão).
 
 const SYSTEM =
   "Você é a Easier, a tutora de IA da plataforma de estudos Easy Study, focada em vestibulares de Medicina no Brasil (ENEM, FUVEST, Unicamp, Unesp, Provão Paulista). Responda sempre em português do Brasil, com correção científica. Se perguntarem seu nome, diga que é a Easier.";
@@ -24,15 +26,14 @@ function limited(ip) {
   return list.length > MAX_PER_WINDOW;
 }
 
-function pickProvider() {
-  const want = (process.env.AI_PROVIDER || "").toLowerCase();
-  const hasGemini = !!process.env.GEMINI_API_KEY;
-  const hasAnthropic = !!process.env.ANTHROPIC_API_KEY;
-  if (want === "anthropic" && hasAnthropic) return "anthropic";
-  if (want === "gemini" && hasGemini) return "gemini";
-  if (hasGemini) return "gemini";
-  if (hasAnthropic) return "anthropic";
-  return null;
+const KEYS = { gemini: "GEMINI_API_KEY", groq: "GROQ_API_KEY", anthropic: "ANTHROPIC_API_KEY" };
+function providerOrder() {
+  const wanted = (process.env.AI_PROVIDER || "gemini,groq,anthropic")
+    .toLowerCase()
+    .split(",")
+    .map((s) => s.trim());
+  const order = [...new Set([...wanted, "gemini", "groq", "anthropic"])];
+  return order.filter((p) => KEYS[p] && process.env[KEYS[p]]);
 }
 
 export default async function handler(req, res) {
@@ -40,8 +41,8 @@ export default async function handler(req, res) {
     res.status(405).json({ code: "method_not_allowed" });
     return;
   }
-  const provider = pickProvider();
-  if (!provider) {
+  const providers = providerOrder();
+  if (!providers.length) {
     res.status(500).json({ code: "no_key" });
     return;
   }
@@ -57,38 +58,30 @@ export default async function handler(req, res) {
     return;
   }
 
-  let upstream, tried = [];
-  try {
-    if (provider === "gemini") {
-      // Chaves novas do AI Studio (prefixo "AQ.") funcionam na API Interactions;
-      // chaves antigas ("AIza") funcionam na generateContent. Tenta as duas.
-      outer: for (const model of geminiModels()) {
-        for (const api of ["interactions", "generate"]) {
-          upstream = await callGemini(prompt, model, api);
-          tried.push(`${model}/${api}:${upstream.status}`);
-          if (upstream.ok || upstream.status === 429) break outer;
-          const msg = await upstream.text().catch(() => "");
-          console.error(`[easier] gemini ${model}/${api} ${upstream.status}: ${msg.slice(0, 300)}`);
-          upstream._detail = msg;
-        }
+  let ok = null;
+  let last = { status: 502, detail: "" };
+  const tried = [];
+  for (const provider of providers) {
+    try {
+      const r = await PROVIDERS[provider](prompt, tried);
+      if (r.ok) {
+        ok = r;
+        break;
       }
-    } else {
-      upstream = await callAnthropic(prompt);
+      last = r;
+    } catch (e) {
+      tried.push(`${provider}:erro de rede`);
+      last = { status: 502, detail: String(e).slice(0, 200) };
     }
-  } catch (e) {
-    res.status(502).json({ code: "upstream_unreachable", detail: String(e).slice(0, 200) });
-    return;
   }
-  if (!upstream.ok || !upstream.body) {
-    const status = upstream.status === 429 ? 429 : 502;
-    let detail = upstream._detail || "";
-    if (!detail) { try { detail = await upstream.text(); } catch {} }
-    detail = shortError(detail);
-    console.error(`[easier] ${provider} falhou (${tried.join(", ") || upstream.status}): ${detail}`);
+
+  if (!ok) {
+    const status = last.status === 429 ? 429 : 502;
+    const detail = shortError(last.detail);
+    console.error(`[easier] todos os provedores falharam (${tried.join(", ")}): ${detail}`);
     res.status(status).json({
       code: status === 429 ? "rate_limited" : "upstream_error",
-      provider,
-      status: upstream.status,
+      status: last.status,
       detail,
     });
     return;
@@ -97,9 +90,9 @@ export default async function handler(req, res) {
   res.setHeader("Content-Type", "text/plain; charset=utf-8");
   res.setHeader("Cache-Control", "no-store");
   res.setHeader("X-Accel-Buffering", "no");
+  res.setHeader("X-Easier-Provider", ok.provider);
 
-  const extract = provider === "gemini" ? geminiText : anthropicText;
-  const reader = upstream.body.getReader();
+  const reader = ok.response.body.getReader();
   const decoder = new TextDecoder();
   let buffer = "";
   try {
@@ -113,7 +106,9 @@ export default async function handler(req, res) {
         buffer = buffer.slice(idx + 2);
         for (const line of event.split("\n")) {
           if (!line.startsWith("data:")) continue;
-          const text = extract(safeJSON(line.slice(5).trim()));
+          const raw = line.slice(5).trim();
+          if (raw === "[DONE]") continue;
+          const text = ok.extract(safeJSON(raw));
           if (text) res.write(text);
         }
       }
@@ -124,11 +119,66 @@ export default async function handler(req, res) {
   res.end();
 }
 
-/* ---------- Google Gemini ---------- */
-function geminiModels() {
-  const list = [process.env.GEMINI_MODEL, "gemini-3.8-flash", "gemini-flash-latest", "gemini-3.6-flash", "gemini-3.5-flash-lite"];
-  return [...new Set(list.filter(Boolean))];
-}
+// Cada provedor devolve { ok: true, provider, response, extract } ou { ok: false, status, detail }.
+const PROVIDERS = {
+  /* ---------- Google Gemini ---------- */
+  async gemini(prompt, tried) {
+    const models = [...new Set([process.env.GEMINI_MODEL, "gemini-3.8-flash", "gemini-flash-latest", "gemini-3.6-flash", "gemini-3.5-flash-lite"].filter(Boolean))];
+    let last = { ok: false, status: 502, detail: "" };
+    // Chaves novas do AI Studio ("AQ.") funcionam na API Interactions;
+    // chaves antigas ("AIza") funcionam na generateContent. Tenta as duas.
+    for (const model of models) {
+      for (const api of ["interactions", "generate"]) {
+        const r = await callGemini(prompt, model, api);
+        tried.push(`gemini ${model}/${api}:${r.status}`);
+        if (r.ok && r.body) return { ok: true, provider: "gemini", response: r, extract: geminiText };
+        last = { ok: false, status: r.status, detail: await r.text().catch(() => "") };
+        // sem cota: não adianta tentar outros modelos do mesmo projeto
+        if (r.status === 429) return last;
+      }
+    }
+    return last;
+  },
+
+  /* ---------- Groq (API compatível com OpenAI) ---------- */
+  async groq(prompt, tried) {
+    const model = process.env.GROQ_MODEL || "openai/gpt-oss-120b";
+    const r = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+      method: "POST",
+      headers: { "content-type": "application/json", authorization: `Bearer ${process.env.GROQ_API_KEY}` },
+      body: JSON.stringify({
+        model,
+        stream: true,
+        max_tokens: MAX_TOKENS,
+        messages: [
+          { role: "system", content: SYSTEM },
+          { role: "user", content: prompt },
+        ],
+      }),
+    });
+    tried.push(`groq ${model}:${r.status}`);
+    if (r.ok && r.body) return { ok: true, provider: "groq", response: r, extract: openaiText };
+    return { ok: false, status: r.status, detail: await r.text().catch(() => "") };
+  },
+
+  /* ---------- Anthropic ---------- */
+  async anthropic(prompt, tried) {
+    const model = process.env.ANTHROPIC_MODEL || "claude-sonnet-5-5";
+    const r = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        "x-api-key": process.env.ANTHROPIC_API_KEY,
+        "anthropic-version": "2023-06-01",
+      },
+      body: JSON.stringify({ model, max_tokens: MAX_TOKENS, stream: true, system: SYSTEM, messages: [{ role: "user", content: prompt }] }),
+    });
+    tried.push(`anthropic ${model}:${r.status}`);
+    if (r.ok && r.body) return { ok: true, provider: "anthropic", response: r, extract: anthropicText };
+    return { ok: false, status: r.status, detail: await r.text().catch(() => "") };
+  },
+};
+
 function callGemini(prompt, model, api) {
   const headers = { "content-type": "application/json", "x-goog-api-key": process.env.GEMINI_API_KEY };
   if (api === "interactions") {
@@ -151,6 +201,7 @@ function callGemini(prompt, model, api) {
     }
   );
 }
+
 function geminiText(data) {
   if (!data) return "";
   // API Interactions: eventos "step.delta" com delta de texto
@@ -161,24 +212,9 @@ function geminiText(data) {
   const parts = data.candidates?.[0]?.content?.parts || [];
   return parts.filter((p) => !p.thought && typeof p.text === "string").map((p) => p.text).join("");
 }
-
-/* ---------- Anthropic ---------- */
-function callAnthropic(prompt) {
-  return fetch("https://api.anthropic.com/v1/messages", {
-    method: "POST",
-    headers: {
-      "content-type": "application/json",
-      "x-api-key": process.env.ANTHROPIC_API_KEY,
-      "anthropic-version": "2023-06-01",
-    },
-    body: JSON.stringify({
-      model: process.env.ANTHROPIC_MODEL || "claude-sonnet-5-5",
-      max_tokens: MAX_TOKENS,
-      stream: true,
-      system: SYSTEM,
-      messages: [{ role: "user", content: prompt }],
-    }),
-  });
+function openaiText(data) {
+  const c = data?.choices?.[0]?.delta?.content;
+  return typeof c === "string" ? c : "";
 }
 function anthropicText(data) {
   return data?.type === "content_block_delta" && data.delta?.type === "text_delta" ? data.delta.text : "";
@@ -188,7 +224,9 @@ function anthropicText(data) {
 function shortError(text) {
   const j = safeJSON(text);
   const msg = j?.error?.message || j?.error?.type || text || "";
-  return String(msg).replace(/(AIza|AQ\.)[0-9A-Za-z_.-]{10,}/g, "[chave]").slice(0, 240);
+  return String(msg)
+    .replace(/(AIza|AQ\.|gsk_|sk-ant-)[0-9A-Za-z_.-]{10,}/g, "[chave]")
+    .slice(0, 240);
 }
 
 function safeJSON(s) {

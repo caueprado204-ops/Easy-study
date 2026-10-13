@@ -293,6 +293,14 @@ select,.inp{border:1.5px solid var(--line);border-radius:10px;padding:7px 10px;b
 .score{background:var(--violet);color:var(--white);border-radius:20px;padding:18px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
 .score .h-big{font-size:52px;color:var(--lime)}
 
+.auto .ag{border-top:1.5px solid var(--hair);padding-top:10px;margin-top:10px}
+.auto .ag-h{font-family:var(--display);font-weight:800;text-transform:uppercase;font-size:12.5px;letter-spacing:.03em;margin-bottom:6px}
+.auto .ai{display:grid;grid-template-columns:18px minmax(0,1fr);gap:8px;padding:5px 0}
+.auto .st{width:14px;height:14px;border-radius:50%;margin-top:3px;border:1.5px solid var(--line)}
+.st-ok{background:var(--ok)} .st-warn{background:var(--butter)} .st-bad{background:var(--bad)}
+.gram{display:flex;flex-direction:column;gap:8px;max-height:340px;overflow:auto}
+.gm{border:1.5px solid var(--hair);border-radius:10px;padding:8px 10px;overflow-wrap:anywhere}
+.gm mark{background:#FFE1DA;color:var(--ink);border-radius:4px;padding:0 2px;text-decoration:underline wavy var(--bad)}
 /* rotina */
 .week{display:grid;grid-template-columns:repeat(7,minmax(130px,1fr));gap:8px;overflow-x:auto;padding-bottom:6px}
 .day{border:1.5px solid var(--line);border-radius:16px;background:var(--white);padding:10px;display:flex;flex-direction:column;gap:7px;min-height:240px}
@@ -1336,37 +1344,187 @@ function simResult(){const s=S.sim,by={};s.ids.forEach(id=>{const q=QMAP[id];if(
 setInterval(()=>{const el=document.getElementById("simTimer");if(!el||!S.sim||S.sim.done)return;const left=S.sim.start+S.sim.dur-Date.now();if(left<=0){finishSim();toast("Tempo esgotado. Simulado entregue.");return;}el.textContent=pad(Math.floor(left/60e3))+":"+pad(Math.floor(left%60e3/1e3));},500);
 
 /* redação */
-let essayResult=null,essayBusy=false;
+let essayResult=null,essayBusy=false,autoResult=null,grammar=null;
 const lineEstimate=t=>t.split("\n").reduce((a,l)=>a+Math.max(1,Math.ceil(l.length/75)),0);
+
+/* ---------- correção automática (sem IA) ---------- */
+const STOP=new Set("a o as os um uma uns umas de da do das dos em na no nas nos por pela pelo pelas pelos para com sem sob sobre entre que se e ou mas como mais menos muito muita muitos muitas seu sua seus suas ele ela eles elas isso isto esse essa esses essas este esta estes estas aquele aquela aqueles aquelas ao aos à às é são ser foi foram está estão ter tem têm há já não também quando onde qual quais cujo cuja assim pois porque então ainda bem mesmo cada todo toda todos todas outro outra outros outras sua brasil brasileira brasileiro brasileiros brasileiras sociedade forma maneira modo fato desse dessa deste desta nesse nessa neste nesta".split(" "));
+const CONNECTIVES={
+  "Adição":/\b(além disso|ademais|outrossim|não só|bem como|também|ainda)\b/gi,
+  "Oposição":/\b(mas|porém|contudo|todavia|entretanto|no entanto|não obstante)\b/gi,
+  "Concessão":/\b(embora|ainda que|mesmo que|apesar de|conquanto|posto que)\b/gi,
+  "Causa":/\b(porque|visto que|já que|uma vez que|devido a|em virtude de|em razão de|haja vista)\b/gi,
+  "Consequência":/\b(consequentemente|por consequência|por conseguinte|de modo que|de forma que|dessa forma|desse modo|assim sendo)\b/gi,
+  "Conclusão":/\b(portanto|logo|em suma|dessarte|destarte|diante disso|diante do exposto|por fim|em síntese)\b/gi,
+  "Ordenação":/\b(em primeiro lugar|primeiramente|inicialmente|em segundo lugar|em seguida|posteriormente|outrossim)\b/gi,
+  "Exemplificação":/\b(por exemplo|a exemplo de|como exemplo|tal como|tais como)\b/gi,
+  "Explicação":/\b(ou seja|isto é|em outras palavras|a saber)\b/gi,
+  "Conformidade":/\b(segundo|conforme|de acordo com|consoante)\b/gi
+};
+const OPENERS=/^(além disso|ademais|outrossim|em primeiro lugar|primeiramente|inicialmente|em segundo lugar|em seguida|por outro lado|nesse sentido|nesse contexto|sob esse viés|sob essa ótica|dessa forma|desse modo|diante disso|diante do exposto|portanto|logo|em suma|por fim|assim|contudo|no entanto|entretanto|todavia|outro|ainda|paralelamente|concomitantemente|não obstante|em síntese|consequentemente|destarte|dessarte)\b/i;
+const REPERTOIRE=/\b(constituição|lei\b|estatuto|eca\b|declaração universal|ibge|oms|onu|unesco|ipea|unicef|fiocruz|bauman|durkheim|marx|weber|foucault|arendt|kant|aristóteles|platão|sócrates|rousseau|hobbes|locke|sartre|beauvoir|paulo freire|milton santos|djamila|adorno|habermas|bourdieu|byung-chul han|sérgio buarque|gilberto freyre|darcy ribeiro|machado de assis|graciliano|drummond|clarice|guimarães rosa|carolina maria de jesus|montesquieu|maquiavel|nietzsche|freud|simone|hannah)\b/gi;
+const AGENTS=/\b(governo|estado|ministério|ministérios|poder público|poder legislativo|congresso|prefeituras?|secretarias?|escolas?|instituições de ensino|universidades|ongs?|organizações não governamentais|mídia|imprensa|meios de comunicação|famílias?|sociedade civil|empresas|iniciativa privada|sus|inep|mec|ministério público|câmara)\b/i;
+const ACTIONS=/\b(deve|devem|deverá|deverão|cabe a|cabe ao|cabe à|é preciso|é necessário|faz-se necessário|é fundamental|é imprescindível|precisa|precisam|é dever)\b/i;
+const MEANS=/\b(por meio de|por meio da|por meio do|mediante|através de|através da|através do|por intermédio|com o auxílio|com o apoio|via|a partir de)\b/i;
+const PURPOSE=/\b(a fim de|para que|com o objetivo de|com o intuito de|com a finalidade de|visando|objetivando|de modo a|de forma a)\b/i;
+const DETAIL=/\b(ou seja|isto é|por exemplo|a exemplo de|tais como|como|os quais|as quais|que contem|que contenham|com o uso de|com a participação)\b/i;
+const VIOLENT=/\b(pena de morte|castração|tortura|linchamento|matar|exterminar|esterilização forçada|prisão perpétua para)\b/i;
+const INFORMAL=/\b(pra|pro|pros|tá|tô|né|vc|vcs|tb|tbm|tipo assim|a gente|aí|daí|beleza|galera|coisa)\b/gi;
+
+function analyzeEssay(text,theme){
+  const items=[];const add=(group,status,title,msg)=>items.push({group,status,title,msg});
+  const paras=text.split(/\n+/).map(p=>p.trim()).filter(p=>p.length>0);
+  const words=(text.match(/[A-Za-zÀ-ÿ]+(?:-[A-Za-zÀ-ÿ]+)*/g)||[]);
+  const sentences=text.split(/(?<=[.!?])\s+/).map(s=>s.trim()).filter(Boolean);
+  const lines=lineEstimate(text);
+  const low=text.toLowerCase();
+
+  // Estrutura
+  if(lines<=7)add("Estrutura","bad","Texto muito curto",`Cerca de ${lines} linhas. No ENEM, redações com até 7 linhas recebem nota zero.`);
+  else if(lines>30)add("Estrutura","bad","Passou do limite",`Cerca de ${lines} linhas. O limite da folha oficial é 30 linhas.`);
+  else if(lines<20)add("Estrutura","warn","Texto curto",`Cerca de ${lines} linhas. Textos entre 25 e 30 linhas costumam desenvolver melhor os argumentos.`);
+  else add("Estrutura","ok","Tamanho adequado",`Cerca de ${lines} linhas e ${words.length} palavras.`);
+  if(paras.length<3)add("Estrutura","bad","Poucos parágrafos",`${paras.length} parágrafo(s). Use introdução, dois de desenvolvimento e conclusão.`);
+  else if(paras.length===3)add("Estrutura","warn","Só 3 parágrafos","O modelo mais seguro tem 4: introdução, dois desenvolvimentos e conclusão.");
+  else if(paras.length>6)add("Estrutura","warn","Muitos parágrafos",`${paras.length} parágrafos. Parágrafos curtos demais costumam ter argumentação rasa.`);
+  else add("Estrutura","ok","Parágrafos bem divididos",`${paras.length} parágrafos.`);
+  const longS=sentences.filter(s=>s.split(/\s+/).length>55);
+  if(longS.length)add("Estrutura","warn","Frases muito longas",`${longS.length} frase(s) com mais de 55 palavras. Divida para ganhar clareza. Começo: “${longS[0].slice(0,70)}…”`);
+
+  // C1
+  const inf=[...new Set((low.match(INFORMAL)||[]))];
+  if(inf.length)add("C1 · Norma-padrão","bad","Marcas de informalidade",`Evite: ${inf.slice(0,6).join(", ")}.`);
+  if(/\b(eu|meu|minha|acho que)\b/i.test(text))add("C1 · Norma-padrão","warn","Primeira pessoa do singular","Prefira a impessoalidade (\"percebe-se\", \"é necessário\") ao \"eu acho\".");
+  if(/\betc\b/i.test(text))add("C1 · Norma-padrão","warn","Uso de \"etc.\"","Na dissertação, enumere os exemplos que importam em vez de usar \"etc.\".");
+  if(/[.!?]\s+[a-zà-ÿ]/.test(text))add("C1 · Norma-padrão","warn","Letra minúscula após ponto","Comece cada frase com letra maiúscula.");
+  if(/\s+[,.;:!?]/.test(text))add("C1 · Norma-padrão","warn","Espaço antes da pontuação","Tire o espaço antes de vírgulas e pontos.");
+  if(/\?/.test(text))add("C1 · Norma-padrão","warn","Pergunta retórica","Perguntas no texto dissertativo enfraquecem a argumentação. Prefira afirmar.");
+  if(!items.some(i=>i.group.startsWith("C1")))add("C1 · Norma-padrão","ok","Sem marcas de informalidade","Veja abaixo a revisão de ortografia e gramática.");
+
+  // C2
+  const themeWords=[...new Set(((theme||"").toLowerCase().replace(/\(.*?\)/g,"").match(/[a-zà-ÿ]{5,}/g)||[]).filter(w=>!STOP.has(w)))];
+  if(themeWords.length){
+    const found=themeWords.filter(w=>low.includes(w.slice(0,Math.max(5,w.length-2))));
+    const pct=found.length/themeWords.length;
+    if(pct<0.4)add("C2 · Tema e repertório","bad","Pouca relação com o tema",`Palavras-chave do tema quase não aparecem: ${themeWords.filter(w=>!found.includes(w)).slice(0,5).join(", ")}. Cuidado com a fuga ao tema.`);
+    else if(pct<0.7)add("C2 · Tema e repertório","warn","Tema parcialmente retomado",`Retome também: ${themeWords.filter(w=>!found.includes(w)).slice(0,5).join(", ")}.`);
+    else add("C2 · Tema e repertório","ok","Tema bem retomado","As palavras-chave do tema aparecem no texto.");
+  }
+  const rep=[...new Set((text.match(REPERTOIRE)||[]).map(x=>x.toLowerCase()))];
+  const years=(text.match(/\b(1[5-9]\d\d|20[0-3]\d)\b/g)||[]).length;
+  const nRep=rep.length+(years?1:0);
+  if(nRep===0)add("C2 · Tema e repertório","bad","Sem repertório identificado","Use pelo menos dois repertórios legitimados: lei, dado de órgão oficial, pensador, obra ou fato histórico.");
+  else if(nRep===1)add("C2 · Tema e repertório","warn","Só um repertório",`Encontrado: ${rep[0]||"uma data histórica"}. O ideal é um repertório produtivo em cada parágrafo de desenvolvimento.`);
+  else add("C2 · Tema e repertório","ok","Repertório presente",`Encontrados: ${rep.slice(0,5).join(", ")}${years?(rep.length?", ":"")+"datas históricas":""}. Lembre-se de explicar como cada um prova seu argumento.`);
+
+  // C3
+  const dev=paras.slice(1,-1);
+  if(dev.length){
+    const thin=dev.filter(p=>p.split(/\s+/).length<60);
+    if(thin.length)add("C3 · Argumentação","warn","Desenvolvimento curto",`${thin.length} parágrafo(s) de desenvolvimento com menos de 60 palavras. Inclua fundamentação, análise e fechamento.`);
+    else add("C3 · Argumentação","ok","Desenvolvimento encorpado","Os parágrafos de desenvolvimento têm tamanho para argumentar bem.");
+  }
+  if(paras[0]&&!/\b(dev|necessári|precis|problema|desafio|impasse|entrave|obstácul|causa|devido|em razão|por causa|fator|consequência)/i.test(paras[0]))
+    add("C3 · Argumentação","warn","Tese pouco clara na introdução","Deixe explícito na introdução qual é o problema e quais causas você vai discutir.");
+
+  // C4
+  const conn={};for(const [k,re] of Object.entries(CONNECTIVES)){const m=low.match(re);if(m)conn[k]=[...new Set(m)];}
+  const distinct=Object.values(conn).flat().length;
+  if(distinct<3)add("C4 · Coesão","bad","Poucos conectivos",`Só ${distinct} conectivo(s) diferentes. Use \"além disso\", \"no entanto\", \"portanto\", \"dessa forma\".`);
+  else if(distinct<6)add("C4 · Coesão","warn","Conectivos pouco variados",`${distinct} conectivos diferentes (${Object.values(conn).flat().slice(0,5).join(", ")}). Varie mais entre os parágrafos.`);
+  else add("C4 · Coesão","ok","Boa variedade de conectivos",`${distinct} conectivos diferentes, de ${Object.keys(conn).length} tipos.`);
+  const noOpen=paras.slice(1).map((p,i)=>({p,i:i+2})).filter(x=>!OPENERS.test(x.p.toLowerCase()));
+  if(paras.length>1&&noOpen.length)add("C4 · Coesão","warn","Parágrafo sem conectivo no início",`Parágrafo(s) ${noOpen.map(x=>x.i).join(", ")} começam sem conectivo. Ex.: \"Em primeiro lugar\", \"Além disso\", \"Portanto\".`);
+  const freq={};(low.match(/[a-zà-ÿ]{5,}/g)||[]).forEach(w=>{if(!STOP.has(w))freq[w]=(freq[w]||0)+1;});
+  const rep4=Object.entries(freq).filter(([w,n])=>n>=4&&!themeWords.includes(w)).sort((a,b)=>b[1]-a[1]).slice(0,4);
+  if(rep4.length)add("C4 · Coesão","warn","Palavras repetidas",rep4.map(([w,n])=>`\"${w}\" (${n}x)`).join(", ")+". Use sinônimos ou pronomes.");
+
+  // C5
+  const last=paras[paras.length-1]||"";
+  const el=[["Agente",AGENTS],["Ação",ACTIONS],["Meio ou modo",MEANS],["Finalidade",PURPOSE],["Detalhamento",DETAIL]].map(([n,re])=>[n,re.test(last)]);
+  const nEl=el.filter(x=>x[1]).length;
+  const listEl=el.map(([n,ok])=>`${ok?"✓":"✗"} ${n}`).join("  ");
+  if(paras.length<2)add("C5 · Intervenção","bad","Sem conclusão separada","Escreva um parágrafo de conclusão com a proposta de intervenção.");
+  else if(nEl>=4)add("C5 · Intervenção","ok",`Proposta com ${nEl} de 5 elementos`,listEl);
+  else if(nEl>=2)add("C5 · Intervenção","warn",`Proposta com ${nEl} de 5 elementos`,listEl+". Complete: agente, ação, meio, finalidade e detalhamento.");
+  else add("C5 · Intervenção","bad","Proposta de intervenção incompleta",listEl+". Diga quem faz, o quê, como, para quê e detalhe um desses itens.");
+  if(VIOLENT.test(low))add("C5 · Intervenção","bad","Possível desrespeito aos direitos humanos","Propostas violentas ou punitivas extremas zeram a competência. Prefira educação, políticas públicas e fiscalização.");
+
+  return {items,ok:items.filter(i=>i.status==="ok").length,warn:items.filter(i=>i.status!=="ok").length,at:Date.now()};
+}
+
+async function checkGrammar(text){
+  grammar={status:"loading"};paintAuto();
+  try{
+    const r=await fetch("https://api.languagetool.org/v2/check",{method:"POST",headers:{"content-type":"application/x-www-form-urlencoded"},body:new URLSearchParams({text:text.slice(0,19000),language:"pt-BR"})});
+    if(!r.ok)throw new Error("HTTP "+r.status);
+    const j=await r.json();
+    grammar={status:"ok",matches:(j.matches||[]).slice(0,25),total:(j.matches||[]).length};
+  }catch(e){console.warn("[LanguageTool]",e);grammar={status:"err"};}
+  paintAuto();
+}
+function runAuto(){
+  const text=(S.essayDraft||"").trim(),theme=S.essayTheme==="__custom"?"":S.essayTheme;
+  if(text.split(/\s+/).length<40){toast("Escreva pelo menos umas 40 palavras para a correção automática.");return false;}
+  autoResult=analyzeEssay(text,theme);grammar=null;
+  if(VIEW==="redacao")render();
+  checkGrammar(text);
+  return true;
+}
+function paintAuto(){const el=document.getElementById("autoBox");if(el)el.outerHTML=autoHTML();}
+function autoHTML(){
+  if(!autoResult)return `<div id="autoBox"></div>`;
+  const r=autoResult;const groups=[...new Set(r.items.map(i=>i.group))];
+  let g="";
+  if(!grammar||grammar.status==="loading")g=`<p class="small muted" style="margin:0">Revisando ortografia e gramática…</p>`;
+  else if(grammar.status==="err")g=`<p class="small muted" style="margin:0">A revisão de ortografia está indisponível agora. Tente de novo em instantes.</p>`;
+  else if(!grammar.total)g=`<p class="small" style="margin:0">Nenhum erro de ortografia ou gramática encontrado.</p>`;
+  else g=`<p class="small" style="margin:0 0 8px">${grammar.total} ponto(s) encontrado(s)${grammar.total>grammar.matches.length?`, mostrando os ${grammar.matches.length} primeiros`:""}:</p>
+    <div class="gram">${grammar.matches.map(m=>{const c=m.context||{text:"",offset:0,length:0};const sug=(m.replacements||[]).slice(0,3).map(x=>x.value).filter(Boolean);
+      return `<div class="gm"><div class="small">${esc(c.text.slice(0,c.offset))}<mark>${esc(c.text.substr(c.offset,c.length))}</mark>${esc(c.text.slice(c.offset+c.length))}</div><div class="small muted">${esc(m.message)}${sug.length?` <b style="color:var(--ok)">Sugestão: ${esc(sug.join(" / "))}</b>`:""}</div></div>`}).join("")}</div>`;
+  return `<div id="autoBox" class="card auto" style="margin-top:12px">
+    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px"><h3 style="font-size:17px;margin-right:auto">Correção automática</h3><span class="chip" style="background:var(--lime)">grátis · sem IA</span></div>
+    <p class="small muted" style="margin:0 0 10px">${r.ok} ponto(s) fortes e ${r.warn} para melhorar. É uma análise por regras: aponta problemas comuns, mas não dá nota oficial.</p>
+    ${groups.map(gr=>`<div class="ag"><div class="ag-h">${esc(gr)}</div>${r.items.filter(i=>i.group===gr).map(i=>`<div class="ai"><span class="st st-${i.status}" aria-label="${i.status==="ok"?"ok":i.status==="warn"?"atenção":"problema"}"></span><div><b class="small">${esc(i.title)}</b><div class="small muted">${esc(i.msg)}</div></div></div>`).join("")}</div>`).join("")}
+    <div class="ag"><div class="ag-h">Ortografia e gramática</div>${g}
+      <p class="note" style="margin:8px 0 0">Revisão feita por <a href="https://languagetool.org" target="_blank" rel="noopener">LanguageTool</a>. Seu texto é enviado ao serviço só para essa checagem (<a href="https://languagetool.org/legal/privacy" target="_blank" rel="noopener">política de privacidade</a>).</p></div>
+  </div>`;
+}
+
 function vRedacao(){const txt=S.essayDraft||"",lines=txt.trim()?lineEstimate(txt):0,words=txt.trim()?txt.trim().split(/\s+/).length:0;
   return `<div class="row-head" style="margin-top:4px"><h1 class="h-sec">Corretor de redação</h1><span class="small muted">Correção pelas 5 competências do ENEM</span></div>
   <div class="red-wrap"><div class="form">
     <label>Tema<select id="essayTheme" class="inp">${ESSAY_THEMES.map(t=>`<option ${t===S.essayTheme?"selected":""}>${esc(t)}</option>`).join("")}<option value="__custom" ${!ESSAY_THEMES.includes(S.essayTheme)?"selected":""}>Outro tema…</option></select></label>
     ${!ESSAY_THEMES.includes(S.essayTheme)?`<input id="essayCustom" class="inp" placeholder="Escreva o tema" value="${esc(S.essayTheme==="__custom"?"":S.essayTheme)}">`:""}
     <textarea id="essayText" class="sheet" placeholder="Escreva sua redação aqui. Título é opcional no ENEM.">${esc(txt)}</textarea>
-    <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><span class="small num" id="essayCount" style="${lines>30?"color:var(--bad);font-weight:700":""}">${words} palavras · cerca de ${lines}/30 linhas</span><button class="btn" style="margin-left:auto" data-correct ${essayBusy?"disabled":""}>${essayBusy?"Corrigindo…":"Corrigir com a Easier"}</button></div>
-    <p class="note" style="margin:0">A estimativa de linhas considera cerca de 75 caracteres por linha da folha oficial. A correção é uma simulação feita por IA: use como treino, não como nota oficial.</p>
+    <span class="small num" id="essayCount" style="${lines>30?"color:var(--bad);font-weight:700":""}">${words} palavras · cerca de ${lines}/30 linhas</span>
+    <div style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn ghost" data-autocheck>Correção automática</button><button class="btn" data-correct ${essayBusy?"disabled":""}>${essayBusy?"Corrigindo…":"Corrigir com a Easier"}</button></div>
+    <p class="note" style="margin:0">A correção automática é instantânea e não usa IA. A da Easier dá nota por competência e comentários. As duas são treino, não nota oficial.</p>
   </div><div id="essayOut">${essayOutHTML()}</div></div>`;}
-function essayOutHTML(){const r=essayResult;
-  if(essayBusy)return `<div class="card"><b>Lendo sua redação…</b><p class="muted small">A correção completa leva de 20 a 60 segundos.</p></div>`;
-  if(r&&r.error)return `<div class="card" style="border-color:var(--bad)">${esc(r.error)}</div>`;
-  if(!r){const hist=S.essays.slice().reverse().slice(0,5);return `<div class="card"><h3 style="font-size:16px">Antes de escrever</h3><ul class="small" style="padding-left:18px">${MOD["Redação"][0].k.concat(MOD["Redação"][2].k.slice(0,1)).map(p=>`<li>${esc(p)}</li>`).join("")}</ul><button class="btn sm ghost" data-subjopen="Redação">Estudar os módulos de redação</button>
-    ${hist.length?`<h3 style="font-size:16px;margin-top:14px">Últimas notas</h3>${hist.map(h=>`<div class="stat"><span class="small">${esc(h.theme.slice(0,48))}…</span><b class="num">${h.total}</b></div>`).join("")}`:""}</div>`;}
-  const names=["Norma-padrão","Proposta e repertório","Argumentação","Coesão","Intervenção"];
-  return `<div class="score"><div class="h-big num">${r.total}</div><div><b>Nota estimada</b><br><span class="small">${esc(r.resumo||"")}</span></div></div>
+function essayOutHTML(){const r=essayResult;let top="";
+  if(essayBusy)top=`<div class="card"><b>Lendo sua redação…</b><p class="muted small">A correção completa leva de 20 a 60 segundos.</p></div>`;
+  else if(r&&r.error)top=`<div class="card" style="border-color:var(--orange)">${esc(r.error)}${autoResult?`<div class="small muted" style="margin-top:6px">Enquanto isso, veja a correção automática.</div>`:""}</div>`;
+  else if(r){const names=["Norma-padrão","Proposta e repertório","Argumentação","Coesão","Intervenção"];
+    top=`<div class="score"><div class="h-big num">${r.total}</div><div><b>Nota estimada pela Easier</b><br><span class="small">${esc(r.resumo||"")}</span></div></div>
     <div class="grid" style="margin-top:12px;gap:8px">${(r.competencias||[]).map((c,i)=>`<div class="comp"><div class="n num" style="background:${["var(--butter)","var(--lilac)","var(--sky)","var(--mint)","var(--peach)"][i]}">${c.nota}</div><div><b class="small">C${i+1} · ${names[i]}</b><div class="small">${esc(c.comentario)}</div></div></div>`).join("")}</div>
     ${r.melhorias?.length?`<div class="card" style="margin-top:12px"><b>Para subir a nota</b><ul class="small" style="padding-left:18px;margin:6px 0 0">${r.melhorias.map(m=>`<li>${esc(m)}</li>`).join("")}</ul></div>`:""}`;}
+  else if(!autoResult){const hist=S.essays.slice().reverse().slice(0,5);top=`<div class="card"><h3 style="font-size:16px">Antes de escrever</h3><ul class="small" style="padding-left:18px">${MOD["Redação"][0].k.concat(MOD["Redação"][2].k.slice(0,1)).map(p=>`<li>${esc(p)}</li>`).join("")}</ul><button class="btn sm ghost" data-subjopen="Redação">Estudar os módulos de redação</button>
+    ${hist.length?`<h3 style="font-size:16px;margin-top:14px">Últimas notas</h3>${hist.map(h=>`<div class="stat"><span class="small">${esc(h.theme.slice(0,48))}…</span><b class="num">${h.total}</b></div>`).join("")}`:""}</div>`;}
+  return top+autoHTML();}
 async function correctEssay(){
   const text=(S.essayDraft||"").trim(),theme=S.essayTheme==="__custom"?"":S.essayTheme;
   if(text.split(/\s+/).length<80){toast("Escreva pelo menos umas 80 palavras para corrigir.");return;}
   if(!theme){toast("Escolha ou escreva um tema.");return;}
   const sample=await getSample();
-  if(!sample){essayResult={error:"A Easier está indisponível agora. Tente de novo em instantes."};render();return;}
   essayBusy=true;essayResult=null;render();
   const prompt=`Seu nome é Easier, a corretora de IA da plataforma Easy Study, com experiência em redações do ENEM. Corrija a redação abaixo seguindo a matriz oficial das 5 competências (cada uma de 0 a 200, em múltiplos de 40). Seja rigoroso e justo, como a banca. Comentários objetivos em português do Brasil, citando trechos curtos do texto quando útil.\n\nTema: ${theme}\n\nRedação:\n"""\n${text}\n"""\n\nResponda SOMENTE com JSON neste formato:\n{"competencias":[{"nota":0,"comentario":""},{"nota":0,"comentario":""},{"nota":0,"comentario":""},{"nota":0,"comentario":""},{"nota":0,"comentario":""}],"total":0,"resumo":"uma frase de avaliação geral","melhorias":["3 a 5 ações concretas para melhorar"]}`;
-  try{const r=await sample.json(prompt,{modelTier:"default"});r.competencias=(r.competencias||[]).slice(0,5).map(c=>({nota:Math.max(0,Math.min(200,Math.round((+c.nota||0)/40)*40)),comentario:String(c.comentario||"")}));r.total=r.competencias.reduce((a,c)=>a+c.nota,0);essayResult=r;S.essays.push({theme,total:r.total,date:Date.now()});addXP(40);save();}
-  catch(e){essayResult={error:errMsg(e)};}
-  essayBusy=false;if(VIEW==="redacao")render();
+  let failed=false;
+  try{if(!sample)throw {code:"server"};const r=await sample.json(prompt,{modelTier:"default"});r.competencias=(r.competencias||[]).slice(0,5).map(c=>({nota:Math.max(0,Math.min(200,Math.round((+c.nota||0)/40)*40)),comentario:String(c.comentario||"")}));r.total=r.competencias.reduce((a,c)=>a+c.nota,0);essayResult=r;S.essays.push({theme,total:r.total,date:Date.now()});addXP(40);save();}
+  catch(e){essayResult={error:errMsg(e)};failed=true;}
+  essayBusy=false;
+  // se a IA falhar, a correção automática entra no lugar
+  if(failed&&!autoResult){autoResult=analyzeEssay(text,theme);grammar=null;if(VIEW==="redacao")render();checkGrammar(text);return;}
+  if(VIEW==="redacao")render();
 }
 
 /* rotina */
@@ -1451,6 +1609,7 @@ document.addEventListener("click",e=>{
   if(d.finishsim!==undefined){if(t.dataset.confirm!=="1"){t.dataset.confirm="1";t.textContent="Confirmar entrega?";setTimeout(()=>{t.dataset.confirm="";t.textContent="Entregar";},3000);return;}finishSim();return;}
   if(d.closesim!==undefined){S.sim=null;simView=null;save();render();return;}
   if(d.correct!==undefined){correctEssay();return;}
+  if(d.autocheck!==undefined){if(runAuto())toast("Correção automática pronta");return;}
   if(d.delblk){S.routine=S.routine.filter(b=>b.id!==d.delblk);save();render();return;}
   if(d.clearroutine!==undefined){if(t.dataset.confirm!=="1"){t.dataset.confirm="1";t.textContent="Confirmar?";setTimeout(()=>{t.dataset.confirm="";t.textContent="Limpar semana";},3000);return;}S.routine=[];save();render();return;}
   if(d.addexam!==undefined){S.exams.push({n:"Nova prova",d:""});save();render();return;}

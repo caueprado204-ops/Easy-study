@@ -50,6 +50,17 @@ Cuidados do plano gratuito:
 - O Google pode usar o conteúdo enviado no plano gratuito para melhorar os produtos dele. Evite enviar dados pessoais.
 - Não ative cobrança no projeto do Google se quiser continuar no gratuito.
 
+### Segunda IA gratuita: Groq
+
+Quando o Gemini fica sem cota, a Easier passa sozinha para o Groq.
+
+1. Entre em **console.groq.com**, vá em **API Keys → Create API Key**.
+2. Na Vercel, adicione `GROQ_API_KEY` em **Production** e reimplante.
+
+### Correção automática de redação (sem IA)
+
+O corretor de redação também tem uma **correção automática** que funciona sempre, mesmo sem nenhuma chave: confere tamanho, parágrafos, informalidade, repertório, conectivos, palavras repetidas e os 5 elementos da proposta de intervenção. A ortografia e a gramática são revisadas pelo serviço público gratuito do [LanguageTool](https://languagetool.org). Se a Easier estiver com muita demanda, essa correção aparece no lugar.
+
 ### Opção paga: Anthropic
 
 Adicione `ANTHROPIC_API_KEY` (console.anthropic.com) e `AI_PROVIDER=anthropic`. As aulas longas e a correção de redação ficam mais precisas. Cada uso gasta créditos da sua conta: defina um limite de gastos no console antes de divulgar o site.
@@ -58,7 +69,8 @@ Adicione `ANTHROPIC_API_KEY` (console.anthropic.com) e `AI_PROVIDER=anthropic`. 
 
 - `GEMINI_MODEL` — padrão `gemini-3.8-flash`.
 - `ANTHROPIC_MODEL` — padrão `claude-sonnet-5-5`.
-- `AI_PROVIDER` — `gemini` ou `anthropic`, quando as duas chaves existem.
+- `AI_PROVIDER` — ordem das IAs (padrão `gemini,groq,anthropic`).
+- `GROQ_MODEL` — padrão `openai/gpt-oss-120b`.
 - `EASIER_RATE_LIMIT` — pedidos por minuto por IP (padrão: 12).
 
 ## Progresso dos alunos
