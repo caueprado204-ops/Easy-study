@@ -1,6 +1,6 @@
 # Easy Study
 
-Plataforma de estudos para vestibulares de Medicina (ENEM, FUVEST, Unicamp, Unesp e Provão Paulista), com a **Easier**, a IA da plataforma.
+Plataforma de estudos para o curso dos sonhos (Medicina, Psicologia, Engenharia, Direito e outros), com foco em USP/FUVEST, Unicamp, Unesp, ENEM e Provão Paulista, com a **Easier**, a IA da plataforma.
 
 ## O que tem aqui
 
@@ -88,19 +88,19 @@ Não há plano grátis: a conta nova começa sem plano e só a aba Planos e Minh
 
 | Plano | Preço | Usos da Easier | Correções de redação com IA |
 |---|---|---|---|
-| Foco | R$ 24,90 | 200 | 10 |
-| Medicina Pro | R$ 44,90 | 350 | 20 |
+| Easy Plus | R$ 24,90 | 200 | 10 |
+| Easy Pro | R$ 44,90 | 350 | 20 |
 
 Variáveis na Vercel (Production): `SUPABASE_URL` e `SUPABASE_SECRET_KEY` (Supabase → Project Settings → API Keys → Secret key). Sem elas, a Easier funciona sem exigir login.
 
 **Liberar um plano pago** (depois do Pix): no Supabase, abra SQL Editor e rode
 
 ```sql
-update public.assinaturas set plano = 'foco', valido_ate = current_date + 31, atualizado_em = now()
+update public.assinaturas set plano = 'plus', valido_ate = current_date + 31, atualizado_em = now()
 where user_id = (select id from auth.users where email = 'email-do-aluno@exemplo.com');
 ```
 
-Troque `foco` por `medicina` para o Medicina Pro. Quando `valido_ate` passa, a plataforma volta a ficar bloqueada até a renovação (o progresso continua salvo).
+Use `plus` para o Easy Plus e `pro` para o Easy Pro. Quando `valido_ate` passa, a plataforma volta a ficar bloqueada até a renovação (o progresso continua salvo).
 
 Contato para assinar: preencha `CONTATO` no `index.html` com seu WhatsApp (só números, com 55 e DDD) e/ou e-mail.
 

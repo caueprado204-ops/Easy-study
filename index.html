@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="description" content="Easy Study: plataforma de estudos para Medicina, com módulos, questões do ENEM, simulados, redação corrigida pela Easier e rotina de estudos.">
+<meta name="description" content="Easy Study: plataforma de estudos para o curso dos seus sonhos, com foco em FUVEST, Unicamp, Unesp, ENEM e Provão Paulista. Módulos, questões do ENEM, simulados, redação corrigida pela Easier e rotina de estudos.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' rx='10' fill='%234E3DF2'/%3E%3Cg fill='%23DFF24B'%3E%3Crect x='17' y='6' width='6' height='28' rx='3'/%3E%3Crect x='17' y='6' width='6' height='28' rx='3' transform='rotate(60 20 20)'/%3E%3Crect x='17' y='6' width='6' height='28' rx='3' transform='rotate(120 20 20)'/%3E%3C/g%3E%3C/svg%3E">
 <style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
 </head>
@@ -333,6 +333,29 @@ select,.inp{border:1.5px solid var(--line);border-radius:10px;padding:7px 10px;b
 .pl b{display:block}
 
 
+.cursos{display:flex;flex-wrap:wrap;gap:6px;margin:14px 0 0;position:relative;z-index:1}
+.cursos span{border:1.5px solid var(--lime);color:var(--lime);border-radius:99px;padding:3px 11px;font-size:12.5px;font-weight:700}
+.easier{background:var(--shell);color:var(--white);border-radius:30px;margin-top:70px;padding:40px 34px;position:relative;overflow:hidden;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:24px 30px}
+.ez-head{grid-column:1/-1;max-width:760px;display:flex;flex-direction:column;gap:12px}
+.ez-badge{align-self:flex-start;background:var(--lime);color:var(--ink);border-radius:99px;padding:4px 12px;font-family:var(--display);font-weight:800;font-size:12px;text-transform:uppercase}
+.easier h2{font-size:clamp(28px,4.2vw,46px)}
+.easier h2 em{font-style:normal;color:var(--lime)}
+.ez-head p{margin:0;color:#D8D2C8;max-width:60ch}
+.ez-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;grid-column:1/2}
+.ez-card{background:#3A3734;border-radius:18px;padding:14px;display:flex;flex-direction:column;gap:6px}
+.ez-card b{font-size:15px;line-height:1.25}
+.ez-card span:last-child{font-size:12.5px;color:#D8D2C8}
+.ez-ic{font-family:var(--display);font-weight:900;color:var(--pink);font-size:14px}
+.ez-free{background:var(--violet)}
+.ez-free span:last-child{color:#E3E0FF}
+.ez-chat{grid-column:2/3;align-self:center;display:flex;flex-direction:column;gap:10px;background:var(--cream);border-radius:22px;padding:18px;color:var(--ink);border:2px solid var(--lime);transform:rotate(2deg)}
+.ez-msg{background:var(--lav);border-radius:14px 14px 14px 4px;padding:10px 12px;font-size:13.5px;max-width:90%}
+.ez-msg.me{align-self:flex-end;background:var(--lime);border-radius:14px 14px 4px 14px}
+.vests5{grid-template-columns:repeat(5,minmax(0,1fr))!important}
+.vests5 .pg{min-height:230px}
+.vests5 .pg h3{font-size:clamp(24px,2.4vw,32px)}
+@media (max-width:1050px){.vests5{grid-template-columns:repeat(2,minmax(0,1fr))!important}.easier{grid-template-columns:1fr}.ez-grid,.ez-chat{grid-column:1/-1}}
+@media (max-width:760px){.easier{padding:28px 18px}.ez-grid{grid-template-columns:1fr}.vests5{grid-template-columns:1fr!important}}
 /* ---------- contas e planos ---------- */
 .auth-wrap{max-width:1080px;margin:0 auto;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:14px;background:var(--cream);border-radius:6px;padding:14px}
 .auth-side{background:var(--violet);color:var(--white);border-radius:24px;padding:30px;position:relative;overflow:hidden;display:flex;flex-direction:column;gap:16px;min-height:520px}
@@ -423,7 +446,7 @@ select,.inp{border:1.5px solid var(--line);border-radius:10px;padding:7px 10px;b
           <button aria-label="Buscar"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></button>
         </form>
         <div class="flame" id="topStreak" title="Dias seguidos estudando"></div>
-        <div class="me"><span class="avatar" id="avatar">C</span><div><strong id="meName">Cauê</strong><small id="meSub">Rumo à Medicina</small></div></div>
+        <div class="me"><span class="avatar" id="avatar">C</span><div><strong id="meName">Cauê</strong><small id="meSub">Meta: curso dos sonhos</small></div></div>
       </header>
       <section id="view"></section>
     </main>
@@ -1000,7 +1023,7 @@ const ESSAY_THEMES=["Desafios para a valorização da herança africana no Brasi
 const SIMS=[
  {id:"nat",name:"Natureza + Matemática",desc:"No estilo do 2º dia do ENEM.",n:20,min:60,cls:"c-violet",f:q=>q.a==="ciencias-natureza"||q.a==="matematica"},
  {id:"hum",name:"Humanas + Linguagens",desc:"No estilo do 1º dia do ENEM.",n:20,min:60,cls:"c-pink",f:q=>q.a==="ciencias-humanas"||q.a==="linguagens"},
- {id:"med",name:"Turbo Medicina",desc:"Biologia, Química e Física: o peso que decide Medicina.",n:15,min:45,cls:"c-lime",f:q=>q.a==="ciencias-natureza"},
+ {id:"med",name:"Turbo Natureza",desc:"Biologia, Química e Física, o peso maior nos cursos de saúde.",n:15,min:45,cls:"c-lime",f:q=>q.a==="ciencias-natureza"},
  {id:"mat",name:"Maratona de Matemática",desc:"Só matemática do ENEM, com tempo apertado.",n:15,min:40,cls:"c-ink",f:q=>q.a==="matematica"}
 ];
 const DEFAULT_EXAMS=[{n:"FUVEST 1ª fase",d:"2026-11-01"},{n:"ENEM 1º dia",d:"2026-11-08"},{n:"ENEM 2º dia",d:"2026-11-15"},{n:"Unesp 1ª fase",d:"2026-11-22"},{n:"FUVEST 2ª fase",d:"2026-12-06"},{n:"Unesp 2ª fase",d:"2026-12-13"},{n:"Unicamp 1ª fase",d:""},{n:"Provão Paulista",d:""}];
@@ -1051,6 +1074,7 @@ function renderLanding(){
     <nav class="lnav" aria-label="Easy Study">
       <span class="logo">EASY<span>STUDY</span></span>
       <a class="lk" href="#como">Como funciona</a>
+      <a class="lk" href="#easier">Easier IA</a>
       <a class="lk" href="#vestibulares">Vestibulares</a>
       <a class="lk" href="#planos">Planos</a>
       <button class="pill-btn" data-enter>${ACC?"Abrir plataforma":"Entrar"}</button>
@@ -1058,8 +1082,9 @@ function renderLanding(){
     <div class="l-hero">
       <div class="l-main">
         <span class="half" style="right:-40px;top:40px"></span><span class="half" style="right:60px;top:40px;opacity:.7"></span>
-        <h1 class="h-big">Plataforma<br><em>de estudos</em><br>para quem quer<br>Medicina</h1>
-        <p>ENEM, FUVEST, Unicamp, Unesp e Provão Paulista: módulos completos, questões reais e uma rotina que cabe na sua semana.</p>
+        <h1 class="h-big">Estude para<br>o curso<br><em>dos seus sonhos</em></h1>
+        <div class="cursos">${["Medicina","Psicologia","Engenharia","Direito","Odontologia","Arquitetura","Veterinária","Computação"].map(c=>`<span>${c}</span>`).join("")}</div>
+        <p>Foco em USP (FUVEST), Unicamp, Unesp, ENEM e Provão Paulista: módulos completos, questões reais, a Easier e uma rotina que cabe na sua semana.</p>
         <button class="l-cta" ${ACC?"data-enter":"data-enter-signup"}>${ACC?"Continuar estudando":"Criar minha conta"}</button>
       </div>
       <div class="l-small"><span>60 módulos em<br>9 matérias</span><hr><span>${nq} questões reais do ENEM</span></div>
@@ -1079,10 +1104,31 @@ function renderLanding(){
     <h2 class="h-big l-sec-title" id="como">Estudar no Easy Study significa${GSTAR(70,"right:-90px","top:-20px",12)}</h2>
     <div class="feat">
       <div class="fc"><b>Módulos completos por matéria</b><span>Teoria em seções curtas, conceitos-chave, exemplo resolvido e questões do ENEM no fim de cada módulo.</span></div>
-      <div class="fc tilt"><b>Easier: a IA que responde na hora</b><span>Peça à Easier, a IA da plataforma, a aula completa de qualquer módulo ou tire uma dúvida específica sem sair da página.</span></div>
+      <div class="fc tilt"><b>Easier: a IA que estuda com você</b><span>Aula completa de qualquer módulo, dúvidas na hora, explicação de questões e correção de redação.</span></div>
       <div class="fc"><b>Simulados e redação corrigida</b><span>Simulados cronometrados com questões reais e nota da redação nas 5 competências do ENEM.</span></div>
-      <div class="fc"><b>Rotina que vira hábito</b><span>Semana montada para Medicina, contagem para cada prova e uma ofensiva de dias seguidos para não parar.</span></div>
+      <div class="fc"><b>Rotina que vira hábito</b><span>Semana montada pelo peso das matérias no seu curso, contagem para cada prova e uma ofensiva de dias seguidos.</span></div>
     </div>
+
+    <section class="easier" id="easier">
+      ${SPARK("#DFF24B",38,"right:34px","top:30px")}${GSTAR(64,"left:-14px","bottom:40px",15)}
+      <div class="ez-head">
+        <span class="ez-badge">Easier IA</span>
+        <h2 class="h-big">Conheça a <em>Easier</em>,<br>a IA que estuda com você</h2>
+        <p>A Easier é a tutora de inteligência artificial do Easy Study. Ela conhece seu curso e sua faculdade dos sonhos, explica do jeito que você entende e corrige redação seguindo as 5 competências do ENEM.</p>
+      </div>
+      <div class="ez-grid">
+        <div class="ez-card"><span class="ez-ic">01</span><b>Aula completa de qualquer módulo</b><span>Explicação passo a passo, como o assunto cai na FUVEST, Unicamp, Unesp e ENEM, exemplos resolvidos e exercícios com gabarito.</span></div>
+        <div class="ez-card"><span class="ez-ic">02</span><b>Tira-dúvidas na hora</b><span>Travou em algum ponto? Pergunte dentro do módulo e receba uma resposta curta, com exemplo.</span></div>
+        <div class="ez-card"><span class="ez-ic">03</span><b>Explica cada questão</b><span>Depois de responder, a Easier mostra por que a certa está certa, onde você errou e o que revisar.</span></div>
+        <div class="ez-card"><span class="ez-ic">04</span><b>Correção de redação pelas 5 competências</b><span>Nota de 0 a 1000, nível de cada competência com trechos do seu texto e o que falta para subir.</span></div>
+        <div class="ez-card"><span class="ez-ic">05</span><b>Proposta de intervenção sem mistério</b><span>Ela aponta quais dos 5 elementos você usou (agente, ação, meio, efeito e detalhamento) e quais faltam.</span></div>
+        <div class="ez-card ez-free"><span class="ez-ic">+</span><b>Correção automática instantânea</b><span>Antes da Easier, uma revisão por regras confere estrutura, conectivos, repertório e ortografia. Ilimitada em todos os planos.</span></div>
+      </div>
+      <div class="ez-chat" aria-hidden="true">
+        <div class="ez-msg me">Easier, por que a alternativa B está errada?</div>
+        <div class="ez-msg">A B confunde mitose com meiose: só na meiose há permutação entre cromátides, o que gera variabilidade. Revise o módulo de Citologia, seção 4.</div>
+      </div>
+    </section>
 
     <section class="lime-band" id="vestibulares">
       <div class="lb-grid">
@@ -1094,14 +1140,16 @@ function renderLanding(){
         </div>
         <div class="lb-text">
           <h2 class="h-big">Preparação para <em>cada vestibular</em> e cada sonho</h2>
-          <p>Escolha onde quer chegar e estude no formato certo. A plataforma mostra o que falta, o que você já domina e o que revisar antes da prova.</p>
+          <p>Medicina, Psicologia, Engenharia, Direito ou qualquer outro curso: escolha onde quer chegar e estude no formato da prova. A plataforma mostra o que falta, o que você já domina e o que revisar.</p>
           ${PLUS(56,"right:20px","top:300px")}
         </div>
       </div>
-      <div class="progs">
-        <div class="pg pg-v"><div class="tags"><span>180 questões</span><span>2 dias + redação</span></div><h3>ENEM e SiSU —</h3><p>Federais pelo SiSU, com redação nas 5 competências.</p></div>
-        <div class="pg pg-p"><div class="tags"><span>90 questões na 1ª fase</span><span>2ª fase discursiva</span></div><h3>FUVEST e Unesp</h3><p>USP e Unesp, com foco em Natureza e dissertação.</p></div>
-        <div class="pg pg-v"><div class="tags"><span>Redação em gêneros</span><span>Seriado</span></div><h3>Unicamp e Provão</h3><p>Unicamp e Provão Paulista, para quem estuda na rede pública de SP.</p></div>
+      <div class="progs vests5">
+        <div class="pg pg-v"><div class="tags"><span>USP</span><span>90 questões na 1ª fase</span></div><h3>FUVEST</h3><p>Primeira fase de testes e segunda fase discursiva, com redação dissertativa.</p></div>
+        <div class="pg pg-p"><div class="tags"><span>Unicamp</span><span>Redação em gêneros</span></div><h3>Comvest</h3><p>Questões interdisciplinares e redação com gênero, interlocutor e propósito definidos.</p></div>
+        <div class="pg pg-v"><div class="tags"><span>Unesp</span><span>Vunesp</span></div><h3>Unesp</h3><p>Prova de conhecimentos gerais e redação dissertativa a partir de coletânea.</p></div>
+        <div class="pg pg-p"><div class="tags"><span>180 questões</span><span>2 dias + redação</span></div><h3>ENEM</h3><p>Porta para federais pelo SiSU e para bolsas, com redação nas 5 competências.</p></div>
+        <div class="pg pg-v"><div class="tags"><span>Rede pública de SP</span><span>Seriado</span></div><h3>Provão Paulista</h3><p>Avaliação seriada que dá acesso a vagas em universidades públicas paulistas.</p></div>
       </div>
     </section>
 
@@ -1109,7 +1157,7 @@ function renderLanding(){
     ${planCardsHTML(true)}
 
     <div class="l-final">${SPARK("#FF44C9",30,"right:30px","top:16px")}<h2 class="h-big">Sua vaga começa <em>hoje</em></h2><button class="l-cta" data-enter>Entrar na plataforma</button></div>
-    <div class="l-foot"><span>Easy Study · questões do ENEM via projeto aberto enem-api</span><span>Feito para vestibulandos de Medicina</span></div>
+    <div class="l-foot"><span>Easy Study · questões do ENEM via projeto aberto enem-api</span><span>Feito para quem sonha com USP, Unicamp, Unesp e federais</span></div>
   </div>`;
 }
 
@@ -1128,7 +1176,7 @@ function paintTop(){
   const el=document.getElementById("topStreak"); if(!el) return;
   el.innerHTML=FLAME+`<span class="num">${streak()} ${streak()===1?"dia":"dias"}</span>`;
   document.getElementById("meName").textContent=S.name||"Estudante";
-  const ms=document.getElementById("meSub");if(ms)ms.textContent="Rumo à "+(ACC?.perfil?.curso_foco||"Medicina");
+  const ms=document.getElementById("meSub");if(ms)ms.textContent="Meta: "+(ACC?.perfil?.curso_foco||"curso dos sonhos");
   document.getElementById("avatar").textContent=(S.name||"E").trim()[0].toUpperCase();
 }
 function toast(msg){const t=document.getElementById("toast");t.textContent=msg;t.hidden=false;clearTimeout(toast._t);toast._t=setTimeout(()=>t.hidden=true,2400);}
@@ -1175,8 +1223,9 @@ function getSample(){
   return samplePromise;
 }
 // Mensagem amigável para o aluno; o motivo técnico fica só no console do navegador.
+const cursoAluno=()=>{const p=ACC?.perfil;if(!p?.curso_foco)return "";return `O aluno quer cursar ${p.curso_foco}${p.faculdade?" na "+p.faculdade:""}${p.vestibulares?.length?" e vai prestar "+p.vestibulares.join(", "):""}; quando fizer sentido, conecte a explicação com esse objetivo.`;};
 const errMsg=e=>{if(e&&(e.detail||e.code))console.warn("[Easier]",e.code,e.detail||"");return errCopy(e&&e.code);};
-const errCopy=c=>({not_granted:"Você não autorizou a Easier nesta página. Recarregue e permita para usar este recurso.",rate_limited:"A Easier está com muita demanda agora. Espere um minutinho e tente de novo.",no_key:"A Easier está em manutenção no momento. Tente de novo mais tarde.",limit_reached:"Você usou todos os usos da Easier do seu plano neste mês. Eles renovam no dia 1º, ou você pode mudar para o Medicina Pro na aba Planos. A correção automática de redação continua liberada.",login_required:"Entre na sua conta para usar a Easier.",no_plan:"Seu plano não está ativo. Assine um plano na aba Planos para usar a Easier."}[c]||"A Easier está com muita demanda agora. Tente de novo em instantes.");
+const errCopy=c=>({not_granted:"Você não autorizou a Easier nesta página. Recarregue e permita para usar este recurso.",rate_limited:"A Easier está com muita demanda agora. Espere um minutinho e tente de novo.",no_key:"A Easier está em manutenção no momento. Tente de novo mais tarde.",limit_reached:"Você usou todos os usos da Easier do seu plano neste mês. Eles renovam no dia 1º, ou você pode mudar para o Easy Pro na aba Planos. A correção automática de redação continua liberada.",login_required:"Entre na sua conta para usar a Easier.",no_plan:"Seu plano não está ativo. Assine um plano na aba Planos para usar a Easier."}[c]||"A Easier está com muita demanda agora. Tente de novo em instantes.");
 function mdBlock(t){
   const lines=esc(t).split("\n"); let out="",inList=false;
   const inline=s=>s.replace(/\*\*(.+?)\*\*/g,"<strong>$1</strong>").replace(/(^|\s)\*(?!\s)(.+?)\*/g,"$1<em>$2</em>");
@@ -1217,9 +1266,9 @@ function vPainel(){
   return contaStripHTML()+`
   <div class="hero">
     <div class="hero-main">${STAR("var(--lime)",54,"right:22px","top:20px",10)}${STAR("var(--pink)",30,"right:90px","bottom:86px",-15)}
-      <h1 class="h-big">${lastMod?`Continue<br><em>${esc(lastMod.t)}</em>`:`Rumo à<br><em>${esc(ACC?.perfil?.curso_foco||"Medicina")}</em><br>${ACC?.perfil?.faculdade?"na "+esc(ACC.perfil.faculdade):"sem parar"}`}</h1>
-      <p>${lastMod?`${esc(lastMod.s)} · módulo ${lastMod.i+1} de ${MOD[lastMod.s].length}. ${esc(lastMod.d)}`:`Comece pelos módulos de Biologia, Química e Física, que pesam mais nas notas de corte de Medicina.`}</p>
-      <button class="btn lime" data-mod="${lastMod?lastMod.id:nextModule("Biologia")}">${lastMod?"Continuar módulo":"Começar o primeiro módulo"}</button>
+      <h1 class="h-big">${lastMod?`Continue<br><em>${esc(lastMod.t)}</em>`:`Meta:<br><em>${esc(ACC?.perfil?.curso_foco||"curso dos sonhos")}</em><br>${ACC?.perfil?.faculdade?"na "+esc(ACC.perfil.faculdade):"sem parar"}`}</h1>
+      <p>${lastMod?`${esc(lastMod.s)} · módulo ${lastMod.i+1} de ${MOD[lastMod.s].length}. ${esc(lastMod.d)}`:`Comece pela matéria que mais pesa no seu curso: ${esc(pesosDoCurso(ACC?.perfil?.curso_foco)[0][0])}.`}</p>
+      <button class="btn lime" data-mod="${lastMod?lastMod.id:nextModule(pesosDoCurso(ACC?.perfil?.curso_foco)[0][0])}">${lastMod?"Continuar módulo":"Começar o primeiro módulo"}</button>
     </div>
     <div class="stack">
       <div class="streak">${STAR("var(--pink)",40,"right:12px","top:10px",20)}
@@ -1379,7 +1428,7 @@ async function genLesson(id){
   const box=()=>document.getElementById("aiText");
   if(!sample){if(box())box().innerHTML=`<p class="muted">A Easier está indisponível agora. Tente de novo em instantes.</p>`;return;}
   modState.aiBusy=true; delete S.lessons[id]; render(); if(box())box().innerHTML="<p class='muted'>Pensando na melhor forma de explicar…</p>";
-  const prompt=`Seu nome é Easier, a tutora de IA da plataforma Easy Study. Você é uma professora de cursinho pré-vestibular de Medicina no Brasil. Escreva uma aula completa e didática sobre "${mm.t}" (${m.s}), para um aluno que se prepara para ENEM, FUVEST, Unicamp e Unesp.
+  const prompt=`Seu nome é Easier, a tutora de IA da plataforma Easy Study. Você é uma professora de cursinho pré-vestibular no Brasil. ${cursoAluno()} Escreva uma aula completa e didática sobre "${mm.t}" (${m.s}), para um aluno que se prepara para ENEM, FUVEST, Unicamp e Unesp.
 
 Use este resumo da plataforma como base e aprofunde muito além dele:
 ${mm.s.map(x=>"- "+x[0]+": "+x[1]).join("\n")}
@@ -1405,7 +1454,7 @@ async function askQuestion(){
   const sample=await getSample(); const out=()=>document.getElementById("askOut");
   if(!sample){modState.askOut="A Easier está indisponível agora. Tente de novo em instantes.";render();return;}
   modState.askBusy=true; if(out())out().innerHTML=`<div class="ai-out small">Pensando…</div>`;
-  const prompt=`Seu nome é Easier, a tutora de IA da plataforma Easy Study, professora de cursinho pré-vestibular (Medicina). Se perguntarem quem você é, diga que é a Easier. O aluno está estudando o módulo "${mm.t}" de ${m.s}. Conteúdo do módulo:\n${mm.s.map(x=>x[0]+": "+x[1]).join("\n")}\n\nPergunta do aluno: ${qtext}\n\nResponda em português do Brasil, de forma clara e correta, em até 150 palavras, com um exemplo se ajudar. Use texto simples ou "- " para listas.`;
+  const prompt=`Seu nome é Easier, a tutora de IA da plataforma Easy Study, professora de cursinho pré-vestibular. ${cursoAluno()} Se perguntarem quem você é, diga que é a Easier. O aluno está estudando o módulo "${mm.t}" de ${m.s}. Conteúdo do módulo:\n${mm.s.map(x=>x[0]+": "+x[1]).join("\n")}\n\nPergunta do aluno: ${qtext}\n\nResponda em português do Brasil, de forma clara e correta, em até 150 palavras, com um exemplo se ajudar. Use texto simples ou "- " para listas.`;
   try{const {text}=await sample(prompt,{modelTier:"default",kb:m.s==="Redação"?"redacao":undefined,onText:({text})=>{if(out())out().innerHTML=`<div class="ai-out small">${mdBlock(text)}</div>`;}});modState.askOut=text;}
   catch(e){modState.askOut=(e&&e.text)||errMsg(e);}
   modState.askBusy=false; if(VIEW==="modulos")render();
@@ -1731,7 +1780,7 @@ function vRotina(){const today=(new Date().getDay()+6)%7,totalMin=S.routine.redu
     ${bl.map(b=>`<div class="blk" style="background:${subjColor(b.s)}"><b>${esc(b.s)}</b><span class="num">${b.h} · ${b.dur} min</span>${b.note?`<br>${esc(b.note)}`:""}<button class="x" data-delblk="${b.id}" aria-label="Remover bloco">×</button></div>`).join("")||`<span class="small muted">Livre</span>`}</div>`}).join("")}</div>
   <div class="grid forms">
     <form class="card form" id="genForm"><h3 style="font-size:17px">Gerar rotina automática</h3>
-      <p class="small muted" style="margin:0">Mais peso em Biologia, Química, Física e Matemática, que decidem Medicina, e redação duas vezes por semana.</p>
+      <p class="small muted" style="margin:0">Distribui as matérias pelo peso que elas têm no seu curso (${esc(ACC?.perfil?.curso_foco||"curso dos sonhos")}), com redação duas vezes por semana.</p>
       <div class="two"><label>Começo (seg–sex)<input type="time" id="gStart" class="inp" value="14:00"></label><label>Horas por dia útil<input type="number" id="gHours" class="inp" min="1" max="12" value="5"></label></div>
       <div class="two"><label>Horas no sábado<input type="number" id="gSat" class="inp" min="0" max="12" value="4"></label><label>Horas no domingo<input type="number" id="gSun" class="inp" min="0" max="12" value="0"></label></div>
       <label>Bloco<select id="gBlock" class="inp"><option value="50">50 min</option><option value="60" selected>60 min</option><option value="90">90 min</option></select></label>
@@ -1745,8 +1794,15 @@ function vRotina(){const today=(new Date().getDay()+6)%7,totalMin=S.routine.redu
       <button class="btn sm ghost" data-addexam style="align-self:flex-start">Adicionar prova</button>
       <p class="note" style="margin:0">Datas de ENEM 2026, FUVEST 2027 e Unesp 2027 divulgadas até agora. Unicamp e Provão Paulista ainda sem data: preencha quando sair o edital.</p></div>
   </div>`;}
+function pesosDoCurso(c){
+  c=(c||"").toLowerCase();
+  if(/medicina|odonto|enferm|fisio|farm|biomed|nutri|veterin/.test(c))return [["Biologia",5],["Química",4],["Matemática",3],["Física",3],["Linguagens",2],["História",1],["Geografia",1],["Filosofia e Sociologia",1]];
+  if(/engenh|computa|sistemas|física|matem|arquitet/.test(c))return [["Matemática",5],["Física",4],["Química",3],["Linguagens",2],["Biologia",1],["História",1],["Geografia",1],["Filosofia e Sociologia",1]];
+  if(/direito|psico|letras|jornal|relações|história|pedagog|ciências sociais|publicid|administra|econom/.test(c))return [["Linguagens",4],["História",3],["Filosofia e Sociologia",3],["Geografia",2],["Matemática",3],["Biologia",1],["Química",1],["Física",1]];
+  return [["Matemática",3],["Linguagens",3],["Biologia",2],["Química",2],["Física",2],["História",2],["Geografia",2],["Filosofia e Sociologia",1]];
+}
 function genRoutine(start,hours,sat,sun,block){
-  const weights=[["Biologia",5],["Química",4],["Matemática",4],["Física",3],["Linguagens",2],["História",1],["Geografia",1],["Filosofia e Sociologia",1]];
+  const weights=pesosDoCurso(ACC?.perfil?.curso_foco||"");
   const bag=[];weights.forEach(([s,w])=>{for(let i=0;i<w;i++)bag.push(s);});
   const out=[];let p=0;const [hh,mm]=start.split(":").map(Number);const perDay=[hours,hours,hours,hours,hours,sat,sun];
   perDay.forEach((h,d)=>{const n=Math.floor(h*60/block);let t=(d>=5?9*60:hh*60+mm);
@@ -1835,7 +1891,7 @@ async function explainQ(id){
   const q=QMAP[id],box=document.getElementById("exp-"+id);if(!box)return;const sample=await getSample();
   if(!sample){box.innerHTML=`<div class="explain">A Easier está indisponível agora. Tente de novo em instantes.</div>`;return;}
   box.innerHTML=`<div class="explain" id="expT-${id}">Pensando…</div>`;const chosen=S.ans[id]??S.sim?.ans?.[id];
-  const prompt=`Seu nome é Easier, a tutora de IA da plataforma Easy Study, professora de cursinho pré-vestibular para Medicina. Explique a resolução desta questão do ENEM ${q.y} de forma clara e curta (até 180 palavras), em português do Brasil, em texto simples sem markdown. Diga por que a alternativa correta está certa, por que a alternativa marcada pelo aluno está errada (se errou) e termine com uma dica de conteúdo para revisar.\n\nTexto-base: ${q.c}\nEnunciado: ${q.q}\nAlternativas:\n${q.o.map((o,i)=>"ABCDE"[i]+") "+o).join("\n")}\nGabarito: ${"ABCDE"[q.k]}\nAlternativa marcada pelo aluno: ${chosen===undefined?"nenhuma":"ABCDE"[chosen]}`;
+  const prompt=`Seu nome é Easier, a tutora de IA da plataforma Easy Study, professora de cursinho pré-vestibular. ${cursoAluno()} Explique a resolução desta questão do ENEM ${q.y} de forma clara e curta (até 180 palavras), em português do Brasil, em texto simples sem markdown. Diga por que a alternativa correta está certa, por que a alternativa marcada pelo aluno está errada (se errou) e termine com uma dica de conteúdo para revisar.\n\nTexto-base: ${q.c}\nEnunciado: ${q.q}\nAlternativas:\n${q.o.map((o,i)=>"ABCDE"[i]+") "+o).join("\n")}\nGabarito: ${"ABCDE"[q.k]}\nAlternativa marcada pelo aluno: ${chosen===undefined?"nenhuma":"ABCDE"[chosen]}`;
   try{const {text}=await sample(prompt,{modelTier:"default",onText:({text})=>{const el=document.getElementById("expT-"+id);if(el)el.textContent=text;}});qExplain[id]=text;const el=document.getElementById("expT-"+id);if(el)el.textContent=text;}
   catch(err){const el=document.getElementById("expT-"+id);if(el)el.textContent=err&&err.text?err.text:errMsg(err);}
 }
@@ -1845,8 +1901,8 @@ const SUPA_URL="https://gqncndoiuitharlgrznr.supabase.co";
 const SUPA_KEY="sb_publishable_eTHs4clz9v_Q3mxicuKsmQ_H66lKv2z";
 // Os mesmos limites estão no servidor (api/easier.js)
 const PLANS={
-  foco:{nome:"Foco",preco:24.90,usos:200,redacoes:10,cls:"pg-v",desc:"Para quem estuda todo dia e quer a Easier por perto.",itens:["Todos os módulos, questões, simulados e rotina","Correção automática de redação ilimitada","200 usos da Easier por mês","10 correções de redação com a Easier por mês","Aulas completas e dúvidas sem aperto"]},
-  medicina:{nome:"Medicina Pro",preco:44.90,usos:350,redacoes:20,cls:"pg-p",desc:"Para a reta final de Medicina, com redação toda semana.",itens:["Tudo do plano Foco","350 usos da Easier por mês","20 correções de redação com a Easier por mês","Ideal para treinar uma redação a cada 2 dias"]}
+  plus:{nome:"Easy Plus",preco:24.90,usos:200,redacoes:10,cls:"pg-v",desc:"Para quem estuda todo dia e quer a Easier por perto.",itens:["Todos os módulos, questões, simulados e rotina","Correção automática de redação ilimitada","200 usos da Easier por mês","10 correções de redação com a Easier por mês"]},
+  pro:{nome:"Easy Pro",preco:44.90,usos:350,redacoes:20,cls:"pg-p",desc:"Para a reta final, com redação corrigida toda semana.",itens:["Tudo do Easy Plus","350 usos da Easier por mês","20 correções de redação com a Easier por mês","Ideal para treinar uma redação a cada 2 dias"]}
 };
 // Contato para assinar (preencha com o seu WhatsApp, só números com DDI e DDD, e/ou e-mail)
 const CONTATO={whatsapp:"",email:""};
@@ -1872,7 +1928,7 @@ async function carregarConta(user){
     sb.from("uso_ia").select("usos,redacoes").eq("user_id",user.id).eq("mes",mesAtual()).maybeSingle(),
     sb.from("progresso").select("dados,atualizado_em").eq("user_id",user.id).maybeSingle()
   ]);
-  ACC.perfil=p.data||{nome:user.user_metadata?.nome||"",curso_foco:"Medicina",faculdade:"",vestibulares:[],meta_horas_semana:20,meta_texto:""};
+  ACC.perfil=p.data||{nome:user.user_metadata?.nome||"",curso_foco:"",faculdade:"",vestibulares:[],meta_horas_semana:20,meta_texto:""};
   ACC.assinatura=a.data||{plano:"nenhum"};
   if(u.data)ACC.uso=u.data;
   // progresso: usa o mais recente entre nuvem e este aparelho
@@ -1918,9 +1974,9 @@ function renderAuth(){
       <label>Faculdade dos sonhos<input class="inp" id="cFacul" list="faculList" placeholder="Ex.: USP" maxlength="120"></label></div>
       <fieldset class="vests"><legend>Vestibulares que vou prestar</legend>${VESTS.map((v,i)=>`<label class="chk"><input type="checkbox" value="${v}" ${i<2?"checked":""}> ${v}</label>`).join("")}</fieldset>
       <div class="two"><label>Meta de estudo (horas por semana)<input class="inp" id="cHoras" type="number" min="1" max="100" value="20"></label><label>Ano da prova<select class="inp" id="cAno"><option>2026</option><option>2027</option><option>2028</option></select></label></div>
-      <label>Minha meta<textarea class="inp" id="cMeta" rows="2" maxlength="250" placeholder="Ex.: passar em Medicina na USP e tirar 900+ na redação"></textarea></label>
+      <label>Minha meta<textarea class="inp" id="cMeta" rows="2" maxlength="250" placeholder="Ex.: passar em Psicologia na USP e tirar 900+ na redação"></textarea></label>
       <button class="l-cta" ${authBusy?"disabled":""}>${authBusy?"Criando conta…":"Criar conta"}</button>
-      <p class="note" style="margin:0">Depois de criar a conta, você escolhe o plano Foco ou Medicina Pro para liberar a plataforma.</p></form>
+      <p class="note" style="margin:0">Depois de criar a conta, você escolhe o Easy Plus ou o Easy Pro para liberar a plataforma.</p></form>
       <datalist id="faculList">${FACULDADES.map(f=>`<option value="${f}">`).join("")}</datalist>`;
   else if(authMode==="recuperar") body=`<form id="resetForm" class="form"><p class="small" style="margin:0">Enviaremos um link para você criar uma nova senha.</p>
       <label>E-mail<input class="inp" id="rEmail" type="email" autocomplete="email" required></label>
@@ -1987,7 +2043,7 @@ function planCardsHTML(ctaLanding){
   const atual=ACC?planoAtual():null;
   return `<div class="progs plan-cards">${Object.entries(PLANS).map(([k,p])=>`
     <div class="pg ${p.cls}">
-      <div class="tags">${k==="medicina"?"<span>Mais completo</span>":""}<span>${p.usos} usos/mês</span><span>${p.redacoes} redações/mês</span></div>
+      <div class="tags">${k==="pro"?"<span>Mais completo</span>":""}<span>${p.usos} usos/mês</span><span>${p.redacoes} redações/mês</span></div>
       <h3>${p.nome}</h3>
       <div class="price"><b class="num">${brl(p.preco)}</b>${p.preco?"<span>/mês</span>":""}</div>
       <p>${p.desc}</p>
@@ -2058,7 +2114,7 @@ function contaStripHTML(){
   if(!ACC)return "";
   const k=planoAtual();if(!k)return "";const p=PLANS[k],u=ACC.uso||{},m=metaSemana(),pf=ACC.perfil||{};
   return `<div class="acc-strip">
-    <div class="acc-who"><span class="avatar">${esc((pf.nome||"E").trim()[0]?.toUpperCase()||"E")}</span><div><b>${esc(pf.nome||"Estudante")}</b><div class="small muted">${esc(pf.curso_foco||"Medicina")}${pf.faculdade?" · "+esc(pf.faculdade):""}</div></div></div>
+    <div class="acc-who"><span class="avatar">${esc((pf.nome||"E").trim()[0]?.toUpperCase()||"E")}</span><div><b>${esc(pf.nome||"Estudante")}</b><div class="small muted">${esc(pf.curso_foco||"Curso dos sonhos")}${pf.faculdade?" · "+esc(pf.faculdade):""}</div></div></div>
     <div class="acc-stat"><span class="small muted">Plano</span><b>${esc(p.nome)}</b></div>
     <div class="acc-stat"><span class="small muted">Easier no mês</span><b class="num">${u.usos||0}/${p.usos}</b></div>
     <div class="acc-stat"><span class="small muted">Redações no mês</span><b class="num">${u.redacoes||0}/${p.redacoes}</b></div>

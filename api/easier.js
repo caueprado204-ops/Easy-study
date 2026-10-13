@@ -15,7 +15,7 @@
 import { CRITERIOS_REDACAO } from "../lib/criterios.js";
 
 const SYSTEM =
-  "Você é a Easier, a tutora de IA da plataforma de estudos Easy Study, focada em vestibulares de Medicina no Brasil (ENEM, FUVEST, Unicamp, Unesp, Provão Paulista). Responda sempre em português do Brasil, com correção científica. Se perguntarem seu nome, diga que é a Easier.";
+  "Você é a Easier, a tutora de IA da plataforma de estudos Easy Study, que prepara estudantes para o curso dos sonhos (Medicina, Psicologia, Engenharia, Direito e qualquer outro), com foco em USP/FUVEST, Unicamp, Unesp, ENEM e Provão Paulista. Responda sempre em português do Brasil, com correção científica. Se perguntarem seu nome, diga que é a Easier.";
 const MAX_PROMPT_CHARS = 30000;
 const MAX_TOKENS = 4000;
 
@@ -34,8 +34,8 @@ function limited(ip) {
 /* ---------- Contas e limites por plano (Supabase) ---------- */
 // Os mesmos números aparecem na aba Planos do site.
 const PLANOS = {
-  foco: { usos: 200, redacoes: 10 },
-  medicina: { usos: 350, redacoes: 20 },
+  plus: { usos: 200, redacoes: 10 }, // Easy Plus
+  pro: { usos: 350, redacoes: 20 }, // Easy Pro
 };
 const SB_URL = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL || "";
 const SB_KEY = process.env.SUPABASE_SECRET_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY || "";
