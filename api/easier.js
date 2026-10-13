@@ -9,6 +9,8 @@
 //   - Anthropic (pago):         ANTHROPIC_API_KEY
 // AI_PROVIDER define a ordem, por exemplo "gemini,groq,anthropic" (esse é o padrão).
 
+import { CRITERIOS_REDACAO } from "../lib/criterios.js";
+
 const SYSTEM =
   "Você é a Easier, a tutora de IA da plataforma de estudos Easy Study, focada em vestibulares de Medicina no Brasil (ENEM, FUVEST, Unicamp, Unesp, Provão Paulista). Responda sempre em português do Brasil, com correção científica. Se perguntarem seu nome, diga que é a Easier.";
 const MAX_PROMPT_CHARS = 30000;
@@ -53,6 +55,8 @@ export default async function handler(req, res) {
   }
   const body = typeof req.body === "string" ? safeJSON(req.body) : req.body || {};
   const prompt = typeof body?.prompt === "string" ? body.prompt : "";
+  // Base de conhecimento: em temas de redação, a Easier recebe os critérios oficiais de correção
+  const system = body?.kb === "redacao" ? `${SYSTEM}\n\n${CRITERIOS_REDACAO}` : SYSTEM;
   if (!prompt.trim() || prompt.length > MAX_PROMPT_CHARS) {
     res.status(400).json({ code: "bad_prompt" });
     return;
@@ -63,7 +67,7 @@ export default async function handler(req, res) {
   const tried = [];
   for (const provider of providers) {
     try {
-      const r = await PROVIDERS[provider](prompt, tried);
+      const r = await PROVIDERS[provider](prompt, tried, system);
       if (r.ok) {
         ok = r;
         break;
@@ -122,14 +126,14 @@ export default async function handler(req, res) {
 // Cada provedor devolve { ok: true, provider, response, extract } ou { ok: false, status, detail }.
 const PROVIDERS = {
   /* ---------- Google Gemini ---------- */
-  async gemini(prompt, tried) {
+  async gemini(prompt, tried, system) {
     const models = [...new Set([process.env.GEMINI_MODEL, "gemini-3.8-flash", "gemini-flash-latest", "gemini-3.6-flash", "gemini-3.5-flash-lite"].filter(Boolean))];
     let last = { ok: false, status: 502, detail: "" };
     // Chaves novas do AI Studio ("AQ.") funcionam na API Interactions;
     // chaves antigas ("AIza") funcionam na generateContent. Tenta as duas.
     for (const model of models) {
       for (const api of ["interactions", "generate"]) {
-        const r = await callGemini(prompt, model, api);
+        const r = await callGemini(prompt, model, api, system);
         tried.push(`gemini ${model}/${api}:${r.status}`);
         if (r.ok && r.body) return { ok: true, provider: "gemini", response: r, extract: geminiText };
         last = { ok: false, status: r.status, detail: await r.text().catch(() => "") };
@@ -141,7 +145,7 @@ const PROVIDERS = {
   },
 
   /* ---------- Groq (API compatível com OpenAI) ---------- */
-  async groq(prompt, tried) {
+  async groq(prompt, tried, system) {
     const model = process.env.GROQ_MODEL || "openai/gpt-oss-120b";
     const r = await fetch("https://api.groq.com/openai/v1/chat/completions", {
       method: "POST",
@@ -151,7 +155,7 @@ const PROVIDERS = {
         stream: true,
         max_tokens: MAX_TOKENS,
         messages: [
-          { role: "system", content: SYSTEM },
+          { role: "system", content: system },
           { role: "user", content: prompt },
         ],
       }),
@@ -162,7 +166,7 @@ const PROVIDERS = {
   },
 
   /* ---------- Anthropic ---------- */
-  async anthropic(prompt, tried) {
+  async anthropic(prompt, tried, system) {
     const model = process.env.ANTHROPIC_MODEL || "claude-sonnet-5-5";
     const r = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
@@ -171,7 +175,7 @@ const PROVIDERS = {
         "x-api-key": process.env.ANTHROPIC_API_KEY,
         "anthropic-version": "2023-06-01",
       },
-      body: JSON.stringify({ model, max_tokens: MAX_TOKENS, stream: true, system: SYSTEM, messages: [{ role: "user", content: prompt }] }),
+      body: JSON.stringify({ model, max_tokens: MAX_TOKENS, stream: true, system, messages: [{ role: "user", content: prompt }] }),
     });
     tried.push(`anthropic ${model}:${r.status}`);
     if (r.ok && r.body) return { ok: true, provider: "anthropic", response: r, extract: anthropicText };
@@ -179,13 +183,13 @@ const PROVIDERS = {
   },
 };
 
-function callGemini(prompt, model, api) {
+function callGemini(prompt, model, api, system) {
   const headers = { "content-type": "application/json", "x-goog-api-key": process.env.GEMINI_API_KEY };
   if (api === "interactions") {
     return fetch("https://generativelanguage.googleapis.com/v1beta/interactions?alt=sse", {
       method: "POST",
       headers,
-      body: JSON.stringify({ model, input: `${SYSTEM}\n\n${prompt}`, stream: true }),
+      body: JSON.stringify({ model, input: `${system}\n\n${prompt}`, stream: true }),
     });
   }
   return fetch(
@@ -194,7 +198,7 @@ function callGemini(prompt, model, api) {
       method: "POST",
       headers,
       body: JSON.stringify({
-        systemInstruction: { parts: [{ text: SYSTEM }] },
+        systemInstruction: { parts: [{ text: system }] },
         contents: [{ role: "user", parts: [{ text: prompt }] }],
         generationConfig: { maxOutputTokens: MAX_TOKENS * 2 },
       }),
