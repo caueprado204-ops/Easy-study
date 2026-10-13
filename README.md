@@ -21,7 +21,7 @@ Não há etapa de build: a Vercel publica o `index.html` como site estático e o
 1. Crie um repositório no GitHub (ex.: `easy-study`) e envie todos os arquivos desta pasta.
 2. Em vercel.com, clique em **Add New → Project** e importe o repositório.
 3. Framework Preset: **Other**. Não precisa de Build Command nem Output Directory.
-4. Em **Environment Variables**, adicione `ANTHROPIC_API_KEY` com sua chave (crie em console.anthropic.com).
+4. Em **Environment Variables**, adicione `GEMINI_API_KEY` com sua chave gratuita do Google AI Studio (veja abaixo).
 5. Clique em **Deploy**. Cada novo commit publica uma nova versão automaticamente.
 
 ### Opção 2 — pela linha de comando
@@ -30,20 +30,36 @@ Não há etapa de build: a Vercel publica o `index.html` como site estático e o
 npm i -g vercel
 cd easy-study
 vercel                 # primeiro deploy (cria o projeto)
-vercel env add ANTHROPIC_API_KEY
+vercel env add GEMINI_API_KEY
 vercel --prod          # publica em produção
 ```
 
 ## A Easier (IA)
 
-A Easier gera aulas completas por módulo, responde dúvidas, explica questões e corrige redações. No site publicado, o navegador chama `/api/easier`, que usa a API da Anthropic com a chave guardada na Vercel. Sem a variável `ANTHROPIC_API_KEY`, o site funciona normalmente e só os recursos de IA mostram um aviso.
+A Easier gera aulas completas por módulo, responde dúvidas, explica questões e corrige redações. No site publicado, o navegador chama `/api/easier`, que fala com o provedor de IA usando a chave guardada na Vercel. Sem nenhuma chave, o site funciona normalmente e só os recursos de IA mostram um aviso.
 
-Variáveis opcionais:
+### Opção gratuita: Google Gemini
 
-- `ANTHROPIC_MODEL` — modelo usado (padrão: `claude-sonnet-5-5`).
+1. Entre em **aistudio.google.com** com sua conta Google.
+2. Clique em **Get API key → Create API key**.
+3. Na Vercel, abra o projeto → **Settings → Environment Variables** e adicione `GEMINI_API_KEY` com essa chave.
+4. Faça um novo deploy (**Deployments → ⋯ → Redeploy**) para a chave valer.
+
+Cuidados do plano gratuito:
+- O limite de pedidos é do projeto inteiro, não de cada aluno. Veja o seu no Google AI Studio.
+- O Google pode usar o conteúdo enviado no plano gratuito para melhorar os produtos dele. Evite enviar dados pessoais.
+- Não ative cobrança no projeto do Google se quiser continuar no gratuito.
+
+### Opção paga: Anthropic
+
+Adicione `ANTHROPIC_API_KEY` (console.anthropic.com) e `AI_PROVIDER=anthropic`. As aulas longas e a correção de redação ficam mais precisas. Cada uso gasta créditos da sua conta: defina um limite de gastos no console antes de divulgar o site.
+
+### Variáveis opcionais
+
+- `GEMINI_MODEL` — padrão `gemini-3.8-flash`.
+- `ANTHROPIC_MODEL` — padrão `claude-sonnet-5-5`.
+- `AI_PROVIDER` — `gemini` ou `anthropic`, quando as duas chaves existem.
 - `EASIER_RATE_LIMIT` — pedidos por minuto por IP (padrão: 12).
-
-**Custos:** cada uso da Easier gasta créditos da sua conta da Anthropic. A função tem um limite simples por IP, mas o site é público. Defina um limite de gastos no console da Anthropic antes de divulgar.
 
 ## Progresso dos alunos
 
