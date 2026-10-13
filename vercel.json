@@ -1,0 +1,9 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "functions": {
+    "api/easier.js": { "maxDuration": 60 }
+  },
+  "headers": [
+    { "source": "/questoes.json", "headers": [{ "key": "Cache-Control", "value": "public, max-age=86400" }] }
+  ]
+}
