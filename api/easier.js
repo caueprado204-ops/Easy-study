@@ -60,14 +60,17 @@ export default async function handler(req, res) {
   let upstream, tried = [];
   try {
     if (provider === "gemini") {
-      for (const model of geminiModels()) {
-        upstream = await callGemini(prompt, model);
-        tried.push(`${model}:${upstream.status}`);
-        // modelo inexistente ou indisponível no plano: tenta o próximo
-        if (upstream.ok || ![400, 403, 404].includes(upstream.status)) break;
-        const msg = await upstream.text().catch(() => "");
-        console.error(`[easier] gemini ${model} ${upstream.status}: ${msg.slice(0, 300)}`);
-        upstream._detail = msg;
+      // Chaves novas do AI Studio (prefixo "AQ.") funcionam na API Interactions;
+      // chaves antigas ("AIza") funcionam na generateContent. Tenta as duas.
+      outer: for (const model of geminiModels()) {
+        for (const api of ["interactions", "generate"]) {
+          upstream = await callGemini(prompt, model, api);
+          tried.push(`${model}/${api}:${upstream.status}`);
+          if (upstream.ok || upstream.status === 429) break outer;
+          const msg = await upstream.text().catch(() => "");
+          console.error(`[easier] gemini ${model}/${api} ${upstream.status}: ${msg.slice(0, 300)}`);
+          upstream._detail = msg;
+        }
       }
     } else {
       upstream = await callAnthropic(prompt);
@@ -126,12 +129,20 @@ function geminiModels() {
   const list = [process.env.GEMINI_MODEL, "gemini-3.8-flash", "gemini-flash-latest", "gemini-3.6-flash", "gemini-3.5-flash-lite"];
   return [...new Set(list.filter(Boolean))];
 }
-function callGemini(prompt, model) {
+function callGemini(prompt, model, api) {
+  const headers = { "content-type": "application/json", "x-goog-api-key": process.env.GEMINI_API_KEY };
+  if (api === "interactions") {
+    return fetch("https://generativelanguage.googleapis.com/v1beta/interactions?alt=sse", {
+      method: "POST",
+      headers,
+      body: JSON.stringify({ model, input: `${SYSTEM}\n\n${prompt}`, stream: true }),
+    });
+  }
   return fetch(
     `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:streamGenerateContent?alt=sse`,
     {
       method: "POST",
-      headers: { "content-type": "application/json", "x-goog-api-key": process.env.GEMINI_API_KEY },
+      headers,
       body: JSON.stringify({
         systemInstruction: { parts: [{ text: SYSTEM }] },
         contents: [{ role: "user", parts: [{ text: prompt }] }],
@@ -141,7 +152,13 @@ function callGemini(prompt, model) {
   );
 }
 function geminiText(data) {
-  const parts = data?.candidates?.[0]?.content?.parts || [];
+  if (!data) return "";
+  // API Interactions: eventos "step.delta" com delta de texto
+  if (data.event_type === "step.delta" || data.delta) {
+    return data.delta?.type === "text" && typeof data.delta.text === "string" ? data.delta.text : "";
+  }
+  // API generateContent
+  const parts = data.candidates?.[0]?.content?.parts || [];
   return parts.filter((p) => !p.thought && typeof p.text === "string").map((p) => p.text).join("");
 }
 
@@ -171,7 +188,7 @@ function anthropicText(data) {
 function shortError(text) {
   const j = safeJSON(text);
   const msg = j?.error?.message || j?.error?.type || text || "";
-  return String(msg).replace(/AIza[0-9A-Za-z_-]{10,}/g, "[chave]").slice(0, 240);
+  return String(msg).replace(/(AIza|AQ\.)[0-9A-Za-z_.-]{10,}/g, "[chave]").slice(0, 240);
 }
 
 function safeJSON(s) {

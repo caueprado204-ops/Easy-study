@@ -21,7 +21,7 @@ Não há etapa de build: a Vercel publica o `index.html` como site estático e o
 1. Crie um repositório no GitHub (ex.: `easy-study`) e envie todos os arquivos desta pasta.
 2. Em vercel.com, clique em **Add New → Project** e importe o repositório.
 3. Framework Preset: **Other**. Não precisa de Build Command nem Output Directory.
-4. Em **Environment Variables**, adicione `GEMINI_API_KEY` com sua chave gratuita do Google AI Studio (veja abaixo).
+4. Em **Environment Variables**, adicione `GEMINI_API_KEY` com sua chave gratuita do Google AI Studio (veja abaixo). Chaves novas começam com `AQ.` e funcionam normalmente.
 5. Clique em **Deploy**. Cada novo commit publica uma nova versão automaticamente.
 
 ### Opção 2 — pela linha de comando
