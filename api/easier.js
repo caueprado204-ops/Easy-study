@@ -57,19 +57,37 @@ export default async function handler(req, res) {
     return;
   }
 
-  let upstream;
+  let upstream, tried = [];
   try {
-    upstream = provider === "gemini" ? await callGemini(prompt) : await callAnthropic(prompt);
+    if (provider === "gemini") {
+      for (const model of geminiModels()) {
+        upstream = await callGemini(prompt, model);
+        tried.push(`${model}:${upstream.status}`);
+        // modelo inexistente ou indisponível no plano: tenta o próximo
+        if (upstream.ok || ![400, 403, 404].includes(upstream.status)) break;
+        const msg = await upstream.text().catch(() => "");
+        console.error(`[easier] gemini ${model} ${upstream.status}: ${msg.slice(0, 300)}`);
+        upstream._detail = msg;
+      }
+    } else {
+      upstream = await callAnthropic(prompt);
+    }
   } catch (e) {
-    res.status(502).json({ code: "upstream_unreachable" });
+    res.status(502).json({ code: "upstream_unreachable", detail: String(e).slice(0, 200) });
     return;
   }
   if (!upstream.ok || !upstream.body) {
     const status = upstream.status === 429 ? 429 : 502;
-    let detail = "";
-    try { detail = (await upstream.text()).slice(0, 300); } catch {}
-    console.error(`[easier] ${provider} respondeu ${upstream.status}: ${detail}`);
-    res.status(status).json({ code: status === 429 ? "rate_limited" : "upstream_error" });
+    let detail = upstream._detail || "";
+    if (!detail) { try { detail = await upstream.text(); } catch {} }
+    detail = shortError(detail);
+    console.error(`[easier] ${provider} falhou (${tried.join(", ") || upstream.status}): ${detail}`);
+    res.status(status).json({
+      code: status === 429 ? "rate_limited" : "upstream_error",
+      provider,
+      status: upstream.status,
+      detail,
+    });
     return;
   }
 
@@ -104,8 +122,11 @@ export default async function handler(req, res) {
 }
 
 /* ---------- Google Gemini ---------- */
-function callGemini(prompt) {
-  const model = process.env.GEMINI_MODEL || "gemini-3.8-flash";
+function geminiModels() {
+  const list = [process.env.GEMINI_MODEL, "gemini-3.8-flash", "gemini-flash-latest", "gemini-3.6-flash", "gemini-3.5-flash-lite"];
+  return [...new Set(list.filter(Boolean))];
+}
+function callGemini(prompt, model) {
   return fetch(
     `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:streamGenerateContent?alt=sse`,
     {
@@ -144,6 +165,13 @@ function callAnthropic(prompt) {
 }
 function anthropicText(data) {
   return data?.type === "content_block_delta" && data.delta?.type === "text_delta" ? data.delta.text : "";
+}
+
+// Extrai só a mensagem de erro do provedor (nunca inclui a chave).
+function shortError(text) {
+  const j = safeJSON(text);
+  const msg = j?.error?.message || j?.error?.type || text || "";
+  return String(msg).replace(/AIza[0-9A-Za-z_-]{10,}/g, "[chave]").slice(0, 240);
 }
 
 function safeJSON(s) {

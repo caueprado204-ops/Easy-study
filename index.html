@@ -998,7 +998,7 @@ function serverSample(){
     let r;
     try{r=await fetch("/api/easier",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({prompt:input}),signal:opts.signal});}
     catch(e){throw {code:"network",message:String(e)};}
-    if(!r.ok){let code="server";try{const j=await r.json();code=j.code||code;}catch(e){}if(r.status===429)code="rate_limited";throw {code};}
+    if(!r.ok){let code="server",detail="";try{const j=await r.json();code=j.code||code;detail=[j.status&&("HTTP "+j.status),j.detail].filter(Boolean).join(" · ");}catch(e){detail="HTTP "+r.status+" em /api/easier";}if(r.status===429&&code!=="rate_limited"&&!detail)code="rate_limited";throw {code,detail};}
     const reader=r.body.getReader(),dec=new TextDecoder();let text="";
     while(true){const {done,value}=await reader.read();if(done)break;const delta=dec.decode(value,{stream:true});text+=delta;opts.onText&&opts.onText({text,delta});}
     return {text,truncated:false};
@@ -1014,6 +1014,7 @@ function getSample(){
   }
   return samplePromise;
 }
+const errMsg=e=>errCopy(e&&e.code)+(e&&e.detail?" (detalhe: "+e.detail+")":"");
 const errCopy=c=>({not_granted:"Você não autorizou a Easier nesta página. Recarregue e permita para usar este recurso.",rate_limited:"Muitos pedidos seguidos. Espere um minuto e tente de novo.",no_key:"A Easier ainda não foi configurada neste site (falta a chave da API no servidor)."}[c]||"Não foi possível falar com a Easier agora. Tente de novo em instantes.");
 function mdBlock(t){
   const lines=esc(t).split("\n"); let out="",inList=false;
@@ -1235,7 +1236,7 @@ Escreva em português do Brasil, em markdown simples (só "## " para títulos, "
   try{
     const {text}=await sample(prompt,{modelTier:"default",cache:false,onText:({text})=>{if(box())box().innerHTML=mdBlock(text);}});
     S.lessons[id]=text; save(); addXP(10);
-  }catch(e){if(e&&e.text){S.lessons[id]=e.text;save();}else if(box())box().innerHTML=`<p class="muted">${esc(errCopy(e&&e.code))}</p>`;}
+  }catch(e){if(e&&e.text){S.lessons[id]=e.text;save();}else if(box())box().innerHTML=`<p class="muted">${esc(errMsg(e))}</p>`;}
   modState.aiBusy=false; if(VIEW==="modulos"&&modState.id===id) render();
 }
 async function askQuestion(){
@@ -1245,7 +1246,7 @@ async function askQuestion(){
   modState.askBusy=true; if(out())out().innerHTML=`<div class="ai-out small">Pensando…</div>`;
   const prompt=`Seu nome é Easier, a tutora de IA da plataforma Easy Study, professora de cursinho pré-vestibular (Medicina). Se perguntarem quem você é, diga que é a Easier. O aluno está estudando o módulo "${mm.t}" de ${m.s}. Conteúdo do módulo:\n${mm.s.map(x=>x[0]+": "+x[1]).join("\n")}\n\nPergunta do aluno: ${qtext}\n\nResponda em português do Brasil, de forma clara e correta, em até 150 palavras, com um exemplo se ajudar. Use texto simples ou "- " para listas.`;
   try{const {text}=await sample(prompt,{modelTier:"default",onText:({text})=>{if(out())out().innerHTML=`<div class="ai-out small">${mdBlock(text)}</div>`;}});modState.askOut=text;}
-  catch(e){modState.askOut=(e&&e.text)||errCopy(e&&e.code);}
+  catch(e){modState.askOut=(e&&e.text)||errMsg(e);}
   modState.askBusy=false; if(VIEW==="modulos")render();
 }
 
@@ -1363,7 +1364,7 @@ async function correctEssay(){
   essayBusy=true;essayResult=null;render();
   const prompt=`Seu nome é Easier, a corretora de IA da plataforma Easy Study, com experiência em redações do ENEM. Corrija a redação abaixo seguindo a matriz oficial das 5 competências (cada uma de 0 a 200, em múltiplos de 40). Seja rigoroso e justo, como a banca. Comentários objetivos em português do Brasil, citando trechos curtos do texto quando útil.\n\nTema: ${theme}\n\nRedação:\n"""\n${text}\n"""\n\nResponda SOMENTE com JSON neste formato:\n{"competencias":[{"nota":0,"comentario":""},{"nota":0,"comentario":""},{"nota":0,"comentario":""},{"nota":0,"comentario":""},{"nota":0,"comentario":""}],"total":0,"resumo":"uma frase de avaliação geral","melhorias":["3 a 5 ações concretas para melhorar"]}`;
   try{const r=await sample.json(prompt,{modelTier:"default"});r.competencias=(r.competencias||[]).slice(0,5).map(c=>({nota:Math.max(0,Math.min(200,Math.round((+c.nota||0)/40)*40)),comentario:String(c.comentario||"")}));r.total=r.competencias.reduce((a,c)=>a+c.nota,0);essayResult=r;S.essays.push({theme,total:r.total,date:Date.now()});addXP(40);save();}
-  catch(e){essayResult={error:errCopy(e&&e.code)};}
+  catch(e){essayResult={error:errMsg(e)};}
   essayBusy=false;if(VIEW==="redacao")render();
 }
 
@@ -1478,7 +1479,7 @@ async function explainQ(id){
   box.innerHTML=`<div class="explain" id="expT-${id}">Pensando…</div>`;const chosen=S.ans[id]??S.sim?.ans?.[id];
   const prompt=`Seu nome é Easier, a tutora de IA da plataforma Easy Study, professora de cursinho pré-vestibular para Medicina. Explique a resolução desta questão do ENEM ${q.y} de forma clara e curta (até 180 palavras), em português do Brasil, em texto simples sem markdown. Diga por que a alternativa correta está certa, por que a alternativa marcada pelo aluno está errada (se errou) e termine com uma dica de conteúdo para revisar.\n\nTexto-base: ${q.c}\nEnunciado: ${q.q}\nAlternativas:\n${q.o.map((o,i)=>"ABCDE"[i]+") "+o).join("\n")}\nGabarito: ${"ABCDE"[q.k]}\nAlternativa marcada pelo aluno: ${chosen===undefined?"nenhuma":"ABCDE"[chosen]}`;
   try{const {text}=await sample(prompt,{modelTier:"default",onText:({text})=>{const el=document.getElementById("expT-"+id);if(el)el.textContent=text;}});qExplain[id]=text;const el=document.getElementById("expT-"+id);if(el)el.textContent=text;}
-  catch(err){const el=document.getElementById("expT-"+id);if(el)el.textContent=err&&err.text?err.text:errCopy(err&&err.code);}
+  catch(err){const el=document.getElementById("expT-"+id);if(el)el.textContent=err&&err.text?err.text:errMsg(err);}
 }
 
 /* ---------- início ---------- */
