@@ -57,6 +57,10 @@ Quando o Gemini fica sem cota, a Easier passa sozinha para o Groq.
 1. Entre em **console.groq.com**, vá em **API Keys → Create API Key**.
 2. Na Vercel, adicione `GROQ_API_KEY` em **Production** e reimplante.
 
+### Grok, da xAI (pago)
+
+Não confunda com o Groq acima. O Grok é a IA da xAI e é cobrado por uso. Para ativar, crie uma chave em **console.x.ai**, adicione `XAI_API_KEY` na Vercel (Production) e reimplante. Por padrão ele entra depois do Gemini e do Groq; para usá-lo primeiro, defina `AI_PROVIDER=grok,gemini,groq`.
+
 ### Correção automática de redação (sem IA)
 
 O corretor de redação também tem uma **correção automática** que funciona sempre, mesmo sem nenhuma chave: confere tamanho, parágrafos, informalidade, repertório, conectivos, palavras repetidas e os 5 elementos da proposta de intervenção. A ortografia e a gramática são revisadas pelo serviço público gratuito do [LanguageTool](https://languagetool.org). Se a Easier estiver com muita demanda, essa correção aparece no lugar.
@@ -69,7 +73,8 @@ Adicione `ANTHROPIC_API_KEY` (console.anthropic.com) e `AI_PROVIDER=anthropic`. 
 
 - `GEMINI_MODEL` — padrão `gemini-3.8-flash`.
 - `ANTHROPIC_MODEL` — padrão `claude-sonnet-5-5`.
-- `AI_PROVIDER` — ordem das IAs (padrão `gemini,groq,anthropic`).
+- `AI_PROVIDER` — ordem das IAs (padrão `gemini,groq,grok,anthropic`).
+- `XAI_MODEL` — padrão `grok-4.7`.
 - `GROQ_MODEL` — padrão `openai/gpt-oss-120b`.
 - `EASIER_RATE_LIMIT` — pedidos por minuto por IP (padrão: 12).
 

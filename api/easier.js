@@ -6,8 +6,9 @@
 // se ele estiver sem cota ou fora do ar, passa automaticamente para o próximo):
 //   - Google Gemini (gratuito): GEMINI_API_KEY
 //   - Groq (gratuito):          GROQ_API_KEY
+//   - Grok, da xAI (pago):      XAI_API_KEY
 //   - Anthropic (pago):         ANTHROPIC_API_KEY
-// AI_PROVIDER define a ordem, por exemplo "gemini,groq,anthropic" (esse é o padrão).
+// AI_PROVIDER define a ordem, por exemplo "gemini,groq,grok,anthropic" (esse é o padrão).
 
 import { CRITERIOS_REDACAO } from "../lib/criterios.js";
 
@@ -28,13 +29,13 @@ function limited(ip) {
   return list.length > MAX_PER_WINDOW;
 }
 
-const KEYS = { gemini: "GEMINI_API_KEY", groq: "GROQ_API_KEY", anthropic: "ANTHROPIC_API_KEY" };
+const KEYS = { gemini: "GEMINI_API_KEY", groq: "GROQ_API_KEY", grok: "XAI_API_KEY", anthropic: "ANTHROPIC_API_KEY" };
 function providerOrder() {
-  const wanted = (process.env.AI_PROVIDER || "gemini,groq,anthropic")
+  const wanted = (process.env.AI_PROVIDER || "gemini,groq,grok,anthropic")
     .toLowerCase()
     .split(",")
     .map((s) => s.trim());
-  const order = [...new Set([...wanted, "gemini", "groq", "anthropic"])];
+  const order = [...new Set([...wanted, "gemini", "groq", "grok", "anthropic"])];
   return order.filter((p) => KEYS[p] && process.env[KEYS[p]]);
 }
 
@@ -165,6 +166,27 @@ const PROVIDERS = {
     return { ok: false, status: r.status, detail: await r.text().catch(() => "") };
   },
 
+  /* ---------- Grok, da xAI (API compatível com OpenAI) ---------- */
+  async grok(prompt, tried, system) {
+    const model = process.env.XAI_MODEL || "grok-4.7";
+    const r = await fetch("https://api.x.ai/v1/chat/completions", {
+      method: "POST",
+      headers: { "content-type": "application/json", authorization: `Bearer ${process.env.XAI_API_KEY}` },
+      body: JSON.stringify({
+        model,
+        stream: true,
+        max_tokens: MAX_TOKENS,
+        messages: [
+          { role: "system", content: system },
+          { role: "user", content: prompt },
+        ],
+      }),
+    });
+    tried.push(`grok ${model}:${r.status}`);
+    if (r.ok && r.body) return { ok: true, provider: "grok", response: r, extract: openaiText };
+    return { ok: false, status: r.status, detail: await r.text().catch(() => "") };
+  },
+
   /* ---------- Anthropic ---------- */
   async anthropic(prompt, tried, system) {
     const model = process.env.ANTHROPIC_MODEL || "claude-sonnet-5-5";
@@ -229,7 +251,7 @@ function shortError(text) {
   const j = safeJSON(text);
   const msg = j?.error?.message || j?.error?.type || text || "";
   return String(msg)
-    .replace(/(AIza|AQ\.|gsk_|sk-ant-)[0-9A-Za-z_.-]{10,}/g, "[chave]")
+    .replace(/(AIza|AQ\.|gsk_|xai-|sk-ant-)[0-9A-Za-z_.-]{10,}/g, "[chave]")
     .slice(0, 240);
 }
 
