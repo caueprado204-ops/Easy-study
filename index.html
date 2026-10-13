@@ -332,6 +332,46 @@ select,.inp{border:1.5px solid var(--line);border-radius:10px;padding:7px 10px;b
 .pl div{flex:1;min-width:0}
 .pl b{display:block}
 
+
+/* ---------- contas e planos ---------- */
+.auth-wrap{max-width:1080px;margin:0 auto;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:14px;background:var(--cream);border-radius:6px;padding:14px}
+.auth-side{background:var(--violet);color:var(--white);border-radius:24px;padding:30px;position:relative;overflow:hidden;display:flex;flex-direction:column;gap:16px;min-height:520px}
+.auth-side h1{font-size:clamp(34px,4.6vw,54px);margin-top:auto}
+.auth-side h1 em{font-style:normal;color:var(--lime)}
+.auth-side p{color:#D3CFFF;max-width:38ch;margin:0}
+.auth-logo{align-self:flex-start;background:var(--lime);color:var(--ink);border:0;border-radius:999px;padding:8px 18px;font-family:var(--display);font-weight:900;font-size:16px;position:relative;z-index:1}
+.auth-logo span{color:var(--violet)}
+.auth-card{background:var(--white);border:1.5px solid var(--line);border-radius:24px;padding:24px;display:flex;flex-direction:column;gap:14px;align-self:start}
+.auth-card .l-cta{width:100%}
+.auth-card .form{gap:12px}
+.auth-tabs{display:grid;grid-template-columns:1fr 1fr;border:1.5px solid var(--line);border-radius:999px;padding:4px;gap:4px}
+.auth-tabs button{border:0;background:transparent;border-radius:999px;padding:9px;font-family:var(--display);font-weight:800;text-transform:uppercase;font-size:13px}
+.auth-tabs button.on{background:var(--ink);color:var(--lime)}
+.auth-link{border:0;background:none;color:var(--violet);text-decoration:underline;font-size:13px;align-self:center}
+.auth-msg{border:1.5px solid var(--bad);background:#FFE1DA;border-radius:12px;padding:10px 12px;font-size:14px}
+.auth-msg.ok{border-color:var(--ok);background:#D9F7E4}
+.vests{border:1.5px solid var(--hair);border-radius:12px;padding:8px 12px;display:flex;flex-wrap:wrap;gap:6px 14px;margin:0}
+.vests legend{font-size:13px;font-weight:500;padding:0 4px}
+.chk{font-size:13px;display:flex!important;flex-direction:row!important;align-items:center;gap:6px!important}
+.plan-cards{margin:0!important;gap:14px!important}
+.plan-cards .pg{border-radius:24px;min-height:auto;gap:12px}
+.plan-cards .pg h3{margin-top:6px}
+.plan-cards .price b{font-family:var(--display);font-weight:900;font-size:34px}
+.plan-cards .price span{font-size:13px;opacity:.85;margin-left:4px}
+.plan-cards ul{margin:0;padding-left:18px;font-size:13.5px;display:flex;flex-direction:column;gap:4px}
+.plan-cards .l-cta{margin-top:auto;padding:12px}
+.cur-plan{margin-top:auto;align-self:flex-start;background:var(--white);color:var(--ink);border-radius:999px;padding:7px 14px;font-weight:700;font-size:13px}
+.usage-card{display:flex;flex-direction:column;gap:12px;margin-bottom:14px}
+.ubs{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+.ub .bar{margin-top:4px}
+.acc-strip{display:flex;align-items:center;gap:12px 22px;flex-wrap:wrap;border:1.5px solid var(--line);border-radius:18px;background:var(--white);padding:12px 16px;margin-bottom:14px}
+.acc-who{display:flex;align-items:center;gap:10px;margin-right:auto;min-width:0}
+.acc-stat{display:flex;flex-direction:column;line-height:1.25}
+.acc-btns{display:flex;gap:8px}
+.nav .navbtn{color:#FFB4A3}
+@media (max-width:860px){.auth-wrap{grid-template-columns:1fr;border-radius:0;padding:12px 16px}.auth-side{min-height:auto}.auth-side h1{margin-top:20px}}
+@media (max-width:760px){.acc-btns{width:100%}.acc-btns .btn{flex:1}.plan-cards{grid-template-columns:1fr!important}}
+
 @media (max-width:1100px){
   .reader{grid-template-columns:200px minmax(0,1fr)}
   .reader .side{grid-column:1/-1;display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
@@ -369,6 +409,7 @@ select,.inp{border:1.5px solid var(--line);border-radius:10px;padding:7px 10px;b
 </style>
 
 <div id="landing"></div>
+<div id="auth" hidden></div>
 <div id="app" hidden>
   <div class="frame">
     <nav class="nav" id="nav" aria-label="Seções"></nav>
@@ -380,7 +421,7 @@ select,.inp{border:1.5px solid var(--line);border-radius:10px;padding:7px 10px;b
           <button aria-label="Buscar"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></button>
         </form>
         <div class="flame" id="topStreak" title="Dias seguidos estudando"></div>
-        <div class="me"><span class="avatar" id="avatar">C</span><div><strong id="meName">Cauê</strong><small>Rumo à Medicina</small></div></div>
+        <div class="me"><span class="avatar" id="avatar">C</span><div><strong id="meName">Cauê</strong><small id="meSub">Rumo à Medicina</small></div></div>
       </header>
       <section id="view"></section>
     </main>
@@ -919,6 +960,7 @@ ex:["Um viajante diz que a comida de outro país é 'nojenta' por ser diferente 
 ];
 
 </script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.js"></script>
 <script>
 /* ---------- matérias ---------- */
 const SUBJ = {
@@ -966,7 +1008,7 @@ const PLAYLISTS=[{n:"Lo-fi para estudar",q:"lofi study",c:"var(--lilac)"},{n:"Cl
 const KEY="easystudy.v1";
 let S={name:"Cauê",entered:false,act:{},ans:{},watched:{},read:{},modDone:{},lessons:{},routine:[],exams:DEFAULT_EXAMS,sims:[],essays:[],spotify:"",sim:null,essayDraft:"",essayTheme:ESSAY_THEMES[0]};
 try{const raw=localStorage.getItem(KEY)||localStorage.getItem("jaleco.v1");if(raw)S=Object.assign(S,JSON.parse(raw));}catch(e){}
-function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
+function save(){S.__t=Date.now();try{localStorage.setItem(userKey(),JSON.stringify(S));}catch(e){}if(typeof agendarNuvem==="function")agendarNuvem();}
 const pad=n=>String(n).padStart(2,"0");
 const dkey=d=>d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate());
 const todayKey=()=>dkey(new Date());
@@ -979,6 +1021,8 @@ const daysUntil=ds=>{if(!ds)return null;const t=new Date(ds+"T00:00");const n=ne
 
 /* ---------- ícones ---------- */
 const I={
+ planos:'<path d="M12 2 3 7l9 5 9-5z"/><path d="m3 12 9 5 9-5M3 17l9 5 9-5"/>',
+ conta:'<circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/>',
  painel:'<path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h6v6h-6z"/>',
  modulos:'<path d="M4 5a2 2 0 0 1 2-2h12v16H6a2 2 0 0 0-2 2z"/><path d="M4 21V5M8 7h6M8 11h6"/>',
  aulas:'<rect x="3" y="5" width="18" height="14" rx="3"/><path d="m10 9 5 3-5 3z"/>',
@@ -988,7 +1032,7 @@ const I={
  rotina:'<rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/>',
  foco:'<path d="M9 18V6l11-2v12"/><circle cx="6" cy="18" r="3"/><circle cx="17" cy="16" r="3"/>'
 };
-const LABEL={painel:"Painel",modulos:"Módulos",aulas:"Videoaulas",questoes:"Questões",simulados:"Simulados e provas",redacao:"Redação",rotina:"Rotina e calendário",foco:"Foco e música"};
+const LABEL={planos:"Planos",conta:"Minha conta",painel:"Painel",modulos:"Módulos",aulas:"Videoaulas",questoes:"Questões",simulados:"Simulados e provas",redacao:"Redação",rotina:"Rotina e calendário",foco:"Foco e música"};
 const svg=(p,s=21)=>`<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${p}</svg>`;
 const FLAME='<svg viewBox="0 0 24 24"><path d="M12 2c1 4 5 5.5 5 11a5 5 0 0 1-10 0c0-2.5 1.2-4 2.5-5 .2 2 1.2 3 2.5 3-1.5-3 0-6 0-9z" fill="#FF5B37" stroke="#1C1B1A" stroke-width="1.5" stroke-linejoin="round"/></svg>';
 const STAR=(c,s,x,y,r=0)=>`<svg class="star" style="width:${s}px;height:${s}px;${x};${y};transform:rotate(${r}deg)" viewBox="0 0 40 40"><g fill="${c}">${[0,45,90,135].map(a=>`<rect x="17" y="2" width="6" height="36" rx="3" transform="rotate(${a} 20 20)"/>`).join("")}</g></svg>`;
@@ -1006,14 +1050,15 @@ function renderLanding(){
       <span class="logo">EASY<span>STUDY</span></span>
       <a class="lk" href="#como">Como funciona</a>
       <a class="lk" href="#vestibulares">Vestibulares</a>
-      <button class="pill-btn" data-enter>Entrar</button>
+      <a class="lk" href="#planos">Planos</a>
+      <button class="pill-btn" data-enter>${ACC?"Abrir plataforma":"Entrar"}</button>
     </nav>
     <div class="l-hero">
       <div class="l-main">
         <span class="half" style="right:-40px;top:40px"></span><span class="half" style="right:60px;top:40px;opacity:.7"></span>
         <h1 class="h-big">Plataforma<br><em>de estudos</em><br>para quem quer<br>Medicina</h1>
         <p>ENEM, FUVEST, Unicamp, Unesp e Provão Paulista: módulos completos, questões reais e uma rotina que cabe na sua semana.</p>
-        <button class="l-cta" data-enter>Começar agora</button>
+        <button class="l-cta" ${ACC?"data-enter":"data-enter-signup"}>${ACC?"Continuar estudando":"Criar conta grátis"}</button>
       </div>
       <div class="l-small"><span>60 módulos em<br>9 matérias</span><hr><span>${nq} questões reais do ENEM</span></div>
       <div class="l-photo" aria-hidden="true">
@@ -1058,6 +1103,9 @@ function renderLanding(){
       </div>
     </section>
 
+    <h2 class="h-big l-sec-title" id="planos">Planos que cabem<br>no seu bolso</h2>
+    ${planCardsHTML(true)}
+
     <div class="l-final">${SPARK("#FF44C9",30,"right:30px","top:16px")}<h2 class="h-big">Sua vaga começa <em>hoje</em></h2><button class="l-cta" data-enter>Entrar na plataforma</button></div>
     <div class="l-foot"><span>Easy Study · questões do ENEM via projeto aberto enem-api</span><span>Feito para vestibulandos de Medicina</span></div>
   </div>`;
@@ -1071,12 +1119,14 @@ function showLanding(on){
   if(on) renderLanding();
   window.scrollTo({top:0});
 }
-function buildNav(){document.getElementById("nav").innerHTML=Object.keys(I).map(k=>`<button data-go="${k}" aria-label="${LABEL[k]}" class="${k===VIEW?"on":""}">${svg(I[k])}<span class="tip">${LABEL[k]}</span></button>`).join("");}
+const NAV_ORDER=["painel","modulos","aulas","questoes","simulados","redacao","rotina","foco","planos","conta"];
+function buildNav(){document.getElementById("nav").innerHTML=NAV_ORDER.map(k=>`<button data-go="${k}" aria-label="${LABEL[k]}" class="${k===VIEW?"on":""}">${svg(I[k])}<span class="tip">${LABEL[k]}</span></button>`).join("")+`<span class="sep"></span><button class="navbtn" data-logout aria-label="Sair da conta">${svg('<path d="M15 4h4v16h-4"/><path d="M10 8l-4 4 4 4M6 12h10"/>')}<span class="tip">Sair da conta</span></button>`;}
 function go(v){VIEW=v;buildNav();render();try{history.replaceState(null,"","#"+v);}catch(e){}window.scrollTo({top:0});}
 function paintTop(){
   const el=document.getElementById("topStreak"); if(!el) return;
   el.innerHTML=FLAME+`<span class="num">${streak()} ${streak()===1?"dia":"dias"}</span>`;
   document.getElementById("meName").textContent=S.name||"Estudante";
+  const ms=document.getElementById("meSub");if(ms)ms.textContent="Rumo à "+(ACC?.perfil?.curso_foco||"Medicina");
   document.getElementById("avatar").textContent=(S.name||"E").trim()[0].toUpperCase();
 }
 function toast(msg){const t=document.getElementById("toast");t.textContent=msg;t.hidden=false;clearTimeout(toast._t);toast._t=setTimeout(()=>t.hidden=true,2400);}
@@ -1099,9 +1149,13 @@ let samplePromise=null;
 function serverSample(){
   const f=async(input,opts={})=>{
     let r;
-    try{r=await fetch("/api/easier",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({prompt:input,kb:opts.kb||undefined}),signal:opts.signal});}
+    const hdr={"content-type":"application/json"};
+    try{const ses=sb?(await sb.auth.getSession()).data.session:null;if(ses)hdr.authorization="Bearer "+ses.access_token;}catch(e){}
+    try{r=await fetch("/api/easier",{method:"POST",headers:hdr,body:JSON.stringify({prompt:input,kb:opts.kb||undefined,tipo:opts.tipo||undefined}),signal:opts.signal});}
     catch(e){throw {code:"network",message:String(e)};}
-    if(!r.ok){let code="server",detail="";try{const j=await r.json();code=j.code||code;detail=[j.status&&("HTTP "+j.status),j.detail].filter(Boolean).join(" · ");}catch(e){detail="HTTP "+r.status+" em /api/easier";}if(r.status===429&&code!=="rate_limited"&&!detail)code="rate_limited";throw {code,detail};}
+    const hu=r.headers.get("X-Easier-Usos"),hr=r.headers.get("X-Easier-Redacoes");
+    if(ACC&&hu){ACC.uso={usos:+hu.split("/")[0],redacoes:+(hr||"0/0").split("/")[0]};}
+    if(!r.ok){let code="server",detail="";try{const j=await r.json();code=j.code||code;if(ACC&&j.code==="limit_reached"){ACC.uso={usos:j.usos,redacoes:j.redacoes};}detail=[j.status&&("HTTP "+j.status),j.detail].filter(Boolean).join(" · ");}catch(e){detail="HTTP "+r.status+" em /api/easier";}if(r.status===429&&code!=="rate_limited"&&!detail)code="rate_limited";throw {code,detail};}
     const reader=r.body.getReader(),dec=new TextDecoder();let text="";
     while(true){const {done,value}=await reader.read();if(done)break;const delta=dec.decode(value,{stream:true});text+=delta;opts.onText&&opts.onText({text,delta});}
     return {text,truncated:false};
@@ -1120,7 +1174,7 @@ function getSample(){
 }
 // Mensagem amigável para o aluno; o motivo técnico fica só no console do navegador.
 const errMsg=e=>{if(e&&(e.detail||e.code))console.warn("[Easier]",e.code,e.detail||"");return errCopy(e&&e.code);};
-const errCopy=c=>({not_granted:"Você não autorizou a Easier nesta página. Recarregue e permita para usar este recurso.",rate_limited:"A Easier está com muita demanda agora. Espere um minutinho e tente de novo.",no_key:"A Easier está em manutenção no momento. Tente de novo mais tarde."}[c]||"A Easier está com muita demanda agora. Tente de novo em instantes.");
+const errCopy=c=>({not_granted:"Você não autorizou a Easier nesta página. Recarregue e permita para usar este recurso.",rate_limited:"A Easier está com muita demanda agora. Espere um minutinho e tente de novo.",no_key:"A Easier está em manutenção no momento. Tente de novo mais tarde.",limit_reached:"Você usou todos os usos da Easier do seu plano neste mês. Veja a aba Planos para continuar. A correção automática de redação continua liberada.",login_required:"Entre na sua conta para usar a Easier."}[c]||"A Easier está com muita demanda agora. Tente de novo em instantes.");
 function mdBlock(t){
   const lines=esc(t).split("\n"); let out="",inList=false;
   const inline=s=>s.replace(/\*\*(.+?)\*\*/g,"<strong>$1</strong>").replace(/(^|\s)\*(?!\s)(.+?)\*/g,"$1<em>$2</em>");
@@ -1136,7 +1190,7 @@ function mdBlock(t){
 
 /* ---------- render ---------- */
 function render(){
-  const map={painel:vPainel,modulos:vModulos,aulas:vAulas,questoes:vQuestoes,simulados:vSimulados,redacao:vRedacao,rotina:vRotina,foco:vFoco};
+  const map={planos:vPlanos,conta:vConta,painel:vPainel,modulos:vModulos,aulas:vAulas,questoes:vQuestoes,simulados:vSimulados,redacao:vRedacao,rotina:vRotina,foco:vFoco};
   document.getElementById("view").innerHTML=map[VIEW]();
   if(VIEW==="foco")paintPomo();
 }
@@ -1158,10 +1212,10 @@ function vPainel(){
   const essayBest=Math.max(0,...S.essays.map(e=>e.total||0)), mods=Object.keys(S.modDone).length;
   const badges=[["Primeira questão",qs.n>=1],["Primeiro módulo",mods>=1],["10 módulos",mods>=10],["100 questões",qs.n>=100],["3 dias seguidos",bestStreak()>=3],["7 dias seguidos",bestStreak()>=7],["30 dias seguidos",bestStreak()>=30],["Simulado feito",S.sims.length>0],["Redação 900+",essayBest>=900]];
   const lastMod=S.lastMod&&MODMAP[S.lastMod];
-  return `
+  return contaStripHTML()+`
   <div class="hero">
     <div class="hero-main">${STAR("var(--lime)",54,"right:22px","top:20px",10)}${STAR("var(--pink)",30,"right:90px","bottom:86px",-15)}
-      <h1 class="h-big">${lastMod?`Continue<br><em>${esc(lastMod.t)}</em>`:`Rumo à<br><em>Medicina</em><br>sem parar`}</h1>
+      <h1 class="h-big">${lastMod?`Continue<br><em>${esc(lastMod.t)}</em>`:`Rumo à<br><em>${esc(ACC?.perfil?.curso_foco||"Medicina")}</em><br>${ACC?.perfil?.faculdade?"na "+esc(ACC.perfil.faculdade):"sem parar"}`}</h1>
       <p>${lastMod?`${esc(lastMod.s)} · módulo ${lastMod.i+1} de ${MOD[lastMod.s].length}. ${esc(lastMod.d)}`:`Comece pelos módulos de Biologia, Química e Física, que pesam mais nas notas de corte de Medicina.`}</p>
       <button class="btn lime" data-mod="${lastMod?lastMod.id:nextModule("Biologia")}">${lastMod?"Continuar módulo":"Começar o primeiro módulo"}</button>
     </div>
@@ -1659,7 +1713,7 @@ Responda SOMENTE com JSON neste formato:
 {"competencias":[{"nota":0,"nivel":"descritor do nível aplicado","comentario":"justificativa com trechos do texto"},{"nota":0,"nivel":"","comentario":""},{"nota":0,"nivel":"","comentario":""},{"nota":0,"nivel":"","comentario":""},{"nota":0,"nivel":"","comentario":""}],"elementos_c5":{"acao":"","agente":"","modo_meio":"","efeito":"","detalhamento":""},"total":0,"resumo":"uma frase de avaliação geral","melhorias":["3 a 5 ações concretas para subir a nota, citando a competência"]}
 As notas de cada competência são 0, 40, 80, 120, 160 ou 200. Em elementos_c5, copie o trecho de cada elemento válido ou deixe vazio se ele não existir ou for nulo.`;
   let failed=false;
-  try{if(!sample)throw {code:"server"};const r=await sample.json(prompt,{modelTier:"default",kb:"redacao"});r.competencias=(r.competencias||[]).slice(0,5).map(c=>({nota:Math.max(0,Math.min(200,Math.round((+c.nota||0)/40)*40)),nivel:String(c.nivel||""),comentario:String(c.comentario||"")}));r.total=r.competencias.reduce((a,c)=>a+c.nota,0);essayResult=r;S.essays.push({theme,total:r.total,date:Date.now()});addXP(40);save();}
+  try{if(!sample)throw {code:"server"};const r=await sample.json(prompt,{modelTier:"default",kb:"redacao",tipo:"redacao"});r.competencias=(r.competencias||[]).slice(0,5).map(c=>({nota:Math.max(0,Math.min(200,Math.round((+c.nota||0)/40)*40)),nivel:String(c.nivel||""),comentario:String(c.comentario||"")}));r.total=r.competencias.reduce((a,c)=>a+c.nota,0);essayResult=r;S.essays.push({theme,total:r.total,date:Date.now()});addXP(40);save();}
   catch(e){essayResult={error:errMsg(e)};failed=true;}
   essayBusy=false;
   // se a IA falhar, a correção automática entra no lugar
@@ -1718,10 +1772,12 @@ setInterval(()=>{if(!pomo.running)return;const left=Math.round((pomo.endAt-Date.
   paintPomo();},500);
 
 /* ---------- eventos ---------- */
-function enterApp(){S.entered=true;save();showLanding(false);buildNav();paintTop();render();try{history.replaceState(null,"","#"+VIEW);}catch(e){}}
+function enterApp(){if(ACC)abrirApp();else showAuth("login");}
 document.addEventListener("click",e=>{
   const t=e.target.closest("button,a");if(!t)return;const d=t.dataset;
   if(d.enter!==undefined){enterApp();return;}
+  if(d.enterSignup!==undefined){if(ACC){abrirApp();go("planos");}else showAuth("cadastro");return;}
+  if(d.authReset!==undefined){sb.auth.resetPasswordForEmail(ACC.user.email,{redirectTo:location.origin}).then(()=>toast("Enviamos o link para trocar a senha no seu e-mail."));return;}
   if(d.landing!==undefined){showLanding(true);try{history.replaceState(null,"","#inicio");}catch(e){}return;}
   if(d.go){e.preventDefault();go(d.go);return;}
   if(d.area){areaFilter=d.area;render();return;}
@@ -1782,10 +1838,251 @@ async function explainQ(id){
   catch(err){const el=document.getElementById("expT-"+id);if(el)el.textContent=err&&err.text?err.text:errMsg(err);}
 }
 
+/* ---------- contas (Supabase) ---------- */
+const SUPA_URL="https://gqncndoiuitharlgrznr.supabase.co";
+const SUPA_KEY="sb_publishable_eTHs4clz9v_Q3mxicuKsmQ_H66lKv2z";
+// Os mesmos limites estão no servidor (api/easier.js)
+const PLANS={
+  gratis:{nome:"Grátis",preco:0,usos:30,redacoes:2,cls:"pg-v",desc:"Para conhecer a plataforma e manter a constância.",itens:["Todos os módulos, questões e simulados","Correção automática de redação ilimitada","30 usos da Easier por mês","2 correções de redação com a Easier por mês"]},
+  foco:{nome:"Foco",preco:24.90,usos:200,redacoes:10,cls:"pg-p",desc:"Para quem estuda todo dia e quer a Easier por perto.",itens:["Tudo do plano Grátis","200 usos da Easier por mês","10 correções de redação com a Easier por mês","Aulas completas e dúvidas sem aperto"]},
+  medicina:{nome:"Medicina Pro",preco:44.90,usos:350,redacoes:20,cls:"pg-v",desc:"Para a reta final de Medicina, com redação toda semana.",itens:["Tudo do plano Foco","350 usos da Easier por mês","20 correções de redação com a Easier por mês","Ideal para treinar uma redação a cada 2 dias"]}
+};
+// Contato para assinar (preencha com o seu WhatsApp, só números com DDI e DDD, e/ou e-mail)
+const CONTATO={whatsapp:"",email:""};
+const CURSOS=["Medicina","Odontologia","Enfermagem","Fisioterapia","Psicologia","Farmácia","Biomedicina","Nutrição","Medicina Veterinária","Direito","Engenharia","Outro"];
+const FACULDADES=["USP","Unicamp","Unesp","UNIFESP","UFMG","UFRJ","UFPR","UFRGS","UFSC","UnB","UFBA","UFPE","UFC","UFSCar","Santa Casa de SP","PUC","Outra"];
+const VESTS=["ENEM","FUVEST","Unicamp","Unesp","Provão Paulista","UNIFESP (via ENEM)","Outro"];
+
+let sb=null, ACC=null, authMode="login", authMsg="", authBusy=false, cloudTimer=null;
+try{ if(window.supabase) sb=window.supabase.createClient(SUPA_URL,SUPA_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}}); }catch(e){console.warn("[contas]",e);}
+const brl=v=>v===0?"R$ 0":"R$ "+v.toFixed(2).replace(".",",");
+const mesAtual=()=>{const d=new Date();return d.getFullYear()+"-"+pad(d.getMonth()+1);};
+const planoAtual=()=>{const p=ACC?.assinatura;if(!p||!PLANS[p.plano])return "gratis";if(p.valido_ate&&new Date(p.valido_ate+"T23:59:59-03:00")<new Date())return "gratis";return p.plano;};
+
+function userKey(){return ACC?.user?.id?KEY+":"+ACC.user.id:KEY;}
+function loadLocalFor(id){try{const raw=localStorage.getItem(KEY+":"+id);return raw?JSON.parse(raw):null;}catch(e){return null;}}
+
+async function carregarConta(user){
+  ACC={user,perfil:null,assinatura:null,uso:{usos:0,redacoes:0}};
+  const [p,a,u,g]=await Promise.all([
+    sb.from("perfis").select("*").eq("id",user.id).maybeSingle(),
+    sb.from("assinaturas").select("plano,valido_ate").eq("user_id",user.id).maybeSingle(),
+    sb.from("uso_ia").select("usos,redacoes").eq("user_id",user.id).eq("mes",mesAtual()).maybeSingle(),
+    sb.from("progresso").select("dados,atualizado_em").eq("user_id",user.id).maybeSingle()
+  ]);
+  ACC.perfil=p.data||{nome:user.user_metadata?.nome||"",curso_foco:"Medicina",faculdade:"",vestibulares:[],meta_horas_semana:20,meta_texto:""};
+  ACC.assinatura=a.data||{plano:"gratis"};
+  if(u.data)ACC.uso=u.data;
+  // progresso: usa o mais recente entre nuvem e este aparelho
+  const base={name:"",entered:true,act:{},ans:{},watched:{},read:{},modDone:{},lessons:{},routine:[],exams:DEFAULT_EXAMS,sims:[],essays:[],spotify:"",sim:null,essayDraft:"",essayTheme:ESSAY_THEMES[0]};
+  const local=loadLocalFor(user.id);
+  const cloud=g.data?.dados&&Object.keys(g.data.dados).length?g.data.dados:null;
+  const cloudT=g.data?Date.parse(g.data.atualizado_em):0, localT=local?.__t||0;
+  S=Object.assign(base,(cloud&&cloudT>=localT)?cloud:(local||cloud||{}));
+  S.name=ACC.perfil.nome||S.name||"Estudante";S.entered=true;
+  save();
+}
+async function salvarNuvem(){
+  if(!sb||!ACC?.user)return;
+  const {__t,...dados}=S;
+  const {error}=await sb.from("progresso").upsert({user_id:ACC.user.id,dados,atualizado_em:new Date().toISOString()});
+  if(error)console.warn("[progresso]",error.message);
+}
+function agendarNuvem(){clearTimeout(cloudTimer);cloudTimer=setTimeout(salvarNuvem,2500);}
+
+/* ---------- telas de entrar e criar conta ---------- */
+function showAuth(mode){
+  authMode=mode||"login";authMsg="";
+  document.getElementById("landing").hidden=true;document.getElementById("app").hidden=true;document.getElementById("auth").hidden=false;
+  document.body.classList.add("on-landing");document.documentElement.classList.add("on-landing");
+  renderAuth();window.scrollTo({top:0});
+}
+function hideAuth(){document.getElementById("auth").hidden=true;}
+function renderAuth(){
+  const el=document.getElementById("auth");
+  if(!sb){el.innerHTML=`<div class="auth-wrap"><div class="auth-card"><h2 class="h-big">Login indisponível</h2><p>Não foi possível carregar o sistema de contas. Verifique sua conexão e recarregue a página.</p></div></div>`;return;}
+  const tabs=`<div class="auth-tabs"><button class="${authMode==="login"?"on":""}" data-auth="login">Entrar</button><button class="${authMode==="cadastro"?"on":""}" data-auth="cadastro">Criar conta</button></div>`;
+  const msg=authMsg?`<div class="auth-msg ${authMsg.startsWith("✓")?"ok":""}">${esc(authMsg.replace(/^✓\s*/,""))}</div>`:"";
+  let body="";
+  if(authMode==="login") body=`<form id="loginForm" class="form">
+      <label>E-mail<input class="inp" id="lEmail" type="email" autocomplete="email" required></label>
+      <label>Senha<input class="inp" id="lSenha" type="password" autocomplete="current-password" required minlength="6"></label>
+      <button class="l-cta" ${authBusy?"disabled":""}>${authBusy?"Entrando…":"Entrar"}</button>
+      <button type="button" class="auth-link" data-auth="recuperar">Esqueci minha senha</button></form>`;
+  else if(authMode==="cadastro") body=`<form id="signupForm" class="form">
+      <label>Nome<input class="inp" id="cNome" autocomplete="name" required maxlength="80"></label>
+      <div class="two"><label>E-mail<input class="inp" id="cEmail" type="email" autocomplete="email" required></label><label>Senha (mín. 8)<input class="inp" id="cSenha" type="password" autocomplete="new-password" required minlength="8"></label></div>
+      <div class="two"><label>Curso foco<select class="inp" id="cCurso">${CURSOS.map(c=>`<option>${c}</option>`).join("")}</select></label>
+      <label>Faculdade dos sonhos<input class="inp" id="cFacul" list="faculList" placeholder="Ex.: USP" maxlength="120"></label></div>
+      <fieldset class="vests"><legend>Vestibulares que vou prestar</legend>${VESTS.map((v,i)=>`<label class="chk"><input type="checkbox" value="${v}" ${i<2?"checked":""}> ${v}</label>`).join("")}</fieldset>
+      <div class="two"><label>Meta de estudo (horas por semana)<input class="inp" id="cHoras" type="number" min="1" max="100" value="20"></label><label>Ano da prova<select class="inp" id="cAno"><option>2026</option><option>2027</option><option>2028</option></select></label></div>
+      <label>Minha meta<textarea class="inp" id="cMeta" rows="2" maxlength="250" placeholder="Ex.: passar em Medicina na USP e tirar 900+ na redação"></textarea></label>
+      <button class="l-cta" ${authBusy?"disabled":""}>${authBusy?"Criando conta…":"Criar conta grátis"}</button>
+      <p class="note" style="margin:0">Ao criar a conta você começa no plano Grátis. Dá para mudar de plano quando quiser.</p></form>
+      <datalist id="faculList">${FACULDADES.map(f=>`<option value="${f}">`).join("")}</datalist>`;
+  else if(authMode==="recuperar") body=`<form id="resetForm" class="form"><p class="small" style="margin:0">Enviaremos um link para você criar uma nova senha.</p>
+      <label>E-mail<input class="inp" id="rEmail" type="email" autocomplete="email" required></label>
+      <button class="l-cta" ${authBusy?"disabled":""}>Enviar link</button><button type="button" class="auth-link" data-auth="login">Voltar para entrar</button></form>`;
+  else if(authMode==="novasenha") body=`<form id="newPassForm" class="form"><p class="small" style="margin:0">Escolha sua nova senha.</p>
+      <label>Nova senha (mín. 8)<input class="inp" id="nSenha" type="password" autocomplete="new-password" required minlength="8"></label>
+      <button class="l-cta" ${authBusy?"disabled":""}>Salvar nova senha</button></form>`;
+  el.innerHTML=`<div class="auth-wrap">
+    <div class="auth-side">${SPARK("#DFF24B",40,"left:24px","top:24px")}${GSTAR(70,"right:20px","bottom:30px",10)}
+      <button class="auth-logo" data-landing>EASY<span>STUDY</span></button>
+      <h1 class="h-big">${authMode==="cadastro"?"Sua vaga<br><em>começa aqui</em>":"Bem-vindo<br><em>de volta</em>"}</h1>
+      <p>Módulos completos, questões do ENEM, simulados, redação corrigida pelas 5 competências e uma rotina que vira hábito.</p></div>
+    <div class="auth-card">${authMode==="login"||authMode==="cadastro"?tabs:""}${msg}${body}</div></div>`;
+}
+const traduzErro=m=>{m=String(m||"");
+  if(/Invalid login/i.test(m))return "E-mail ou senha incorretos.";
+  if(/Email not confirmed/i.test(m))return "Confirme seu e-mail pelo link que enviamos antes de entrar.";
+  if(/already registered|already been registered/i.test(m))return "Esse e-mail já tem conta. Entre ou recupere a senha.";
+  if(/Password should|weak/i.test(m))return "Senha fraca. Use pelo menos 8 caracteres, misturando letras e números.";
+  if(/rate limit|too many/i.test(m))return "Muitas tentativas. Espere alguns minutos e tente de novo.";
+  return "Não foi possível concluir agora. Tente de novo em instantes.";};
+
+async function entrar(email,senha){authBusy=true;authMsg="";renderAuth();
+  const {error}=await sb.auth.signInWithPassword({email,password:senha});
+  authBusy=false;if(error){authMsg=traduzErro(error.message);renderAuth();}}
+async function cadastrar(dados){authBusy=true;authMsg="";renderAuth();
+  const {data,error}=await sb.auth.signUp({email:dados.email,password:dados.senha,options:{emailRedirectTo:location.origin,data:{nome:dados.nome,curso_foco:dados.curso,faculdade:dados.faculdade,vestibulares:dados.vests,meta_horas_semana:dados.horas,meta_texto:dados.meta}}});
+  authBusy=false;
+  if(error){authMsg=traduzErro(error.message);renderAuth();return;}
+  if(!data.session){authMode="login";authMsg="✓ Conta criada! Enviamos um link de confirmação para "+dados.email+". Confirme e depois entre.";renderAuth();}}
+async function sair(){try{await salvarNuvem();}catch(e){}await sb.auth.signOut();ACC=null;S={name:"",entered:false,act:{},ans:{},watched:{},read:{},modDone:{},lessons:{},routine:[],exams:DEFAULT_EXAMS,sims:[],essays:[],spotify:"",sim:null,essayDraft:"",essayTheme:ESSAY_THEMES[0]};hideAuth();showLanding(true);try{history.replaceState(null,"","#inicio");}catch(e){}toast("Você saiu da conta.");}
+
+function abrirApp(){hideAuth();showLanding(false);buildNav();paintTop();render();try{history.replaceState(null,"","#"+VIEW);}catch(e){}}
+
+document.addEventListener("submit",async e=>{const f=e.target;
+  if(f.id==="loginForm"){e.preventDefault();e.stopImmediatePropagation();entrar(lEmail.value.trim(),lSenha.value);}
+  else if(f.id==="signupForm"){e.preventDefault();e.stopImmediatePropagation();
+    const vests=[...f.querySelectorAll(".vests input:checked")].map(x=>x.value);
+    cadastrar({nome:cNome.value.trim(),email:cEmail.value.trim(),senha:cSenha.value,curso:cCurso.value,faculdade:cFacul.value.trim(),vests,horas:Math.max(1,Math.min(100,+cHoras.value||20)),meta:(cMeta.value.trim()+(cAno.value?` (prova em ${cAno.value})`:"")).slice(0,300)});}
+  else if(f.id==="resetForm"){e.preventDefault();e.stopImmediatePropagation();authBusy=true;renderAuth();
+    const {error}=await sb.auth.resetPasswordForEmail(rEmail.value.trim(),{redirectTo:location.origin});authBusy=false;
+    authMode="login";authMsg=error?traduzErro(error.message):"✓ Se esse e-mail tiver conta, enviamos o link para criar uma nova senha.";renderAuth();}
+  else if(f.id==="newPassForm"){e.preventDefault();e.stopImmediatePropagation();authBusy=true;renderAuth();
+    const {error}=await sb.auth.updateUser({password:nSenha.value});authBusy=false;
+    if(error){authMsg=traduzErro(error.message);renderAuth();}else{toast("Senha atualizada.");abrirApp();}}
+  else if(f.id==="perfilForm"){e.preventDefault();e.stopImmediatePropagation();
+    const vests=[...f.querySelectorAll(".vests input:checked")].map(x=>x.value);
+    const novo={nome:pNome.value.trim().slice(0,80),curso_foco:pCurso.value,faculdade:pFacul.value.trim().slice(0,120),vestibulares:vests,meta_horas_semana:Math.max(1,Math.min(100,+pHoras.value||20)),meta_texto:pMeta.value.trim().slice(0,300)};
+    const {error}=await sb.from("perfis").update(novo).eq("id",ACC.user.id);
+    if(error){toast("Não foi possível salvar. Tente de novo.");return;}
+    Object.assign(ACC.perfil,novo);S.name=novo.nome||S.name;save();paintTop();render();toast("Perfil atualizado");}
+},true);
+
+document.addEventListener("click",e=>{const t=e.target.closest("button,a");if(!t)return;const d=t.dataset;
+  if(d.auth!==undefined){e.stopImmediatePropagation();authMode=d.auth;authMsg="";renderAuth();return;}
+  if(d.logout!==undefined){e.stopImmediatePropagation();
+    if(t.dataset.confirm!=="1"){t.dataset.confirm="1";const old=t.innerHTML;t.innerHTML=t.classList.contains("navbtn")?svg('<path d="M20 6 9 17l-5-5"/>'):"Confirmar saída?";setTimeout(()=>{t.dataset.confirm="";t.innerHTML=old;},3000);return;}
+    sair();return;}
+  if(d.assinar!==undefined){e.stopImmediatePropagation();assinarHTML(d.assinar);return;}
+},true);
+
+/* ---------- aba Planos ---------- */
+function planCardsHTML(ctaLanding){
+  const atual=ACC?planoAtual():null;
+  return `<div class="progs plan-cards">${Object.entries(PLANS).map(([k,p])=>`
+    <div class="pg ${p.cls}">
+      <div class="tags">${k==="foco"?"<span>Mais escolhido</span>":""}<span>${p.usos} usos/mês</span><span>${p.redacoes} redações/mês</span></div>
+      <h3>${p.nome}</h3>
+      <div class="price"><b class="num">${brl(p.preco)}</b>${p.preco?"<span>/mês</span>":""}</div>
+      <p>${p.desc}</p>
+      <ul>${p.itens.map(i=>`<li>${esc(i)}</li>`).join("")}</ul>
+      ${ctaLanding?`<button class="l-cta" data-enter-signup>${p.preco?"Começar grátis":"Criar conta grátis"}</button>`
+        :atual===k?`<span class="cur-plan">Seu plano atual</span>`:p.preco?`<button class="l-cta" data-assinar="${k}">Assinar ${p.nome}</button>`:""}
+    </div>`).join("")}</div>`;
+}
+function vPlanos(){
+  const k=planoAtual(),p=PLANS[k],u=ACC?.uso||{usos:0,redacoes:0};
+  return `<div class="row-head" style="margin-top:4px"><h1 class="h-sec">Planos</h1><span class="small muted">Os limites renovam todo dia 1º</span></div>
+  <div class="card usage-card">
+    <div><span class="chip dark">${esc(p.nome)}</span>${ACC?.assinatura?.valido_ate&&k!=="gratis"?`<span class="small muted" style="margin-left:8px">válido até ${new Date(ACC.assinatura.valido_ate+"T12:00").toLocaleDateString("pt-BR")}</span>`:""}</div>
+    ${usageBars(u,p)}
+  </div>
+  ${planCardsHTML(false)}
+  <div id="assinarBox"></div>
+  <div class="card" style="margin-top:14px"><b>O que conta como uso da Easier</b>
+    <ul class="small" style="padding-left:18px;margin:6px 0 0"><li>Explicar uma questão, tirar uma dúvida ou gerar uma aula completa: 1 uso.</li><li>Corrigir uma redação pelas 5 competências: 1 correção de redação.</li><li>Módulos, questões, simulados, rotina e a correção automática de redação não gastam nada.</li><li>Se a Easier falhar, o uso é devolvido.</li></ul></div>`;
+}
+function usageBars(u,p){
+  const b=(n,m,l)=>`<div class="ub"><div class="small" style="display:flex;justify-content:space-between"><span>${l}</span><b class="num">${n}/${m}</b></div><div class="bar"><i style="width:${Math.min(100,n/m*100)}%;${n>=m?"background:var(--bad)":""}"></i></div></div>`;
+  return `<div class="ubs">${b(u.usos||0,p.usos,"Usos da Easier este mês")}${b(u.redacoes||0,p.redacoes,"Correções de redação este mês")}</div>`;
+}
+function assinarHTML(k){
+  const p=PLANS[k],box=document.getElementById("assinarBox");if(!box)return;
+  const msg=encodeURIComponent(`Olá! Quero assinar o plano ${p.nome} (${brl(p.preco)}/mês) do Easy Study. Meu e-mail de cadastro: ${ACC?.user?.email||""}`);
+  const temContato=CONTATO.whatsapp||CONTATO.email;
+  box.innerHTML=`<div class="card" style="margin-top:14px;border-color:var(--violet)"><h3 style="font-size:17px;margin-bottom:6px">Assinar o plano ${esc(p.nome)}</h3>
+    ${temContato?`<p class="small" style="margin:0 0 10px">Fale com a equipe, faça o pagamento por Pix e seu plano é liberado em até 24 horas na sua conta (${esc(ACC?.user?.email||"")}).</p>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">${CONTATO.whatsapp?`<a class="btn" href="https://wa.me/${CONTATO.whatsapp}?text=${msg}" target="_blank" rel="noopener">Falar no WhatsApp</a>`:""}${CONTATO.email?`<span class="chip" style="padding:6px 10px;user-select:all">${esc(CONTATO.email)}</span>`:""}</div>`
+      :`<p class="small" style="margin:0">As assinaturas pagas abrem em breve. Por enquanto, aproveite o plano Grátis.</p>`}</div>`;
+  box.scrollIntoView({behavior:"smooth",block:"nearest"});
+}
+
+/* ---------- aba Minha conta ---------- */
+function vConta(){
+  const pf=ACC?.perfil||{},k=planoAtual(),p=PLANS[k];
+  const vs=pf.vestibulares||[];
+  return `<div class="row-head" style="margin-top:4px"><h1 class="h-sec">Minha conta</h1><button class="btn sm ghost" data-logout>Sair da conta</button></div>
+  <div class="grid forms" style="margin-top:0">
+    <form class="card form" id="perfilForm"><h3 style="font-size:17px">Perfil e metas</h3>
+      <label>Nome<input class="inp" id="pNome" value="${esc(pf.nome||"")}" maxlength="80"></label>
+      <div class="two"><label>Curso foco<select class="inp" id="pCurso">${CURSOS.map(c=>`<option ${c===pf.curso_foco?"selected":""}>${c}</option>`).join("")}</select></label>
+      <label>Faculdade dos sonhos<input class="inp" id="pFacul" list="faculList2" value="${esc(pf.faculdade||"")}" maxlength="120"></label></div>
+      <datalist id="faculList2">${FACULDADES.map(f=>`<option value="${f}">`).join("")}</datalist>
+      <fieldset class="vests"><legend>Vestibulares</legend>${VESTS.map(v=>`<label class="chk"><input type="checkbox" value="${v}" ${vs.includes(v)?"checked":""}> ${v}</label>`).join("")}</fieldset>
+      <label>Meta de estudo (horas por semana)<input class="inp" id="pHoras" type="number" min="1" max="100" value="${pf.meta_horas_semana||20}"></label>
+      <label>Minha meta<textarea class="inp" id="pMeta" rows="2" maxlength="300">${esc(pf.meta_texto||"")}</textarea></label>
+      <button class="btn" style="align-self:flex-start">Salvar perfil</button></form>
+    <div class="card form"><h3 style="font-size:17px">Plano e consumo</h3>
+      <div><span class="chip dark">${esc(p.nome)}</span></div>
+      ${usageBars(ACC?.uso||{},p)}
+      <button class="btn sm violet" data-go="planos" style="align-self:flex-start">Ver planos</button>
+      <h3 style="font-size:17px;margin-top:8px">Acesso</h3>
+      <p class="small" style="margin:0">E-mail: <b>${esc(ACC?.user?.email||"")}</b></p>
+      <p class="small muted" style="margin:0">Seu progresso é salvo na nuvem e aparece em qualquer aparelho em que você entrar.</p>
+      <button class="btn sm ghost" data-auth-reset style="align-self:flex-start">Trocar senha</button>
+    </div>
+  </div>`;
+}
+function metaSemana(){
+  const now=new Date(),mon=new Date(now);mon.setDate(now.getDate()-((now.getDay()+6)%7));let min=0;
+  for(let i=0;i<7;i++){const d=new Date(mon);d.setDate(mon.getDate()+i);min+=S.act[dkey(d)]?.min||0;}
+  return {feito:Math.round(min/6)/10,meta:ACC?.perfil?.meta_horas_semana||20};
+}
+function contaStripHTML(){
+  if(!ACC)return "";
+  const k=planoAtual(),p=PLANS[k],u=ACC.uso||{},m=metaSemana(),pf=ACC.perfil||{};
+  return `<div class="acc-strip">
+    <div class="acc-who"><span class="avatar">${esc((pf.nome||"E").trim()[0]?.toUpperCase()||"E")}</span><div><b>${esc(pf.nome||"Estudante")}</b><div class="small muted">${esc(pf.curso_foco||"Medicina")}${pf.faculdade?" · "+esc(pf.faculdade):""}</div></div></div>
+    <div class="acc-stat"><span class="small muted">Plano</span><b>${esc(p.nome)}</b></div>
+    <div class="acc-stat"><span class="small muted">Easier no mês</span><b class="num">${u.usos||0}/${p.usos}</b></div>
+    <div class="acc-stat"><span class="small muted">Redações no mês</span><b class="num">${u.redacoes||0}/${p.redacoes}</b></div>
+    <div class="acc-stat"><span class="small muted">Meta da semana</span><b class="num">${m.feito}/${m.meta} h</b></div>
+    <div class="acc-btns"><button class="btn sm ghost" data-go="conta">Minha conta</button><button class="btn sm" data-logout>Sair da conta</button></div>
+  </div>`;
+}
+
 /* ---------- início ---------- */
-const h=(location.hash||"").slice(1);
-if(LABEL[h]){VIEW=h;S.entered=true;}
-if(h==="inicio"||!S.entered){showLanding(true);}else{showLanding(false);buildNav();paintTop();render();}
+let iniciado=false;
+async function aoMudarSessao(ev,session){
+  if(ev==="PASSWORD_RECOVERY"){if(session&&(!ACC||ACC.user.id!==session.user.id))await carregarConta(session.user);showAuth("novasenha");return;}
+  if(session&&(!ACC||ACC.user.id!==session.user.id)){
+    await carregarConta(session.user);
+    const h=(location.hash||"").slice(1);
+    if(!document.getElementById("auth").hidden&&authMode==="novasenha")return;
+    if(h==="inicio"&&ev==="INITIAL_SESSION")showLanding(true);else abrirApp();
+    return;
+  }
+  if(!session&&ev==="INITIAL_SESSION")showLanding(true);
+}
+(function iniciar(){
+  const h=(location.hash||"").slice(1);if(LABEL[h])VIEW=h;
+  if(!sb){showLanding(true);return;}
+  sb.auth.onAuthStateChange((ev,session)=>{setTimeout(()=>aoMudarSessao(ev,session).catch(e=>console.warn("[contas]",e)),0);});
+})();
 </script>
 
 </body>

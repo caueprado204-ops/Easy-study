@@ -78,6 +78,33 @@ Adicione `ANTHROPIC_API_KEY` (console.anthropic.com) e `AI_PROVIDER=anthropic`. 
 - `GROQ_MODEL` — padrão `openai/gpt-oss-120b`.
 - `EASIER_RATE_LIMIT` — pedidos por minuto por IP (padrão: 12).
 
+## Contas, planos e limites (Supabase)
+
+O login, os perfis (curso foco, faculdade, vestibulares e metas), o progresso na nuvem e o consumo da Easier ficam no Supabase (projeto `gqncndoiuitharlgrznr`).
+
+Tabelas: `perfis`, `assinaturas` (plano de cada aluno), `progresso` e `uso_ia` (consumo do mês). Todas com RLS: o aluno só lê os próprios dados e não consegue mudar o próprio plano nem o consumo.
+
+Limites por mês (iguais no site e em `api/easier.js`):
+
+| Plano | Preço | Usos da Easier | Correções de redação com IA |
+|---|---|---|---|
+| Grátis | R$ 0 | 30 | 2 |
+| Foco | R$ 24,90 | 200 | 10 |
+| Medicina Pro | R$ 44,90 | 350 | 20 |
+
+Variáveis na Vercel (Production): `SUPABASE_URL` e `SUPABASE_SECRET_KEY` (Supabase → Project Settings → API Keys → Secret key). Sem elas, a Easier funciona sem exigir login.
+
+**Liberar um plano pago** (depois do Pix): no Supabase, abra SQL Editor e rode
+
+```sql
+update public.assinaturas set plano = 'foco', valido_ate = current_date + 31, atualizado_em = now()
+where user_id = (select id from auth.users where email = 'email-do-aluno@exemplo.com');
+```
+
+Troque `foco` por `medicina` para o Medicina Pro. Quando `valido_ate` passa, o aluno volta automaticamente ao Grátis.
+
+Contato para assinar: preencha `CONTATO` no `index.html` com seu WhatsApp (só números, com 55 e DDD) e/ou e-mail.
+
 ## Progresso dos alunos
 
-O progresso (ofensiva, módulos, questões, rotina) fica salvo no navegador de cada aluno (`localStorage`). Para login e progresso na nuvem, o próximo passo é ligar um banco como o Supabase.
+O progresso (ofensiva, módulos, questões, rotina) fica salvo no navegador e sincronizado na nuvem pela conta do aluno.

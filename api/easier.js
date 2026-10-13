@@ -8,6 +8,8 @@
 //   - Groq (gratuito):          GROQ_API_KEY
 //   - Grok, da xAI (pago):      XAI_API_KEY
 //   - Anthropic (pago):         ANTHROPIC_API_KEY
+// Contas: com SUPABASE_URL e SUPABASE_SECRET_KEY definidos, a Easier exige login e
+// respeita o limite mensal do plano de cada aluno (tabelas assinaturas e uso_ia).
 // AI_PROVIDER define a ordem, por exemplo "gemini,groq,grok,anthropic" (esse é o padrão).
 
 import { CRITERIOS_REDACAO } from "../lib/criterios.js";
@@ -27,6 +29,40 @@ function limited(ip) {
   list.push(now);
   hits.set(ip, list);
   return list.length > MAX_PER_WINDOW;
+}
+
+/* ---------- Contas e limites por plano (Supabase) ---------- */
+// Os mesmos números aparecem na aba Planos do site.
+const PLANOS = {
+  gratis: { usos: 30, redacoes: 2 },
+  foco: { usos: 200, redacoes: 10 },
+  medicina: { usos: 350, redacoes: 20 },
+};
+const SB_URL = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL || "";
+const SB_KEY = process.env.SUPABASE_SECRET_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY || "";
+const contasAtivas = () => !!(SB_URL && SB_KEY);
+function sbHeaders(extra = {}) {
+  const h = { apikey: SB_KEY, "content-type": "application/json", ...extra };
+  if (SB_KEY.startsWith("eyJ")) h.authorization = `Bearer ${SB_KEY}`; // chave legada (JWT)
+  return h;
+}
+async function usuarioDoToken(token) {
+  if (!token) return null;
+  const r = await fetch(`${SB_URL}/auth/v1/user`, { headers: { apikey: SB_KEY, authorization: `Bearer ${token}` } });
+  if (!r.ok) return null;
+  const u = await r.json().catch(() => null);
+  return u?.id ? u : null;
+}
+async function planoDoUsuario(id) {
+  const r = await fetch(`${SB_URL}/rest/v1/assinaturas?user_id=eq.${id}&select=plano,valido_ate`, { headers: sbHeaders() });
+  const [a] = r.ok ? await r.json() : [];
+  if (!a || !PLANOS[a.plano]) return "gratis";
+  if (a.valido_ate && new Date(a.valido_ate + "T23:59:59-03:00") < new Date()) return "gratis";
+  return a.plano;
+}
+async function rpc(nome, body) {
+  const r = await fetch(`${SB_URL}/rest/v1/rpc/${nome}`, { method: "POST", headers: sbHeaders(), body: JSON.stringify(body) });
+  return r.ok ? r.json().catch(() => null) : null;
 }
 
 const KEYS = { gemini: "GEMINI_API_KEY", groq: "GROQ_API_KEY", grok: "XAI_API_KEY", anthropic: "ANTHROPIC_API_KEY" };
@@ -49,6 +85,34 @@ export default async function handler(req, res) {
     res.status(500).json({ code: "no_key" });
     return;
   }
+  // Com contas ativas, só alunos logados usam a Easier, dentro do limite do plano
+  let conta = null;
+  if (contasAtivas()) {
+    const token = String(req.headers.authorization || "").replace(/^Bearer\s+/i, "");
+    const user = await usuarioDoToken(token).catch(() => null);
+    if (!user) {
+      res.status(401).json({ code: "login_required" });
+      return;
+    }
+    const b0 = typeof req.body === "string" ? safeJSON(req.body) : req.body || {};
+    const tipo = b0?.tipo === "redacao" ? "redacao" : "uso";
+    const plano = await planoDoUsuario(user.id).catch(() => "gratis");
+    const lim = PLANOS[plano];
+    const c = await rpc("consumir_ia", { p_user: user.id, p_tipo: tipo, p_limite_usos: lim.usos, p_limite_redacoes: lim.redacoes });
+    if (!c) {
+      res.status(502).json({ code: "upstream_error", detail: "falha ao verificar o plano" });
+      return;
+    }
+    res.setHeader("X-Easier-Plano", plano);
+    res.setHeader("X-Easier-Usos", `${c.usos}/${lim.usos}`);
+    res.setHeader("X-Easier-Redacoes", `${c.redacoes}/${lim.redacoes}`);
+    if (!c.ok) {
+      res.status(429).json({ code: "limit_reached", plano, tipo, usos: c.usos, redacoes: c.redacoes, limite_usos: lim.usos, limite_redacoes: lim.redacoes });
+      return;
+    }
+    conta = { id: user.id, tipo };
+  }
+
   const ip = (req.headers["x-forwarded-for"] || "").split(",")[0].trim() || "local";
   if (limited(ip)) {
     res.status(429).json({ code: "rate_limited" });
@@ -81,6 +145,7 @@ export default async function handler(req, res) {
   }
 
   if (!ok) {
+    if (conta) await rpc("devolver_ia", { p_user: conta.id, p_tipo: conta.tipo }).catch(() => null);
     const status = last.status === 429 ? 429 : 502;
     const detail = shortError(last.detail);
     console.error(`[easier] todos os provedores falharam (${tried.join(", ")}): ${detail}`);
