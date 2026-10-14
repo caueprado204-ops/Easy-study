@@ -7,6 +7,8 @@ const json = (res, s, b) => res.status(s).json(b);
 
 export default async function handler(req, res) {
   res.setHeader("cache-control", "no-store");
+  // configuração pública do formulário de cartão (a chave pública não é segredo)
+  if (req.method === "GET") return json(res, 200, { ativo: configurado(), publicKey: process.env.MP_PUBLIC_KEY || null });
   if (req.method !== "POST") return json(res, 405, { code: "method_not_allowed" });
   if (!configurado()) return json(res, 503, { code: "pagamento_desligado", message: "O pagamento automático ainda não foi configurado." });
 
@@ -32,6 +34,39 @@ export default async function handler(req, res) {
       const pre = await mp(`/preapproval/${atual.gateway_id}`, { method: "PUT", body: JSON.stringify({ status: "cancelled" }) });
       const salvo = await aplicarAssinatura(pre, "cancelamento");
       return json(res, 200, { assinatura: salvo });
+    }
+
+    if (acao === "assinar_cartao") {
+      // cartão digitado no próprio site (formulário seguro do Mercado Pago): o aluno não precisa de conta no Mercado Pago
+      const plano = body.plano;
+      if (!PLANOS[plano]) return json(res, 400, { code: "plano_invalido" });
+      if (!body.token) return json(res, 400, { code: "cartao_invalido" });
+      const p = PLANOS[plano];
+      const email = String(body.email || user.email || "").trim().toLowerCase();
+      if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return json(res, 400, { code: "email_invalido" });
+      if (atual?.gateway_id && atual.status_pagamento === "authorized") return json(res, 409, { code: "ja_assinante", assinatura: atual });
+      const origem = (req.headers["x-forwarded-proto"] || "https") + "://" + (req.headers["x-forwarded-host"] || req.headers.host);
+      let pre;
+      try {
+        pre = await mp("/preapproval", {
+          method: "POST",
+          idem: `${user.id}-${plano}-${String(body.token).slice(0, 16)}`,
+          body: JSON.stringify({
+            reason: `Easy Study – ${p.nome}`,
+            external_reference: `${user.id}|${plano}`,
+            payer_email: email,
+            card_token_id: body.token,
+            auto_recurring: { frequency: 1, frequency_type: "months", transaction_amount: p.preco, currency_id: "BRL" },
+            back_url: `${origem}/#planos`,
+            status: "authorized",
+          }),
+        });
+      } catch (e) {
+        await registrarEvento(user.id, "cartao_recusado", null, { status: e.status, message: e.message, detail: e.detail?.cause || e.detail?.message });
+        return json(res, 402, { code: "cartao_recusado", message: "O Mercado Pago não aceitou este cartão. Confira os dados ou tente outro cartão." });
+      }
+      const salvo = await aplicarAssinatura(pre, "cartao_no_site");
+      return json(res, 200, { code: pre.status === "authorized" ? "assinado" : "pendente", assinatura: salvo });
     }
 
     if (acao === "assinar") {

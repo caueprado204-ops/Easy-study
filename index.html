@@ -451,7 +451,7 @@ select,.inp{border:1.5px solid var(--line);border-radius:10px;padding:7px 10px;b
 .plan-cards .l-cta{margin-top:auto;padding:12px}
 .cur-plan{margin-top:auto;align-self:flex-start;background:var(--white);color:var(--ink);border-radius:999px;padding:7px 14px;font-weight:700;font-size:13px}
 .paywall{background:var(--lime);margin-bottom:14px}
-.pay-box{margin-top:14px;border-color:var(--violet)}.pay-mail{display:grid;gap:4px;max-width:380px}
+.pay-box{margin-top:14px;border-color:var(--violet)}.card-brick{max-width:560px;min-height:60px}.pay-alt{margin-top:12px}.pay-alt summary{cursor:pointer;color:var(--violet);font-weight:700}.pay-alt[open] summary{margin-bottom:8px}.pay-mail{display:grid;gap:4px;max-width:380px}
 .pay-status{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin-bottom:14px}.card.pay-status{background:var(--white)}
 .plan-cards{grid-template-columns:repeat(2,minmax(0,1fr))!important;max-width:900px}
 .usage-card{display:flex;flex-direction:column;gap:12px;margin-bottom:14px}
@@ -2381,13 +2381,57 @@ function assinarHTML(k){
   box.innerHTML=`<div class="card pay-box"><h3 style="font-size:17px;margin-bottom:6px">${troca?"Mudar para o":"Assinar o"} plano ${esc(p.nome)}</h3>
     ${troca?`<p class="small" style="margin:0 0 10px">Sua assinatura continua no mesmo cartão. O novo valor, ${brl(p.preco)}/mês, vale a partir da próxima cobrança, e o ${esc(p.nome)} é liberado agora.</p>
       <button class="btn violet" data-paygo="${k}">Confirmar mudança</button>`
-    :`<p class="small" style="margin:0 0 10px"><b>Pagamento automático no cartão:</b> ${brl(p.preco)} por mês, cobrados todo mês pelo Mercado Pago. Você pode cancelar quando quiser, aqui mesmo, e continua com acesso até o fim do mês pago.</p>
-      <label class="small pay-mail">E-mail da sua conta Mercado Pago<input class="inp" id="payEmail" type="email" autocomplete="email" value="${esc(a.email_pagador||ACC?.user?.email||"")}"></label>
-      <p class="note" style="margin:4px 0 10px">Use o mesmo e-mail com que você vai entrar no Mercado Pago para pagar. Se não tiver conta, dá para criar na hora.</p>
-      <button class="btn violet" data-paygo="${k}">Assinar com pagamento automático</button>
+    :`<p class="small" style="margin:0 0 10px"><b>Pagamento automático no cartão:</b> ${brl(p.preco)} por mês, cobrados todo mês. Você digita o cartão aqui mesmo, sem precisar de conta no Mercado Pago. Dá para cancelar quando quiser e o acesso continua até o fim do mês pago.</p>
+      <div id="cardBrick" class="card-brick"><p class="small muted">Carregando o formulário seguro de pagamento…</p></div>
+      <p class="note" style="margin:6px 0 0">Os dados do cartão vão direto para o Mercado Pago, que processa o pagamento. O Easy Study não vê nem guarda o número do cartão.</p>
+      <details class="pay-alt"><summary class="small">Prefiro pagar pelo site do Mercado Pago</summary>
+        <label class="small pay-mail">E-mail da sua conta Mercado Pago<input class="inp" id="payEmail" type="email" autocomplete="email" value="${esc(a.email_pagador||ACC?.user?.email||"")}"></label>
+        <p class="note" style="margin:4px 0 10px">Nesse caso, entre no Mercado Pago com o mesmo e-mail.</p>
+        <button class="btn ghost sm" data-paygo="${k}">Ir para o Mercado Pago</button></details>
       ${temContato?`<p class="small" style="margin:12px 0 6px">Prefere pagar por Pix, mês a mês? Fale com a equipe e o plano é liberado em até 24 horas.</p><div style="display:flex;gap:8px;flex-wrap:wrap">${CONTATO.whatsapp?`<a class="btn ghost sm" href="https://wa.me/${CONTATO.whatsapp}?text=${msg}" target="_blank" rel="noopener">Pagar por Pix (WhatsApp)</a>`:""}${CONTATO.email?`<span class="chip" style="padding:6px 10px">${esc(CONTATO.email)}</span>`:""}</div>`:""}`}
     <div id="payMsg" class="small" style="margin-top:8px"></div></div>`;
   box.scrollIntoView({behavior:"smooth",block:"nearest"});
+  if(!troca)montarCartao(k);
+}
+let payCfg=null,mpSdk=null,cardCtl=null;
+function carregarSdkMP(){
+  if(window.MercadoPago)return Promise.resolve();
+  if(mpSdk)return mpSdk;
+  mpSdk=new Promise((ok,erro)=>{const sc=document.createElement("script");sc.src="https://sdk.mercadopago.com/js/v2";sc.onload=ok;sc.onerror=()=>{mpSdk=null;erro(new Error("sdk"));};document.head.appendChild(sc);});
+  return mpSdk;
+}
+async function montarCartao(k){
+  const alvo=document.getElementById("cardBrick"),msg=document.getElementById("payMsg");if(!alvo)return;
+  const falha=t=>{alvo.innerHTML=`<p class="small" style="color:var(--bad);margin:0">${esc(t)}</p>`;};
+  try{
+    if(!payCfg)payCfg=await fetch("/api/assinatura").then(r=>r.json()).catch(()=>({}));
+    if(!payCfg.ativo){falha("O pagamento automático ainda está sendo ativado. Tente mais tarde ou fale com a equipe.");return;}
+    if(!payCfg.publicKey){alvo.innerHTML=`<p class="small muted" style="margin:0">O formulário de cartão no site ainda não foi ligado. Use a opção abaixo para pagar pelo site do Mercado Pago.</p>`;const d=document.querySelector(".pay-alt");if(d)d.open=true;return;}
+    await carregarSdkMP();
+    try{await cardCtl?.unmount();}catch(e){}
+    alvo.innerHTML="";
+    const mp=new MercadoPago(payCfg.publicKey,{locale:"pt-BR"});
+    cardCtl=await mp.bricks().create("cardPayment","cardBrick",{
+      initialization:{amount:PLANS[k].preco,payer:{email:ACC?.user?.email||""}},
+      customization:{paymentMethods:{maxInstallments:1,types:{excluded:["debit_card"]}},visual:{texts:{formSubmit:`Assinar ${PLANS[k].nome} por ${brl(PLANS[k].preco)}/mês`},style:{theme:"default",customVariables:{baseColor:"#4E3DF2",borderRadiusMedium:"10px"}}}},
+      callbacks:{
+        onReady:()=>{},
+        onError:e=>{console.warn("[cartão]",e);},
+        onSubmit:fd=>new Promise(async(ok,erro)=>{
+          if(msg)msg.textContent="";
+          const r=await pagamentoAPI({acao:"assinar_cartao",plano:k,token:fd.token,email:fd.payer?.email||ACC?.user?.email}).catch(()=>({}));
+          if(r.assinatura&&(r.code==="assinado"||r.code==="ja_assinante")){
+            ok();ACC.assinatura={...ACC.assinatura,...r.assinatura};
+            toast(r.code==="assinado"?"Assinatura ativa! Seu plano está liberado.":"Você já tem uma assinatura ativa.");
+            try{await cardCtl?.unmount();}catch(e){}
+            if(VIEW==="planos"&&planoAtual())VIEW="painel";buildNav();render();return;}
+          if(r.code==="pendente"){ok();toast("Pagamento em análise. Avisamos assim que for aprovado.");conferirPagamento(true);return;}
+          erro();
+          if(msg)msg.innerHTML=`<span style="color:var(--bad)">${esc(r.message||"Não foi possível concluir a assinatura. Tente de novo.")}</span>`;
+        })
+      }
+    });
+  }catch(e){falha("Não foi possível carregar o formulário de pagamento. Verifique sua conexão e tente de novo.");}
 }
 async function pagamentoAPI(body){
   const ses=sb?(await sb.auth.getSession()).data.session:null;

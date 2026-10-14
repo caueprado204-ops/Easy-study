@@ -141,15 +141,16 @@ A prioridade de cada conteúdo é calculada por `GPS.motor(ctx, idDoModulo)`, um
 
 ## Pagamento automático (Mercado Pago)
 
-O aluno assina na aba Planos e paga no Mercado Pago com cartão. A cobrança se repete todo mês sem ninguém precisar liberar nada.
+O aluno assina na aba Planos digitando o cartão no próprio site (formulário seguro do Mercado Pago, sem precisar de conta no Mercado Pago). A cobrança se repete todo mês sem ninguém precisar liberar nada. Como alternativa, ele pode pagar pelo site do Mercado Pago.
 
 - `api/assinatura.js`: cria a assinatura (link do checkout), troca de plano e cancela.
 - `api/mp-webhook.js`: recebe os avisos do Mercado Pago, relê a assinatura pela API e atualiza `assinaturas` no Supabase.
+- Com o cartão no site, o plano é liberado na hora, mas só até a primeira cobrança + 3 dias; quando ela é aprovada, o acesso passa a ir até a próxima cobrança + 3 dias.
 - O plano vale até a próxima cobrança + 3 dias. Ao cancelar, o acesso continua até o fim do período pago.
 - Tudo o que o Mercado Pago avisa fica registrado na tabela `eventos_pagamento` (só o servidor acessa).
 
 Para ligar:
-1. Na Vercel, crie `MP_ACCESS_TOKEN` com o Access Token **de produção** do Mercado Pago (Suas integrações → sua aplicação → Credenciais de produção).
+1. Na Vercel, crie `MP_ACCESS_TOKEN` com o Access Token **de produção** e `MP_PUBLIC_KEY` com a Public Key **de produção** do Mercado Pago (Suas integrações → sua aplicação → Credenciais de produção).
 2. No Mercado Pago, em Webhooks, cadastre a URL `https://SEU-SITE/api/mp-webhook`, marque o evento **Planos e assinaturas** e copie a "Assinatura secreta" para `MP_WEBHOOK_SECRET` na Vercel.
 3. Faça um redeploy.
 
