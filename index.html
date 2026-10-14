@@ -1159,6 +1159,7 @@ const SIMS=[
  {id:"hum",name:"Humanas + Linguagens",desc:"No estilo do 1º dia do ENEM.",n:20,min:60,cls:"c-pink",f:q=>(q.v||"ENEM")==="ENEM"&&(q.a==="ciencias-humanas"||q.a==="linguagens")},
  {id:"fuv",name:"Estilo FUVEST",desc:"Questões reais da 1ª fase da FUVEST, de todas as matérias.",n:30,min:90,cls:"c-lime",f:q=>q.v==="FUVEST"},
  {id:"uni",name:"Estilo Unicamp",desc:"Questões reais da 1ª fase da Unicamp, de todas as matérias.",n:24,min:72,cls:"c-pink",f:q=>q.v==="Unicamp"},
+ {id:"pp",name:"Provão Paulista",desc:"Questões reais das provas seriadas da 1ª, 2ª e 3ª série do ensino médio.",n:24,min:72,cls:"c-violet",f:q=>q.v==="Provão Paulista"},
  {id:"med",name:"Turbo Natureza",desc:"Biologia, Química e Física de ENEM, FUVEST e Unicamp, o peso maior nos cursos de saúde.",n:15,min:45,cls:"c-lime",f:q=>q.a==="ciencias-natureza"},
  {id:"mat",name:"Maratona de Matemática",desc:"Matemática de ENEM, FUVEST e Unicamp, com tempo apertado.",n:15,min:40,cls:"c-ink",f:q=>q.a==="matematica"}
 ];
@@ -1208,7 +1209,7 @@ const PLUS=(s,x,y)=>`<svg class="star" style="width:${s}px;height:${s}px;${x};${
 
 /* ---------- landing ---------- */
 function renderLanding(){
-  const nq=QREADY===true?Q.length:2133;
+  const nq=QREADY===true?Q.length:2499;
   document.getElementById("landing").innerHTML=`
   <div class="landing">
     <nav class="lnav" aria-label="Easy Study">
@@ -1227,7 +1228,7 @@ function renderLanding(){
         <p>Foco em USP (FUVEST), Unicamp, Unesp, ENEM e Provão Paulista: módulos completos, questões reais, a Easier e uma rotina que cabe na sua semana.</p>
         <button class="l-cta" ${ACC?"data-enter":"data-enter-signup"}>${ACC?"Continuar estudando":"Criar minha conta"}</button>
       </div>
-      <div class="l-small"><span>60 módulos em<br>9 matérias</span><hr><span>${nq} questões reais de ENEM, FUVEST e Unicamp</span></div>
+      <div class="l-small"><span>60 módulos em<br>9 matérias</span><hr><span>${nq} questões reais de ENEM, FUVEST, Unicamp e Provão Paulista</span></div>
       <div class="l-photo" aria-hidden="true">
         ${SPARK("#DFF24B",34,"left:18px","top:22px")}
         <div class="phone">
@@ -1297,7 +1298,7 @@ function renderLanding(){
     ${planCardsHTML(true)}
 
     <div class="l-final">${SPARK("#FF44C9",30,"right:30px","top:16px")}<h2 class="h-big">Sua vaga começa <em>hoje</em></h2><button class="l-cta" data-enter>Entrar na plataforma</button></div>
-    <div class="l-foot"><span>Easy Study · questões do ENEM via projeto aberto enem-api; FUVEST e Unicamp via conjunto aberto BLUEX</span><span>Feito para quem sonha com USP, Unicamp, Unesp e federais</span></div>
+    <div class="l-foot"><span>Easy Study · questões do ENEM via projeto aberto enem-api; FUVEST e Unicamp via conjunto aberto BLUEX; Provão Paulista a partir das provas da Seduc-SP</span><span>Feito para quem sonha com USP, Unicamp, Unesp e federais</span></div>
   </div>`;
 }
 
@@ -1323,9 +1324,12 @@ function toast(msg){const t=document.getElementById("toast");t.textContent=msg;t
 
 /* ---------- questões ---------- */
 let Q=[],QMAP={},QREADY=false;
-Promise.all([fetch("questoes.json").then(r=>r.json()),fetch("questoes-vest.json").then(r=>r.ok?r.json():[]).catch(()=>[])]).then(([d,v])=>{d.forEach(q=>{q.v=q.v||"ENEM";});Q=d.concat(v);Q.forEach(q=>QMAP[q.id]=q);QREADY=true;if(!document.getElementById("app").hidden)render();}).catch(()=>{QREADY="erro";if(!document.getElementById("app").hidden)render();});
+Promise.all([fetch("questoes.json").then(r=>r.json()),...["questoes-vest.json","questoes-provao.json"].map(f=>fetch(f).then(r=>r.ok?r.json():[]).catch(()=>[]))]).then(([d,...extra])=>{d.forEach(q=>{q.v=q.v||"ENEM";});Q=d.concat(...extra);Q.forEach(q=>QMAP[q.id]=q);
+  // provas que só informam a área: estima a matéria pelo assunto do módulo mais próximo
+  Q.forEach(q=>{if((q.s==="Ciências da Natureza"||q.s==="Ciências Humanas")&&q.v!=="ENEM"&&window.GPS&&GPS.topicOf){const t=GPS.topicOf(q);if(t&&MODMAP[t])q.s=MODMAP[t].s;}});
+  QREADY=true;if(!document.getElementById("app").hidden)render();}).catch(()=>{QREADY="erro";if(!document.getElementById("app").hidden)render();});
 const md=s=>esc(s).replace(/\*\*(.+?)\*\*/g,"<strong>$1</strong>").replace(/(^|[^*])\*(?!\s)(.+?)\*/g,"$1<em>$2</em>").replace(/\\([\[\]\-_*().!])/g,"$1");
-const PROVAS=["ENEM","FUVEST","Unicamp"]; // Unesp e Provão Paulista entram aqui quando o banco for carregado
+const PROVAS=["ENEM","FUVEST","Unicamp","Provão Paulista"]; // Unesp entra aqui quando o banco for carregado
 const qProva=q=>q.v||"ENEM";
 const qImg=(q,i)=>q.im&&q.im[i]?`<img class="qimg" src="${q.im[i]}" alt="Figura ${+i+1} da questão" loading="lazy">`:"";
 const qmd=(t,q)=>md(String(t||"").replace(/\n*(\[IMAGE \d+\])\n*/g,"$1")).replace(/\[IMAGE (\d+)\]/g,(m,i)=>qImg(q,i));
@@ -1684,7 +1688,7 @@ function qCardHTML(q,mode){
   const chosen=mode==="sim"||mode==="review"?S.sim?.ans?.[q.id]:S.ans[q.id];
   const answered=mode==="train"?chosen!==undefined:mode==="review";
   return `<article class="qcard">
-    <div class="qmeta"><span class="chip dark">${qProva(q)} ${q.y}</span><span class="chip">Questão ${q.n}</span><span class="chip" style="background:${subjColor(q.s)}">${esc(q.s)}</span></div>
+    <div class="qmeta"><span class="chip dark">${qProva(q)} ${q.y}${q.sr?" · "+q.sr:""}</span><span class="chip">Questão ${q.n}</span><span class="chip" style="background:${subjColor(q.s)}">${esc(q.s)}</span></div>
     ${q.c?`<div class="qctx">${qmd(q.c,q)}</div>`:""}${q.q?`<div class="qintro">${qmd(q.q,q)}</div>`:""}
     <div class="alts">${q.o.map((o,i)=>{let c="";if(answered){if(i===q.k)c="right";else if(i===chosen)c="wrong";}else if(i===chosen)c="sel";
       return `<button class="alt ${c}" data-ans="${i}" data-qid="${q.id}" data-mode="${mode}" ${answered?"disabled":""}><span class="L">${"ABCDE"[i]}</span><span>${qmd(o,q)}</span></button>`}).join("")}</div>
@@ -1720,7 +1724,7 @@ function vSimulados(){
   if(S.sim&&S.sim.done&&simView==="result")return simResult();
   const years=[...new Set(Q.map(q=>q.y))].sort((a,b)=>b-a);
   return `<h1 class="h-big" style="font-size:clamp(28px,5vw,46px);margin:6px 0 4px">Simulados<br><span style="color:var(--violet)">contra o relógio</span></h1>
-  <p class="muted" style="max-width:60ch">Questões reais do ENEM, da FUVEST e da Unicamp sorteadas do banco. O tempo segue a média de 3 minutos por questão.</p>
+  <p class="muted" style="max-width:60ch">Questões reais do ENEM, da FUVEST, da Unicamp e do Provão Paulista sorteadas do banco. O tempo segue a média de 3 minutos por questão.</p>
   ${QREADY!==true?`<div class="empty">Carregando questões…</div>`:`
   <div class="grid programs" style="margin-top:16px">${SIMS.map(s=>`<div class="prog ${s.cls}"><div class="tags"><span>${s.n} questões</span><span>${s.min} min</span></div><h3>${s.name}</h3><p>${s.desc}</p><button class="btn" data-startsim="${s.id}">Começar</button></div>`).join("")}</div>
   <div class="row-head"><h2 class="h-sec">Provas anteriores por ano</h2></div>
@@ -1728,7 +1732,7 @@ function vSimulados(){
     <select id="yearProva" aria-label="Prova">${PROVAS.map(p=>`<option>${p}</option>`).join("")}</select><select id="yearSel" aria-label="Ano da prova">${years.map(y=>`<option>${y}</option>`).join("")}</select>
     <select id="yearArea" aria-label="Área"><option value="">Prova completa (em texto)</option><option value="ciencias-natureza">Ciências da Natureza</option><option value="matematica">Matemática</option><option value="ciencias-humanas">Ciências Humanas</option><option value="linguagens">Linguagens</option></select>
     <button class="btn" data-startyear>Fazer prova</button>
-    <span class="note" style="flex-basis:100%">ENEM de 2016 a 2023 (questões em texto) e FUVEST e Unicamp de 2018 a 2024 (com figuras). Para a prova original completa, use os links oficiais abaixo.</span></div>`}
+    <span class="note" style="flex-basis:100%">ENEM de 2016 a 2023 (questões em texto), FUVEST e Unicamp de 2018 a 2024 e Provão Paulista de 2024 e 2025 (com figuras). Para a prova original completa, use os links oficiais abaixo.</span></div>`}
   ${S.sims.length?`<div class="row-head"><h2 class="h-sec">Histórico</h2></div><div class="card"><table><thead><tr><th>Simulado</th><th>Data</th><th>Acertos</th></tr></thead><tbody>${S.sims.slice().reverse().slice(0,8).map(h=>`<tr><td>${esc(h.name)}</td><td class="num">${new Date(h.date).toLocaleDateString("pt-BR")}</td><td class="num"><b>${h.ok}/${h.n}</b> (${Math.round(h.ok/h.n*100)}%)</td></tr>`).join("")}</tbody></table></div>`:""}
   <div class="row-head"><h2 class="h-sec">Provas oficiais anteriores</h2></div>
   <div class="grid links">${[["ENEM","Provas e gabaritos do INEP","https://www.gov.br/inep/pt-br/areas-de-atuacao/avaliacao-e-exames-educacionais/enem/provas-e-gabaritos"],["FUVEST","USP: provas e resoluções","https://www.fuvest.br/"],["Unicamp","Comvest: provas anteriores","https://www.comvest.unicamp.br/"],["Unesp","Vunesp: vestibular Unesp","https://www.vunesp.com.br/"],["Provão Paulista","Seriado da rede estadual de SP","https://provaopaulista.vunesp.com.br/"]].map(([a,b,u])=>`<a class="link-card" href="${u}" target="_blank" rel="noopener"><b>${a}</b><span class="small muted">${b}</span></a>`).join("")}</div>`;

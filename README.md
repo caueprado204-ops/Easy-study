@@ -8,7 +8,8 @@ Plataforma de estudos para o curso dos sonhos (Medicina, Psicologia, Engenharia,
 index.html        landing page + plataforma (tudo em um arquivo)
 questoes.json     876 questões reais do ENEM 2016–2023 (projeto aberto enem-api)
 questoes-vest.json 1.257 questões da FUVEST e da Unicamp 2018–2024 (conjunto aberto BLUEX)
-img/              figuras das questões da FUVEST e da Unicamp (webp)
+questoes-provao.json 366 questões do Provão Paulista 2024–2025 (provas seriadas da Seduc-SP)
+img/              figuras das questões da FUVEST, da Unicamp e do Provão Paulista (webp)
 api/easier.js     função serverless que conversa com a IA (a chave fica no servidor)
 app/gps-lab.js    GPS de Estudos + Laboratório de Erros
 conteudo/         textos dos módulos, figuras e conteúdos extras
@@ -135,4 +136,5 @@ A prioridade de cada conteúdo é calculada por `GPS.motor(ctx, idDoModulo)`, um
 
 - ENEM: `questoes.json` (projeto aberto enem-api).
 - FUVEST e Unicamp: `questoes-vest.json`, convertido do conjunto aberto BLUEX (github.com/Portuguese-Benchmark-Datasets/BLUEX). As figuras ficam em `img/`. O campo `v` indica a prova e o campo `im` lista as figuras, referenciadas no texto como `[IMAGE n]`.
-- Para incluir Unesp e Provão Paulista, gere um arquivo no mesmo formato (`id, v, y, n, a, s, c, q, o, k, im`), carregue-o junto em `index.html` e acrescente o nome da prova à lista `PROVAS`.
+- Provão Paulista: `questoes-provao.json`, extraído das provas e gabaritos oficiais (1ª, 2ª e 3ª série, 2024 e 2025). Fórmulas, gráficos e figuras viram recortes de imagem; o campo `sr` indica a série.
+- Para incluir a Unesp, gere um arquivo no mesmo formato (`id, v, y, n, a, s, c, q, o, k, im`), carregue-o junto em `index.html` e acrescente o nome da prova à lista `PROVAS`.
