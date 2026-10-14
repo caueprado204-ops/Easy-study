@@ -138,3 +138,19 @@ A prioridade de cada conteúdo é calculada por `GPS.motor(ctx, idDoModulo)`, um
 - FUVEST e Unicamp: `questoes-vest.json`, convertido do conjunto aberto BLUEX (github.com/Portuguese-Benchmark-Datasets/BLUEX). As figuras ficam em `img/`. O campo `v` indica a prova e o campo `im` lista as figuras, referenciadas no texto como `[IMAGE n]`.
 - Provão Paulista: `questoes-provao.json`, extraído das provas e gabaritos oficiais (1ª, 2ª e 3ª série, 2024 e 2025). Fórmulas, gráficos e figuras viram recortes de imagem; o campo `sr` indica a série.
 - Para incluir a Unesp, gere um arquivo no mesmo formato (`id, v, y, n, a, s, c, q, o, k, im`), carregue-o junto em `index.html` e acrescente o nome da prova à lista `PROVAS`.
+
+## Pagamento automático (Mercado Pago)
+
+O aluno assina na aba Planos e paga no Mercado Pago com cartão. A cobrança se repete todo mês sem ninguém precisar liberar nada.
+
+- `api/assinatura.js`: cria a assinatura (link do checkout), troca de plano e cancela.
+- `api/mp-webhook.js`: recebe os avisos do Mercado Pago, relê a assinatura pela API e atualiza `assinaturas` no Supabase.
+- O plano vale até a próxima cobrança + 3 dias. Ao cancelar, o acesso continua até o fim do período pago.
+- Tudo o que o Mercado Pago avisa fica registrado na tabela `eventos_pagamento` (só o servidor acessa).
+
+Para ligar:
+1. Na Vercel, crie `MP_ACCESS_TOKEN` com o Access Token **de produção** do Mercado Pago (Suas integrações → sua aplicação → Credenciais de produção).
+2. No Mercado Pago, em Webhooks, cadastre a URL `https://SEU-SITE/api/mp-webhook`, marque o evento **Planos e assinaturas** e copie a "Assinatura secreta" para `MP_WEBHOOK_SECRET` na Vercel.
+3. Faça um redeploy.
+
+A liberação manual por Pix (SQL acima) continua funcionando para quem preferir.

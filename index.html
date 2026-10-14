@@ -451,6 +451,8 @@ select,.inp{border:1.5px solid var(--line);border-radius:10px;padding:7px 10px;b
 .plan-cards .l-cta{margin-top:auto;padding:12px}
 .cur-plan{margin-top:auto;align-self:flex-start;background:var(--white);color:var(--ink);border-radius:999px;padding:7px 14px;font-weight:700;font-size:13px}
 .paywall{background:var(--lime);margin-bottom:14px}
+.pay-box{margin-top:14px;border-color:var(--violet)}.pay-mail{display:grid;gap:4px;max-width:380px}
+.pay-status{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin-bottom:14px}.card.pay-status{background:var(--white)}
 .plan-cards{grid-template-columns:repeat(2,minmax(0,1fr))!important;max-width:900px}
 .usage-card{display:flex;flex-direction:column;gap:12px;margin-bottom:14px}
 .ubs{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
@@ -2220,7 +2222,7 @@ async function carregarConta(user){
   ACC={user,perfil:null,assinatura:null,uso:{usos:0,redacoes:0}};
   const [p,a,u,g]=await Promise.all([
     sb.from("perfis").select("*").eq("id",user.id).maybeSingle(),
-    sb.from("assinaturas").select("plano,valido_ate").eq("user_id",user.id).maybeSingle(),
+    sb.from("assinaturas").select("plano,valido_ate,gateway,gateway_id,status_pagamento,proximo_pagamento,email_pagador").eq("user_id",user.id).maybeSingle(),
     sb.from("uso_ia").select("usos,redacoes").eq("user_id",user.id).eq("mes",mesAtual()).maybeSingle(),
     sb.from("progresso").select("dados,atualizado_em").eq("user_id",user.id).maybeSingle()
   ]);
@@ -2306,7 +2308,7 @@ async function cadastrar(dados){authBusy=true;authMsg="";renderAuth();
   if(!data.session){authMode="login";authMsg="✓ Conta criada! Enviamos um link de confirmação para "+dados.email+". Confirme e depois entre.";renderAuth();}}
 async function sair(){try{await salvarNuvem();}catch(e){}await sb.auth.signOut();ACC=null;S={name:"",entered:false,act:{},ans:{},watched:{},read:{},modDone:{},lessons:{},routine:[],exams:DEFAULT_EXAMS,sims:[],essays:[],spotify:"",sim:null,essayDraft:"",essayTheme:ESSAY_THEMES[0]};hideAuth();showLanding(true);try{history.replaceState(null,"","#inicio");}catch(e){}toast("Você saiu da conta.");}
 
-function abrirApp(){if(!planoAtual()&&!VIEWS_SEM_PLANO.includes(VIEW))VIEW="planos";hideAuth();showLanding(false);buildNav();paintTop();render();try{history.replaceState(null,"","#"+VIEW);}catch(e){}}
+function abrirApp(){if(!planoAtual()&&!VIEWS_SEM_PLANO.includes(VIEW))VIEW="planos";hideAuth();showLanding(false);buildNav();paintTop();render();setTimeout(voltaDoCheckout,300);try{history.replaceState(null,"","#"+VIEW);}catch(e){}}
 
 document.addEventListener("submit",async e=>{const f=e.target;
   if(f.id==="loginForm"){e.preventDefault();e.stopImmediatePropagation();entrar(lEmail.value.trim(),lSenha.value);}
@@ -2333,6 +2335,10 @@ document.addEventListener("click",e=>{const t=e.target.closest("button,a");if(!t
     if(t.dataset.confirm!=="1"){t.dataset.confirm="1";const old=t.innerHTML;t.innerHTML=t.classList.contains("navbtn")?svg('<path d="M20 6 9 17l-5-5"/>'):"Confirmar saída?";setTimeout(()=>{t.dataset.confirm="";t.innerHTML=old;},3000);return;}
     sair();return;}
   if(d.assinar!==undefined){e.stopImmediatePropagation();assinarHTML(d.assinar);return;}
+  if(d.paygo!==undefined){assinarAgora(d.paygo,t);return;}
+  if(d.paycheck!==undefined){conferirPagamento(false);return;}
+  if(d.paycancel!==undefined){if(t.dataset.confirm!=="1"){t.dataset.confirm="1";t.textContent="Confirmar cancelamento?";setTimeout(()=>{t.dataset.confirm="";t.textContent="Cancelar renovação";},4000);return;}
+    t.disabled=true;pagamentoAPI({acao:"cancelar"}).then(r=>{if(r.assinatura){ACC.assinatura={...ACC.assinatura,...r.assinatura};toast("Renovação cancelada. Seu acesso continua até o fim do período pago.");}else toast("Não foi possível cancelar agora. Tente de novo.");render();});return;}
 },true);
 
 /* ---------- aba Planos ---------- */
@@ -2346,7 +2352,7 @@ function planCardsHTML(ctaLanding){
       <p>${p.desc}</p>
       <ul>${p.itens.map(i=>`<li>${esc(i)}</li>`).join("")}</ul>
       ${ctaLanding?`<button class="l-cta" data-enter-signup>Assinar ${p.nome}</button>`
-        :atual===k?`<span class="cur-plan">Seu plano atual</span>`:p.preco?`<button class="l-cta" data-assinar="${k}">Assinar ${p.nome}</button>`:""}
+        :atual===k?`<span class="cur-plan">Seu plano atual</span>`:p.preco?`<button class="l-cta" data-assinar="${k}">${atual?"Mudar para":"Assinar"} ${p.nome}</button>`:""}
     </div>`).join("")}</div>`;
 }
 function vPlanos(){
@@ -2357,6 +2363,7 @@ function vPlanos(){
     <div><span class="chip dark">${esc(p.nome)}</span>${ACC?.assinatura?.valido_ate?`<span class="small muted" style="margin-left:8px">válido até ${new Date(ACC.assinatura.valido_ate+"T12:00").toLocaleDateString("pt-BR")}</span>`:""}</div>
     ${usageBars(u,p)}</div>`
   :`<div class="card paywall"><b>${venc?"Seu plano venceu.":"Falta só um passo."}</b> <span class="small">${venc?"Renove para voltar a estudar com tudo que você já fez salvo na sua conta.":"Assine um plano para liberar módulos, questões, simulados, redação, rotina e a Easier. Seu progresso fica salvo na conta."}</span></div>`}
+  ${renovacaoHTML()}
   ${planCardsHTML(false)}
   <div id="assinarBox"></div>
   <div class="card" style="margin-top:14px"><b>O que conta como uso da Easier</b>
@@ -2368,13 +2375,65 @@ function usageBars(u,p){
 }
 function assinarHTML(k){
   const p=PLANS[k],box=document.getElementById("assinarBox");if(!box)return;
+  const a=ACC?.assinatura||{},troca=planoAtual()&&a.status_pagamento==="authorized";
   const msg=encodeURIComponent(`Olá! Quero assinar o plano ${p.nome} (${brl(p.preco)}/mês) do Easy Study. Meu e-mail de cadastro: ${ACC?.user?.email||""}`);
   const temContato=CONTATO.whatsapp||CONTATO.email;
-  box.innerHTML=`<div class="card" style="margin-top:14px;border-color:var(--violet)"><h3 style="font-size:17px;margin-bottom:6px">Assinar o plano ${esc(p.nome)}</h3>
-    ${temContato?`<p class="small" style="margin:0 0 10px">Fale com a equipe, faça o pagamento por Pix e seu plano é liberado em até 24 horas na sua conta (${esc(ACC?.user?.email||"")}).</p>
-      <div style="display:flex;gap:8px;flex-wrap:wrap">${CONTATO.whatsapp?`<a class="btn" href="https://wa.me/${CONTATO.whatsapp}?text=${msg}" target="_blank" rel="noopener">Falar no WhatsApp</a>`:""}${CONTATO.email?`<span class="chip" style="padding:6px 10px;user-select:all">${esc(CONTATO.email)}</span>`:""}</div>`
-      :`<p class="small" style="margin:0">As assinaturas abrem em breve. Deixe sua conta criada que avisamos você.</p>`}</div>`;
+  box.innerHTML=`<div class="card pay-box"><h3 style="font-size:17px;margin-bottom:6px">${troca?"Mudar para o":"Assinar o"} plano ${esc(p.nome)}</h3>
+    ${troca?`<p class="small" style="margin:0 0 10px">Sua assinatura continua no mesmo cartão. O novo valor, ${brl(p.preco)}/mês, vale a partir da próxima cobrança, e o ${esc(p.nome)} é liberado agora.</p>
+      <button class="btn violet" data-paygo="${k}">Confirmar mudança</button>`
+    :`<p class="small" style="margin:0 0 10px"><b>Pagamento automático no cartão:</b> ${brl(p.preco)} por mês, cobrados todo mês pelo Mercado Pago. Você pode cancelar quando quiser, aqui mesmo, e continua com acesso até o fim do mês pago.</p>
+      <label class="small pay-mail">E-mail da sua conta Mercado Pago<input class="inp" id="payEmail" type="email" autocomplete="email" value="${esc(a.email_pagador||ACC?.user?.email||"")}"></label>
+      <p class="note" style="margin:4px 0 10px">Use o mesmo e-mail com que você vai entrar no Mercado Pago para pagar. Se não tiver conta, dá para criar na hora.</p>
+      <button class="btn violet" data-paygo="${k}">Assinar com pagamento automático</button>
+      ${temContato?`<p class="small" style="margin:12px 0 6px">Prefere pagar por Pix, mês a mês? Fale com a equipe e o plano é liberado em até 24 horas.</p><div style="display:flex;gap:8px;flex-wrap:wrap">${CONTATO.whatsapp?`<a class="btn ghost sm" href="https://wa.me/${CONTATO.whatsapp}?text=${msg}" target="_blank" rel="noopener">Pagar por Pix (WhatsApp)</a>`:""}${CONTATO.email?`<span class="chip" style="padding:6px 10px">${esc(CONTATO.email)}</span>`:""}</div>`:""}`}
+    <div id="payMsg" class="small" style="margin-top:8px"></div></div>`;
   box.scrollIntoView({behavior:"smooth",block:"nearest"});
+}
+async function pagamentoAPI(body){
+  const ses=sb?(await sb.auth.getSession()).data.session:null;
+  const r=await fetch("/api/assinatura",{method:"POST",headers:{"content-type":"application/json",...(ses?{authorization:"Bearer "+ses.access_token}:{})},body:JSON.stringify(body)});
+  const j=await r.json().catch(()=>({}));
+  return {ok:r.ok,status:r.status,...j};
+}
+async function assinarAgora(k,btn){
+  const msg=document.getElementById("payMsg"),email=document.getElementById("payEmail")?.value.trim();
+  btn.disabled=true;btn.textContent="Abrindo o Mercado Pago…";if(msg)msg.textContent="";
+  try{
+    const r=await pagamentoAPI({acao:"assinar",plano:k,email});
+    if(r.url){location.href=r.url;return;}
+    if(r.assinatura){ACC.assinatura={...ACC.assinatura,...r.assinatura};buildNav();render();toast(r.code==="plano_trocado"?"Plano alterado!":"Você já assina este plano.");return;}
+    const txt={pagamento_desligado:"O pagamento automático ainda está sendo ativado. Tente mais tarde ou fale com a equipe.",email_invalido:"Confira o e-mail da sua conta Mercado Pago.",login_required:"Entre na sua conta de novo para assinar."}[r.code]||r.message||"Não foi possível iniciar o pagamento agora.";
+    if(msg)msg.innerHTML=`<span style="color:var(--bad)">${esc(txt)}</span>`;
+  }catch(e){if(msg)msg.innerHTML=`<span style="color:var(--bad)">Sem conexão. Tente de novo.</span>`;}
+  btn.disabled=false;btn.textContent="Tentar de novo";
+}
+function renovacaoHTML(compacto){
+  const a=ACC?.assinatura;if(!a||a.gateway!=="mercadopago"||!a.status_pagamento)return "";
+  const d=x=>x?new Date(x+"T12:00").toLocaleDateString("pt-BR"):"";
+  const st=a.status_pagamento;
+  const linha=st==="authorized"?`<b>Pagamento automático ativo.</b> ${a.proximo_pagamento?"Próxima cobrança em "+d(a.proximo_pagamento)+".":""}`
+    :st==="pending"?`<b>Pagamento em andamento.</b> Assim que o Mercado Pago confirmar, seu plano é liberado.`
+    :st==="paused"?`<b>Cobrança pausada.</b> ${a.valido_ate?"Seu acesso vai até "+d(a.valido_ate)+".":""}`
+    :st==="cancelled"?`<b>Renovação cancelada.</b> ${a.valido_ate&&planoAtual()?"Você continua com acesso até "+d(a.valido_ate)+".":""}`:"";
+  if(!linha)return "";
+  const btns=st==="authorized"?`<button class="btn ghost sm" data-paycancel>Cancelar renovação</button>`
+    :st==="pending"?`<button class="btn ghost sm" data-paycheck>Já paguei, conferir</button>`
+    :`<button class="btn sm violet" data-go="planos">Assinar de novo</button>`;
+  return `<div class="${compacto?"":"card "}pay-status"><span class="small">${linha}</span>${btns}</div>`;
+}
+let payPoll=null;
+async function conferirPagamento(silencioso){
+  const r=await pagamentoAPI({acao:"atualizar"}).catch(()=>null);
+  if(r?.assinatura){const antes=planoAtual();ACC.assinatura={...ACC.assinatura,...r.assinatura};if(!antes&&planoAtual()){toast("Pagamento confirmado! Seu plano está liberado.");clearInterval(payPoll);payPoll=null;if(VIEW==="planos")VIEW="painel";}buildNav();render();}
+  else if(!silencioso)toast("Ainda não recebemos a confirmação. Tente em alguns minutos.");
+  return r;
+}
+function voltaDoCheckout(){
+  if(!/assinatura=retorno/.test(location.search))return;
+  try{history.replaceState(null,"",location.pathname+location.hash);}catch(e){}
+  toast("Conferindo seu pagamento…");
+  let n=0;conferirPagamento(true);
+  payPoll=setInterval(()=>{if(++n>15||planoAtual()){clearInterval(payPoll);payPoll=null;return;}conferirPagamento(true);},4000);
 }
 
 /* ---------- aba Minha conta ---------- */
@@ -2394,6 +2453,7 @@ function vConta(){
       <button class="btn" style="align-self:flex-start">Salvar perfil</button></form>
     <div class="card form"><h3 style="font-size:17px">Plano e consumo</h3>
       ${p?`<div><span class="chip dark">${esc(p.nome)}</span></div>${usageBars(ACC?.uso||{},p)}`:`<p class="small" style="margin:0">Nenhum plano ativo.</p>`}
+      ${renovacaoHTML(true)}
       <button class="btn sm violet" data-go="planos" style="align-self:flex-start">${p?"Ver planos":"Assinar um plano"}</button>
       <h3 style="font-size:17px;margin-top:8px">Acesso</h3>
       <p class="small" style="margin:0">E-mail: <b>${esc(ACC?.user?.email||"")}</b></p>
