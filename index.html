@@ -355,10 +355,11 @@ select,.inp{border:1.5px solid var(--line);border-radius:10px;padding:7px 10px;b
 .blk{border:1.5px solid var(--line);border-radius:10px;padding:6px 8px;font-size:12.5px;position:relative;line-height:1.3}
 .blk b{display:block;font-size:13px}
 .blk .x{position:absolute;right:4px;top:3px;border:0;background:transparent;font-size:15px;line-height:1;padding:2px 4px}
-.forms{grid-template-columns:repeat(auto-fit,minmax(280px,1fr));margin-top:14px}
+.forms{grid-template-columns:repeat(auto-fit,minmax(min(280px,100%),1fr));margin-top:14px}
 .form{display:flex;flex-direction:column;gap:10px}
 .form label{font-size:13px;font-weight:500;display:flex;flex-direction:column;gap:4px}
-.form .two{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.form .two{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px}
+.form label>.inp,.form label>select{width:100%;max-width:100%}
 .exams{display:flex;flex-direction:column;gap:6px}
 .exam{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:8px;align-items:center;border-bottom:1.5px solid var(--hair);padding:6px 0}
 .exam .days{font-family:var(--display);font-weight:800;font-size:14px;border-radius:8px;padding:2px 8px;background:var(--lime);border:1.5px solid var(--line);white-space:nowrap}
@@ -467,7 +468,7 @@ select,.inp{border:1.5px solid var(--line);border-radius:10px;padding:7px 10px;b
 @media (max-width:1050px){
   .hero{grid-template-columns:1fr 1fr} .hero-main{grid-column:1/-1}
   .subjects{grid-template-columns:repeat(2,minmax(0,1fr))}
-  .lower,.qwrap,.red-wrap,.focus{grid-template-columns:1fr}
+  .lower,.qwrap,.red-wrap,.focus{grid-template-columns:minmax(0,1fr)}
   .l-hero{grid-template-columns:1fr 1fr} .l-main{grid-column:1/-1;grid-row:auto;min-height:360px}
   .l-photo{grid-row:span 2}
   .feat{grid-template-columns:1fr 1fr}
@@ -1068,6 +1069,7 @@ ex:["Um viajante diz que a comida de outro país é 'nojenta' por ser diferente 
 <script src="conteudo/extras-natureza.js"></script>
 <script src="conteudo/extras-exatas-linguagens.js"></script>
 <script src="conteudo/extras-humanas.js"></script>
+<script src="app/gps-lab.js"></script>
 <script>
 /* ---------- matérias ---------- */
 const SUBJ = {
@@ -1168,6 +1170,8 @@ const I={
  planos:'<path d="M12 2 3 7l9 5 9-5z"/><path d="m3 12 9 5 9-5M3 17l9 5 9-5"/>',
  conta:'<circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/>',
  painel:'<path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h6v6h-6z"/>',
+ gps:'<circle cx="6" cy="18" r="2.5"/><path d="M8.5 18H15a3.5 3.5 0 0 0 0-7H9a3.5 3.5 0 0 1 0-7h7"/><path d="M18 2.5 21 4l-3 1.5"/>',
+ erros:'<path d="M9 3h6M10 3v6l-5.5 9.5A2 2 0 0 0 6.2 21h11.6a2 2 0 0 0 1.7-2.5L14 9V3"/><path d="M7.5 15h9"/>',
  modulos:'<path d="M4 5a2 2 0 0 1 2-2h12v16H6a2 2 0 0 0-2 2z"/><path d="M4 21V5M8 7h6M8 11h6"/>',
  aulas:'<rect x="3" y="5" width="18" height="14" rx="3"/><path d="m10 9 5 3-5 3z"/>',
  flash:'<rect x="6" y="3" width="14" height="17" rx="3"/><path d="M4 7v12a2 2 0 0 0 2 2h10"/><path d="M10 9h6M10 13h4"/>',
@@ -1177,7 +1181,7 @@ const I={
  rotina:'<rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/>',
  foco:'<path d="M9 18V6l11-2v12"/><circle cx="6" cy="18" r="3"/><circle cx="17" cy="16" r="3"/>'
 };
-const LABEL={planos:"Planos",conta:"Minha conta",painel:"Painel",modulos:"Módulos",aulas:"Videoaulas",flash:"Flashcards",questoes:"Questões",simulados:"Simulados e provas",redacao:"Redação",rotina:"Rotina e calendário",foco:"Foco e música"};
+const LABEL={planos:"Planos",conta:"Minha conta",painel:"Painel",gps:"GPS de Estudos",erros:"Laboratório de Erros",modulos:"Módulos",aulas:"Videoaulas",flash:"Flashcards",questoes:"Questões",simulados:"Simulados e provas",redacao:"Redação",rotina:"Rotina e calendário",foco:"Foco e música"};
 const svg=(p,s=21)=>`<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${p}</svg>`;
 const FLAME='<svg viewBox="0 0 24 24"><path d="M12 2c1 4 5 5.5 5 11a5 5 0 0 1-10 0c0-2.5 1.2-4 2.5-5 .2 2 1.2 3 2.5 3-1.5-3 0-6 0-9z" fill="#FF5B37" stroke="#1C1B1A" stroke-width="1.5" stroke-linejoin="round"/></svg>';
 const STAR=(c,s,x,y,r=0)=>`<svg class="star" style="width:${s}px;height:${s}px;${x};${y};transform:rotate(${r}deg)" viewBox="0 0 40 40"><g fill="${c}">${[0,45,90,135].map(a=>`<rect x="17" y="2" width="6" height="36" rx="3" transform="rotate(${a} 20 20)"/>`).join("")}</g></svg>`;
@@ -1289,7 +1293,7 @@ function showLanding(on){
   if(on) renderLanding();
   window.scrollTo({top:0});
 }
-const NAV_ORDER=["painel","modulos","aulas","flash","questoes","simulados","redacao","rotina","foco","planos","conta"];
+const NAV_ORDER=["painel","gps","modulos","aulas","flash","questoes","erros","simulados","redacao","rotina","foco","planos","conta"];
 function buildNav(){const livre=!ACC||planoAtual();document.getElementById("nav").innerHTML=NAV_ORDER.filter(k=>livre||VIEWS_SEM_PLANO.includes(k)).map(k=>`<button data-go="${k}" aria-label="${LABEL[k]}" class="${k===VIEW?"on":""}">${svg(I[k])}<span class="tip">${LABEL[k]}</span></button>`).join("")+`<span class="sep"></span><button class="navbtn" data-logout aria-label="Sair da conta">${svg('<path d="M15 4h4v16h-4"/><path d="M10 8l-4 4 4 4M6 12h10"/>')}<span class="tip">Sair da conta</span></button>`;}
 function go(v){if(ACC&&!planoAtual()&&!VIEWS_SEM_PLANO.includes(v)){toast("Assine um plano para liberar a plataforma.");v="planos";}VIEW=v;buildNav();render();try{history.replaceState(null,"","#"+v);}catch(e){}window.scrollTo({top:0});}
 function paintTop(){
@@ -1361,7 +1365,7 @@ function mdBlock(t){
 
 /* ---------- render ---------- */
 function render(){
-  const map={planos:vPlanos,conta:vConta,painel:vPainel,modulos:vModulos,aulas:vAulas,flash:vFlash,questoes:vQuestoes,simulados:vSimulados,redacao:vRedacao,rotina:vRotina,foco:vFoco};
+  const map={planos:vPlanos,conta:vConta,painel:vPainel,gps:()=>window.vGPS(),erros:()=>window.vErros(),modulos:vModulos,aulas:vAulas,flash:vFlash,questoes:vQuestoes,simulados:vSimulados,redacao:vRedacao,rotina:vRotina,foco:vFoco};
   document.getElementById("view").innerHTML=map[VIEW]();
   if(VIEW==="foco")paintPomo();
   if(VIEW==="aulas")prepararThumbs();
@@ -1385,7 +1389,7 @@ function vPainel(){
   const essayBest=Math.max(0,...S.essays.map(e=>e.total||0)), mods=Object.keys(S.modDone).length;
   const badges=[["Primeira questão",qs.n>=1],["Primeiro módulo",mods>=1],["10 módulos",mods>=10],["100 questões",qs.n>=100],["3 dias seguidos",bestStreak()>=3],["7 dias seguidos",bestStreak()>=7],["30 dias seguidos",bestStreak()>=30],["Simulado feito",S.sims.length>0],["Redação 900+",essayBest>=900]];
   const lastMod=S.lastMod&&MODMAP[S.lastMod];
-  return contaStripHTML()+`
+  return contaStripHTML()+(window.gpsDashHTML?gpsDashHTML():"")+`
   <div class="hero">
     <div class="hero-main">${STAR("var(--lime)",54,"right:22px","top:20px",10)}${STAR("var(--pink)",30,"right:90px","bottom:86px",-15)}
       <h1 class="h-big">${lastMod?`Continue<br><em>${esc(lastMod.t)}</em>`:`Meta:<br><em>${esc(ACC?.perfil?.curso_foco||"curso dos sonhos")}</em><br>${ACC?.perfil?.faculdade?"na "+esc(ACC.perfil.faculdade):"sem parar"}`}</h1>
@@ -1525,6 +1529,7 @@ function vReader(m){
       </div>
     </div>
     <aside class="side">
+      ${window.gpsPrereqCard?gpsPrereqCard(m.id):""}
       <div class="card"><h4>Videoaula</h4>${vPrevHTML(m.id)}<p class="small muted" style="margin:8px 0 0">${KHAN_SUBJ.includes(m.s)?"Khan Academy Brasil":"Aula do YouTube"}, sem sair do Easy Study.</p></div>
       <div class="card"><h4>Tire uma dúvida</h4>
         <form class="ask" id="askForm"><input class="inp" id="askInput" placeholder="Ex.: o que é codominância?" value="${esc(modState.ask)}"><button class="btn sm" ${modState.askBusy?"disabled":""}>Perguntar</button></form>
@@ -1551,7 +1556,7 @@ function openModule(id){
 }
 function markRead(){
   const m=MODMAP[modState.id]; if(!m) return; const total=MOD[m.s][m.i].s.length;
-  if(modState.sec<total){const r=S.read[m.id]||(S.read[m.id]={});if(!r[modState.sec]){r[modState.sec]=1;addXP(5);}save();}
+  if(modState.sec<total){if(window.gpsTouch)gpsTouch(m.id);const r=S.read[m.id]||(S.read[m.id]={});if(!r[modState.sec]){r[modState.sec]=1;addXP(5);}save();}
 }
 async function genLesson(id){
   const m=MODMAP[id]; const mm=MOD[m.s][m.i];
@@ -1663,7 +1668,7 @@ function qCardHTML(q,mode){
     <div class="alts">${q.o.map((o,i)=>{let c="";if(answered){if(i===q.k)c="right";else if(i===chosen)c="wrong";}else if(i===chosen)c="sel";
       return `<button class="alt ${c}" data-ans="${i}" data-qid="${q.id}" data-mode="${mode}" ${answered?"disabled":""}><span class="L">${"ABCDE"[i]}</span><span>${md(o)}</span></button>`}).join("")}</div>
     ${answered?`<div class="feedback" style="color:${chosen===q.k?"var(--ok)":"var(--bad)"}">${chosen===undefined?"Não respondida. Gabarito: "+"ABCDE"[q.k]:chosen===q.k?"Correto!":"Resposta certa: "+"ABCDE"[q.k]}</div>
-      <div id="exp-${q.id}">${qExplain[q.id]?`<div class="explain">${esc(qExplain[q.id])}</div>`:`<button class="btn sm ink" style="margin-top:10px" data-explain="${q.id}">Explicar com a Easier</button>`}</div>`:""}
+      <div id="exp-${q.id}">${qExplain[q.id]?`<div class="explain">${esc(qExplain[q.id])}</div>`:`<button class="btn sm ink" style="margin-top:10px" data-explain="${q.id}">Explicar com a Easier</button>`}</div>${chosen!==undefined&&chosen!==q.k&&window.labInline?labInline(q,chosen):""}`:""}
   </article>`;
 }
 function vQuestoes(){
@@ -1712,7 +1717,7 @@ function simRun(){const s=S.sim,q=QMAP[s.ids[s.cur]];
   <div class="qgrid" style="margin-bottom:14px">${s.ids.map((id,i)=>`<button class="${s.ans[id]!==undefined?"ans":""} ${i===s.cur?"cur":""}" data-simgo="${i}" aria-label="Questão ${i+1}">${i+1}</button>`).join("")}</div>
   ${q?qCardHTML(q,"sim"):""}
   <div class="qnav"><button class="btn ghost sm" data-simgo="${s.cur-1}" ${s.cur===0?"disabled":""}>Anterior</button><button class="btn sm" data-simgo="${s.cur+1}" ${s.cur>=s.ids.length-1?"disabled":""}>Próxima</button><span class="small muted num">${Object.keys(s.ans).length}/${s.ids.length} respondidas</span></div>`;}
-function finishSim(){const s=S.sim;if(!s||s.done)return;s.done=true;let ok=0;s.ids.forEach(id=>{if(s.ans[id]===QMAP[id]?.k)ok++;if(s.ans[id]!==undefined)S.ans[id]=s.ans[id];});s.ok=ok;s.cur=0;S.sims.push({name:s.name,date:Date.now(),ok,n:s.ids.length});addXP(50+ok*5,"q",Object.keys(s.ans).length);simView="result";save();render();}
+function finishSim(){const s=S.sim;if(!s||s.done)return;s.done=true;let ok=0;s.ids.forEach(id=>{if(s.ans[id]===QMAP[id]?.k)ok++;if(s.ans[id]!==undefined){S.ans[id]=s.ans[id];if(window.gpsLog)gpsLog(id,s.ans[id],"sim");}});s.ok=ok;s.cur=0;S.sims.push({name:s.name,date:Date.now(),ok,n:s.ids.length});addXP(50+ok*5,"q",Object.keys(s.ans).length);simView="result";save();render();}
 function simResult(){const s=S.sim,by={};s.ids.forEach(id=>{const q=QMAP[id];if(!q)return;by[q.s]=by[q.s]||{t:0,ok:0};by[q.s].t++;if(s.ans[id]===q.k)by[q.s].ok++;});const q=QMAP[s.ids[s.cur]];
   return `<div class="score"><div class="h-big num">${s.ok}/${s.ids.length}</div><div><b>${esc(s.name)}</b><br><span class="small">${Math.round(s.ok/s.ids.length*100)}% de acerto · tempo usado ${Math.round(Math.min(Date.now()-s.start,s.dur)/60e3)} min</span></div><button class="btn lime sm" style="margin-left:auto" data-closesim>Voltar aos simulados</button></div>
   <div class="grid" style="grid-template-columns:repeat(auto-fill,minmax(170px,1fr));margin:14px 0">${Object.entries(by).map(([k,v])=>`<div class="card" style="background:${subjColor(k)};padding:12px"><b>${esc(k)}</b><div class="num">${v.ok}/${v.t} acertos</div></div>`).join("")}</div>
@@ -2115,7 +2120,7 @@ document.addEventListener("click",e=>{
   if(d.watch){S.watched[d.watch]=1;addXP(10);render();if(vState.id)paintVideo();toast("+10 XP");return;}
   if(d.clearsearch!==undefined){modState.search="";document.getElementById("searchInput").value="";render();return;}
   if(d.ans!==undefined){const q=QMAP[d.qid],i=+d.ans;
-    if(d.mode==="train"){if(S.ans[q.id]!==undefined)return;S.ans[q.id]=i;addXP(i===q.k?10:5,"q");render();}
+    if(d.mode==="train"){if(S.ans[q.id]!==undefined)return;S.ans[q.id]=i;if(window.gpsLog)gpsLog(q.id,i,"train");addXP(i===q.k?10:5,"q");render();}
     else if(d.mode==="sim"){S.sim.ans[q.id]=i;save();render();}return;}
   if(d.qmove){qIdx=Math.max(0,Math.min(qList.length-1,qIdx+(+d.qmove)));render();return;}
   if(d.qrand!==undefined){qIdx=Math.floor(Math.random()*qList.length);render();return;}

@@ -8,6 +8,8 @@ Plataforma de estudos para o curso dos sonhos (Medicina, Psicologia, Engenharia,
 index.html        landing page + plataforma (tudo em um arquivo)
 questoes.json     876 questões reais do ENEM 2016–2023 (projeto aberto enem-api)
 api/easier.js     função serverless que conversa com a IA (a chave fica no servidor)
+app/gps-lab.js    GPS de Estudos + Laboratório de Erros
+conteudo/         textos dos módulos, figuras e conteúdos extras
 vercel.json       configuração da Vercel (tempo máximo da função: 60 s)
 .env.example      variáveis de ambiente necessárias
 ```
@@ -113,3 +115,16 @@ Contato para assinar: preencha `CONTATO` no `index.html` com seu WhatsApp (só n
 ## Progresso dos alunos
 
 O progresso (ofensiva, módulos, questões, rotina) fica salvo no navegador e sincronizado na nuvem pela conta do aluno.
+
+## GPS de Estudos e Laboratório de Erros
+
+Ficam em `app/gps-lab.js`. Os dados vão junto com o progresso do aluno (mesma sincronização com a nuvem):
+
+- `S.qlog`: cada resposta com data e origem (questões, simulado, diagnóstico);
+- `S.erros`: análise de cada erro (categoria, observação, dificuldade, revisado);
+- `S.touch`: último contato com cada módulo;
+- `S.gps`: objetivo, diagnóstico, plano do dia e histórico do nível.
+
+Cada questão do ENEM é ligada ao módulo pelo campo `kw` (palavras-chave) dos módulos. Os pré-requisitos ficam na lista `PRE_DEF`, escritos pelo título dos módulos.
+
+A prioridade de cada conteúdo é calculada por `GPS.motor(ctx, idDoModulo)`, uma função de pontuação. Para trocar essa lógica por IA no futuro, substitua `GPS.motor`, ou monte o plano no servidor a partir de `GPS.retrato()`.
