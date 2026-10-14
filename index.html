@@ -1063,6 +1063,8 @@ ex:["Um viajante diz que a comida de outro país é 'nojenta' por ser diferente 
 <script src="conteudo/matematica-1.js"></script>
 <script src="conteudo/matematica-2.js"></script>
 <script src="conteudo/matematica-3.js"></script>
+<script src="conteudo/figuras-basica.js"></script>
+<script src="conteudo/matematica-basica.js"></script>
 <script src="conteudo/extras-natureza.js"></script>
 <script src="conteudo/extras-exatas-linguagens.js"></script>
 <script src="conteudo/extras-humanas.js"></script>
@@ -1073,6 +1075,7 @@ const SUBJ = {
   "Química":{c:"var(--lilac)",area:"Natureza",ea:"ciencias-natureza",ch:"Me Salva!"},
   "Física":{c:"var(--sky)",area:"Natureza",ea:"ciencias-natureza",ch:"Física Total"},
   "Matemática":{c:"var(--lime)",area:"Exatas",ea:"matematica",ch:"Professor Ferretto"},
+  "Matemática Básica":{c:"var(--ice)",area:"Exatas",ea:"matematica",ch:"Gis com Giz"},
   "Linguagens":{c:"var(--rose)",area:"Linguagens",ea:"linguagens",ch:"Professor Noslen"},
   "Redação":{c:"var(--peach)",area:"Linguagens",ea:"",ch:"Descomplica"},
   "História":{c:"var(--sand)",area:"Humanas",ea:"ciencias-humanas",ch:"Débora Aladim"},
@@ -1533,7 +1536,7 @@ function vReader(m){
         <a href="https://books.google.com/?q=${encodeURIComponent(mm.t+" "+m.s)}" target="_blank" rel="noopener"><span class="ic" style="background:var(--sand)">G</span>Google Livros</a>
         <a href="https://pt.wikipedia.org/w/index.php?search=${encodeURIComponent(mm.t)}" target="_blank" rel="noopener"><span class="ic" style="background:var(--hair)">W</span>Wikipédia</a>
         <a href="https://www.youtube.com/results?search_query=${encodeURIComponent(mm.t+" "+SUBJ[m.s].ch+" vestibular")}" target="_blank" rel="noopener"><span class="ic" style="background:var(--orange);color:var(--white)">▶</span>Videoaula no YouTube</a>
-        ${["Matemática","Física","Química","Biologia"].includes(m.s)?`<a href="https://pt.khanacademy.org/search?page_search_query=${encodeURIComponent(mm.t)}" target="_blank" rel="noopener"><span class="ic" style="background:var(--mint)">K</span>Khan Academy</a>`:""}
+        ${["Matemática","Matemática Básica","Física","Química","Biologia"].includes(m.s)?`<a href="https://pt.khanacademy.org/search?page_search_query=${encodeURIComponent(mm.t)}" target="_blank" rel="noopener"><span class="ic" style="background:var(--mint)">K</span>Khan Academy</a>`:""}
       </div></div>
       ${m.s==="Redação"?`<div class="card" style="background:var(--violet);color:var(--white);border-color:var(--violet)"><h4>Pratique agora</h4><p class="small" style="margin:0 0 10px;opacity:.9">Escreva uma redação e corrija pelas 5 competências.</p><button class="btn lime sm" data-go="redacao">Abrir o corretor</button></div>`:`<div class="card" style="background:var(--violet);color:var(--white);border-color:var(--violet)"><h4>Pratique mais</h4><p class="small" style="margin:0 0 10px;opacity:.9">Todas as questões de ${esc(m.s)} no banco do ENEM.</p><button class="btn lime sm" data-subject="${esc(m.s)}">Abrir questões</button></div>`}
     </aside>
@@ -1590,7 +1593,7 @@ async function askQuestion(){
 
 /* videoaulas: player dentro do site (Khan Academy Brasil primeiro, depois YouTube em geral) */
 const VKEY="easystudy.videos.v2";let VCACHE={};try{VCACHE=JSON.parse(localStorage.getItem(VKEY)||"{}");}catch(e){}
-const KHAN_SUBJ=["Biologia","Química","Física","Matemática"];
+const KHAN_SUBJ=["Biologia","Química","Física","Matemática","Matemática Básica"];
 const VPEND={};let vState={id:null,i:0};
 function vQuery(m){const t=m.t.replace(/\s+(I|II|III)(?=[:\s]|$)/g,"").replace(/\s+—\s+/g,": ");const parts=t.split(":");
   return {q:t.replace(/:/g,""),alt:(parts[1]||parts[0]).trim(),geral:`${t.replace(/:/g,"")} ${m.s==="Redação"?"redação":m.s} aula ${(SUBJ[m.s]||{}).ch||""}`.trim(),khan:KHAN_SUBJ.includes(m.s)?1:0};}
