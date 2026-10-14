@@ -1059,6 +1059,10 @@ ex:["Um viajante diz que a comida de outro país é 'nojenta' por ser diferente 
 <script src="conteudo/historia-1.js"></script>
 <script src="conteudo/historia-2.js"></script>
 <script src="conteudo/historia-3.js"></script>
+<script src="conteudo/figuras-mat.js"></script>
+<script src="conteudo/matematica-1.js"></script>
+<script src="conteudo/matematica-2.js"></script>
+<script src="conteudo/matematica-3.js"></script>
 <script src="conteudo/extras-natureza.js"></script>
 <script src="conteudo/extras-exatas-linguagens.js"></script>
 <script src="conteudo/extras-humanas.js"></script>
@@ -1091,6 +1095,13 @@ const HIS_MAPA={0:2,1:4,2:6,3:10,4:8,5:12,6:18,7:16};
   const ord=["intro","civ",0,"amafr",1,"renasc",2,"conq",4,"indep",3,"ind",5,"sul","imp","ww2",7,"gfria",6,"rep1","vargas","dit","nova"];
   const novo=ord.map(k=>typeof k==="number"?Object.assign(o[k],ren[k]?{t:ren[k][0]}:{},ren[k]&&ren[k][1]?{d:ren[k][1]}:{}):N[k]);
   if(novo.every(Boolean))MOD["História"]=novo;})();
+// Matemática completa: 13 módulos novos intercalados com os 7 originais
+const MAT_MAPA={0:2,1:1,2:9,3:10,4:5,5:12,6:15};
+(function(){const N=window.MAT_NOVOS,o=MOD["Matemática"];if(!N||!o||o.length!==7)return;
+  const ren={4:"Funções: os principais tipos"};
+  const ord=["basico",1,0,"eq","fconc",4,"explog","seq","matriz",2,3,"binom",5,"triang","trig",6,"ganal","circ","poli","complex"];
+  const novo=ord.map(k=>typeof k==="number"?Object.assign(o[k],ren[k]?{t:ren[k]}:{}):N[k]);
+  if(novo.every(Boolean))MOD["Matemática"]=novo;})();
 function migrarMods(st,subj,mapa,flag,minLen){ // remapeia o progresso salvo quando a ordem dos módulos de uma matéria muda
   if(!st||st[flag]>=2)return; st[flag]=2; if((MOD[subj]||[]).length<minLen)return;
   const re=new RegExp("^"+subj+"#(\\d+)(\\|.*)?$");
@@ -1101,7 +1112,7 @@ function migrarMods(st,subj,mapa,flag,minLen){ // remapeia o progresso salvo qua
   if(st.fc&&st.fc.ai)st.fc.ai=remap(st.fc.ai);
   if(st.lastMod)st.lastMod=mv(st.lastMod);
 }
-function migrarBio(st){migrarMods(st,"Biologia",BIO_MAPA,"bioV",23);migrarMods(st,"História",HIS_MAPA,"hisV",23);}
+function migrarBio(st){migrarMods(st,"Biologia",BIO_MAPA,"bioV",23);migrarMods(st,"História",HIS_MAPA,"hisV",23);migrarMods(st,"Matemática",MAT_MAPA,"matV",20);}
 // Conteúdo extra dos módulos (seções, figuras, tabelas, como cai na prova, fontes abertas)
 (function(){const EX=window.EXTRA||{};for(const s of Object.keys(MOD))MOD[s].forEach((m,i)=>{const x=EX[s+"#"+i]||EX[s+":"+m.t];if(!x)return;
   if(x.s)m.s=m.s.concat(x.s);if(x.fig)m.fig=[].concat(x.fig);if(x.tab)m.tab=[].concat(x.tab);if(x.prova)m.prova=x.prova;if(x.ler)m.ler=x.ler;if(x.sabia)m.sabia=x.sabia;});})();

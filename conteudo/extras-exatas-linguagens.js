@@ -11,7 +11,7 @@ window.EXTRA = window.EXTRA || {};
   const FUVEST = ["Fuvest: lista de obras de leitura obrigatória", "https://www.fuvest.br/"];
 
   /* ===================== MATEMÁTICA ===================== */
-  E["Matemática#0"] = {
+  E["Matemática#2"] = {
     s: [
       ["Aumentos e descontos sucessivos", "Porcentagens sucessivas **multiplicam**, não somam. Um aumento de 10% seguido de outro de 10% dá 1,1 × 1,1 = 1,21, ou seja, 21% no total, e não 20%.\n\nDo mesmo jeito, um aumento de 20% seguido de um desconto de 20% não volta ao valor original: 1,2 × 0,8 = 0,96, uma perda de 4%. Lojas usam isso em promoções do tipo 'sobe e depois dá desconto'. Para descobrir o preço antes de um aumento, **divida** pelo fator: se custa R$ 132 depois de um aumento de 10%, antes custava 132 ÷ 1,1 = R$ 120."],
       ["Inflação e poder de compra", "Inflação é o aumento geral de preços. Se o salário sobe 5% e a inflação do ano foi 8%, o poder de compra caiu: 1,05 ÷ 1,08 ≈ 0,972, uma perda real de cerca de 2,8%.\n\nO mesmo raciocínio vale para rendimentos: uma aplicação que rende 10% ao ano com inflação de 4% tem ganho real de 1,10 ÷ 1,04 ≈ 1,058, ou cerca de 5,8%. Questões do ENEM e da Fuvest usam financiamentos, parcelamentos e a escolha entre pagar à vista ou a prazo."]
@@ -35,7 +35,7 @@ window.EXTRA = window.EXTRA || {};
     ler: [W("Regra de três"), W("Escala cartográfica"), OBMEP, KHAN_MAT]
   };
 
-  E["Matemática#2"] = {
+  E["Matemática#9"] = {
     s: [
       ["Desvio padrão sem medo", "O desvio padrão mede **o quanto os dados se espalham em torno da média**. Desvio pequeno indica dados parecidos (regularidade); desvio grande indica dados muito diferentes entre si.\n\nPasso a passo: 1) calcule a média; 2) subtraia a média de cada valor; 3) eleve cada diferença ao quadrado; 4) tire a média desses quadrados (variância); 5) tire a raiz quadrada. No ENEM, raramente é preciso fazer a conta inteira: basta comparar visualmente quais dados estão mais espalhados, por exemplo para escolher o atleta mais regular."],
       ["Gráficos que enganam", "Cuidado com gráficos manipulados: eixo vertical que não começa no zero exagera diferenças pequenas; pictogramas com figuras em tamanhos diferentes distorcem a comparação; gráficos de pizza com porcentagens que não somam 100% indicam erro.\n\nAo ler um gráfico, confira sempre: título, unidade, escala dos eixos, fonte e período. Muitas questões perguntam qual período teve **maior variação**, que é diferente de maior valor."]
@@ -47,7 +47,7 @@ window.EXTRA = window.EXTRA || {};
     ler: [W("Desvio padrão"), W("Mediana"), IBGE, KHAN_MAT]
   };
 
-  E["Matemática#3"] = {
+  E["Matemática#10"] = {
     s: [
       ["Como saber se a ordem importa", "A pergunta-chave da combinatória: **trocar a ordem gera uma possibilidade diferente?** Se sim (senhas, pódio, filas, cargos diferentes), é arranjo ou permutação. Se não (comissões, grupos, saladas de frutas, apertos de mão), é combinação.\n\nTeste prático: monte um agrupamento, troque dois elementos de lugar e pergunte se é 'outra coisa'. Presidente Ana e vice Bruno é diferente de presidente Bruno e vice Ana: arranjo. Uma comissão com Ana e Bruno é a mesma que Bruno e Ana: combinação."],
       ["Probabilidade condicional", "Às vezes o enunciado dá uma informação que **reduz o espaço amostral**. Exemplo: numa turma, 30 alunos estudam inglês e 20 estudam espanhol, e 10 estudam os dois. Sorteando alguém que estuda inglês, qual a chance de também estudar espanhol? O universo agora são os 30 de inglês, dos quais 10 estudam espanhol: 10/30 = 1/3.\n\nRegras úteis: eventos que podem acontecer juntos com 'ou' → some e subtraia a interseção; eventos independentes com 'e' → multiplique."]
@@ -59,7 +59,7 @@ window.EXTRA = window.EXTRA || {};
     ler: [W("Análise combinatória"), W("Probabilidade condicional"), OBMEP, KHAN_MAT]
   };
 
-  E["Matemática#4"] = {
+  E["Matemática#5"] = {
     s: [
       ["Do texto para a função", "Muitas questões descrevem uma situação e pedem a função. Procure duas coisas: um **valor fixo** (taxa de entrada, valor inicial) e um **valor que se repete** por unidade (preço por km, por hora, por produto). Isso dá uma função afim: f(x) = valor fixo + (valor por unidade) · x.\n\nSe a situação fala em 'dobrar', 'reduzir pela metade' ou 'crescer x% ao período', é **exponencial**. Se fala em área, lucro máximo, trajetória ou lançamento, provavelmente é **quadrática**."],
       ["Máximos e mínimos", "Na função quadrática f(x) = ax² + bx + c, o vértice dá o valor máximo (se a < 0, parábola com 'boca' para baixo) ou mínimo (se a > 0).\n\nCoordenadas do vértice: **xᵥ = −b / 2a** e **yᵥ = −Δ / 4a**. Exemplo clássico: um cercado retangular com 40 m de tela tem área máxima quando é um quadrado de 10 m de lado, com 100 m². Lucro máximo, altura máxima de um projétil e custo mínimo seguem a mesma ideia."]
@@ -71,7 +71,7 @@ window.EXTRA = window.EXTRA || {};
     ler: [W("Função quadrática"), W("Função exponencial"), OBMEP, KHAN_MAT]
   };
 
-  E["Matemática#5"] = {
+  E["Matemática#12"] = {
     s: [
       ["Polígonos e circunferência", "A soma dos ângulos internos de um polígono de n lados é **(n − 2) · 180°**. Um hexágono regular tem 720° no total, logo cada ângulo mede 120°. É por isso que hexágonos se encaixam perfeitamente (3 × 120° = 360°), como nos favos de mel.\n\nNa circunferência: comprimento **C = 2πr** e área **A = πr²**. Use π ≈ 3,14 ou π ≈ 3 quando o enunciado permitir. Setor circular é uma 'fatia': a área é proporcional ao ângulo central."],
       ["Lei dos senos e dos cossenos", "Para triângulos que não são retângulos:\n\n**Lei dos cossenos**: a² = b² + c² − 2bc · cos A. Use quando conhecer dois lados e o ângulo entre eles.\n\n**Lei dos senos**: a / sen A = b / sen B = c / sen C. Use quando conhecer um lado e o ângulo oposto a ele.\n\nNa prova, os ângulos costumam ser 30°, 45°, 60° ou 120°. Decore: sen 30° = 1/2, sen 45° = √2/2, sen 60° = √3/2, e cos 120° = −1/2."]
@@ -83,7 +83,7 @@ window.EXTRA = window.EXTRA || {};
     ler: [W("Teorema de Pitágoras"), W("Lei dos cossenos"), OBMEP, KHAN_MAT]
   };
 
-  E["Matemática#6"] = {
+  E["Matemática#15"] = {
     s: [
       ["Volume na prática", "Volume é quanto cabe dentro do sólido. Para **prismas e cilindros**, é área da base × altura. Para **pirâmides e cones**, é um terço disso. Para a **esfera**, 4πr³/3.\n\nNa prática: uma caixa-d'água cilíndrica com raio de 1 m e altura de 1,5 m tem volume π × 1² × 1,5 ≈ 4,7 m³, ou cerca de 4.700 litros. Lembre: 1 m³ = 1.000 L. Ao dobrar o raio de um cilindro, o volume fica quatro vezes maior; ao dobrar a altura, só duas vezes."],
       ["Semelhança entre sólidos", "Se dois sólidos são semelhantes com razão k entre os comprimentos, a razão entre as áreas é **k²** e entre os volumes é **k³**.\n\nExemplo: uma maquete 1:100 de um prédio. As medidas reais são 100 vezes maiores, as áreas 10.000 vezes e os volumes 1.000.000 de vezes. Isso explica por que um copo com o dobro da altura (e mesmo formato) cabe 8 vezes mais líquido, e por que animais grandes têm patas proporcionalmente mais grossas."]
