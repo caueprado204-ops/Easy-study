@@ -97,7 +97,7 @@ window.EXTRA = window.EXTRA || {};
   };
 
   /* ===================== QUÍMICA ===================== */
-  E["Química#0"] = {
+  E["Química#2"] = {
     s: [
       ["Distribuição eletrônica", "Os elétrons ocupam subníveis em ordem crescente de energia, seguindo o diagrama de Linus Pauling: 1s 2s 2p 3s 3p 4s 3d 4p 5s... Os subníveis comportam no máximo: s = 2, p = 6, d = 10, f = 14 elétrons.\n\nExemplo: o sódio (Z = 11) fica 1s² 2s² 2p⁶ 3s¹. A **camada de valência** (a mais externa) tem 1 elétron, por isso o sódio está na família 1 e tende a perder esse elétron, formando Na⁺. A distribuição explica a posição na tabela e o tipo de ligação que o átomo faz."],
       ["Radioatividade no cotidiano", "A radioatividade tem aplicações importantes: **datação por carbono-14** (estima a idade de fósseis de até cerca de 50 mil anos), radioterapia contra o câncer, exames de imagem (medicina nuclear) e geração de energia nas usinas de Angra.\n\nO conceito-chave é **meia-vida**: tempo para metade da amostra se desintegrar. Depois de 1 meia-vida resta 1/2; depois de 2, resta 1/4; depois de 3, 1/8. O acidente com césio-137 em Goiânia (1987), o maior acidente radiológico do Brasil, mostra os riscos do descarte incorreto de material radioativo."]
@@ -109,7 +109,7 @@ window.EXTRA = window.EXTRA || {};
     ler: [W("Modelo atômico de Bohr"), W("Tabela periódica"), W("Acidente radiológico de Goiânia"), KHAN_QUI]
   };
 
-  E["Química#1"] = {
+  E["Química#6"] = {
     s: [
       ["Geometria molecular", "A forma da molécula depende dos pares de elétrons ao redor do átomo central, que se repelem e se afastam ao máximo (teoria VSEPR).\n\nPrincipais formas: **linear** (CO₂), **angular** (H₂O, com pares livres no oxigênio), **trigonal plana** (BF₃), **piramidal** (NH₃) e **tetraédrica** (CH₄). A geometria importa porque define a polaridade: o CO₂ tem ligações polares, mas é apolar porque a forma linear faz os efeitos se anularem; a água é polar por ser angular."],
       ["Semelhante dissolve semelhante", "Substâncias polares dissolvem substâncias polares, e apolares dissolvem apolares. Por isso água e óleo não se misturam, e o sal (iônico) se dissolve bem na água.\n\nO **sabão** é a ponte: tem uma ponta polar (que interage com a água) e uma cauda apolar (que interage com a gordura). As moléculas formam micelas que envolvem a sujeira e permitem que ela seja levada pela água. A gasolina brasileira tem etanol misturado, e o teste da proveta com água salgada separa as duas partes, porque o etanol prefere a água."]
@@ -121,7 +121,7 @@ window.EXTRA = window.EXTRA || {};
     ler: [W("Ligação química"), W("Ligação de hidrogênio"), W("Geometria molecular"), KHAN_QUI]
   };
 
-  E["Química#2"] = {
+  E["Química#11"] = {
     s: [
       ["Roteiro para qualquer cálculo", "1) **Escreva e balanceie** a equação. 2) Converta o que foi dado para **mol** (massa ÷ massa molar; volume de gás nas CNTP ÷ 22,4 L). 3) Use a **proporção dos coeficientes**. 4) Converta o resultado para a unidade pedida.\n\nExemplo: quantos gramas de água se formam com 4 g de H₂? Equação: 2 H₂ + O₂ → 2 H₂O. 4 g de H₂ = 2 mol. A proporção H₂ : H₂O é 1 : 1, então se formam 2 mol de água = 36 g. Com prática, a regra de três direta em gramas também funciona, desde que você use a proporção correta."],
       ["Lei de Lavoisier e de Proust", "**Lavoisier**: num sistema fechado, a massa total dos reagentes é igual à massa total dos produtos (\"nada se cria, nada se perde, tudo se transforma\"). Se uma palha de aço queima e fica mais pesada, é porque incorporou oxigênio do ar.\n\n**Proust**: uma substância sempre tem a mesma proporção em massa entre seus elementos. A água sempre tem 1 g de hidrogênio para 8 g de oxigênio. Essas duas leis justificam o balanceamento e permitem prever quantidades sem conhecer a fórmula toda."]
@@ -132,7 +132,7 @@ window.EXTRA = window.EXTRA || {};
     ler: [W("Estequiometria"), W("Lei de conservação das massas"), W("Constante de Avogadro"), KHAN_QUI]
   };
 
-  E["Química#3"] = {
+  E["Química#13"] = {
     s: [
       ["Unidades que caem em prova", "**Concentração comum (g/L)**: massa de soluto por litro de solução. **Concentração molar (mol/L)**: quantidade de matéria por litro. **ppm**: partes por milhão, usada para quantidades pequenas, como flúor na água ou poluentes no ar. 1 ppm = 1 mg por kg ou, para água, cerca de 1 mg por litro.\n\n**Porcentagem em volume**: álcool 70% tem 70 mL de etanol em 100 mL de solução. Rótulos de alimentos, remédios e bulas são as fontes preferidas das questões."],
       ["Solubilidade e curvas", "Solubilidade é a quantidade máxima de soluto que se dissolve em certa quantidade de solvente a uma temperatura. A solução pode ser **insaturada** (abaixo do limite), **saturada** (no limite) ou **supersaturada** (acima, instável; qualquer perturbação faz o excesso precipitar).\n\nPara a maioria dos sólidos, a solubilidade aumenta com a temperatura. Para os gases é o contrário: refrigerante quente perde gás mais rápido, e peixes sofrem em águas aquecidas porque há menos oxigênio dissolvido."]
@@ -143,7 +143,7 @@ window.EXTRA = window.EXTRA || {};
     ler: [W("Solução (química)"), W("Solubilidade"), W("Propriedades coligativas"), KHAN_QUI]
   };
 
-  E["Química#4"] = {
+  E["Química#14"] = {
     s: [
       ["Lei de Hess", "A variação de entalpia de uma reação depende só do estado inicial e do final, não do caminho. Por isso dá para somar equações conhecidas para descobrir o ΔH de uma reação difícil de medir.\n\nRegras: se **inverter** a equação, troque o sinal do ΔH; se **multiplicar** a equação, multiplique o ΔH pelo mesmo número. Some as equações, cancele o que aparece dos dois lados e confira se o resultado bate com a reação pedida."],
       ["Equilíbrio no dia a dia", "O **princípio de Le Chatelier** diz que um sistema em equilíbrio reage para diminuir uma perturbação. Adicionar reagente desloca para os produtos; aumentar a pressão desloca para o lado com menos mols de gás; aquecer favorece o sentido endotérmico.\n\nExemplos cobrados: o sangue mantém pH perto de 7,4 graças ao equilíbrio do bicarbonato (solução-tampão); na **produção de amônia** (Haber-Bosch), usa-se alta pressão para aumentar o rendimento. Catalisador não desloca o equilíbrio: só faz chegar a ele mais rápido."]
@@ -155,7 +155,7 @@ window.EXTRA = window.EXTRA || {};
     ler: [W("Lei de Hess"), W("Princípio de Le Chatelier"), W("PH"), KHAN_QUI]
   };
 
-  E["Química#5"] = {
+  E["Química#21"] = {
     s: [
       ["Petróleo e combustíveis", "O petróleo é uma mistura de hidrocarbonetos, separada por **destilação fracionada** conforme o ponto de ebulição: gás de cozinha (GLP), gasolina, querosene, diesel, óleos lubrificantes e asfalto. Quanto maior a cadeia, maior o ponto de ebulição.\n\nO Brasil se destaca no **etanol** de cana-de-açúcar, um combustível renovável: o CO₂ liberado na queima foi absorvido pela cana na fotossíntese. O **biodiesel** é feito a partir de óleos vegetais ou gordura animal por transesterificação."],
       ["Polímeros e plásticos", "Polímeros são moléculas gigantes formadas pela repetição de unidades menores (monômeros). **Polímeros de adição** (polietileno das sacolas, PVC dos canos, isopor) e **de condensação** (náilon, PET das garrafas, que liberam uma molécula pequena como água na formação).\n\nO problema ambiental é a durabilidade: plásticos comuns levam centenas de anos para se degradar e formam microplásticos. Soluções cobradas: reciclagem, polímeros biodegradáveis e redução do uso."]
@@ -167,7 +167,7 @@ window.EXTRA = window.EXTRA || {};
     ler: [W("Química orgânica"), W("Polímero"), W("Biodiesel"), KHAN_QUI]
   };
 
-  E["Química#6"] = {
+  E["Química#19"] = {
     s: [
       ["Calculando a ddp de uma pilha", "Cada metal tem um **potencial de redução** (E°). Quem tem maior potencial de redução sofre redução (é o cátodo); quem tem menor sofre oxidação (é o ânodo). A diferença de potencial da pilha é:\n\n**ΔE = E°(maior) − E°(menor)**\n\nNa pilha de Daniell, cobre (+0,34 V) e zinco (−0,76 V): ΔE = 0,34 − (−0,76) = 1,10 V. O zinco é corroído (perde massa) e o cobre se deposita na placa de cobre (ganha massa). Se a ddp der positiva, a pilha funciona espontaneamente."],
       ["Baterias e meio ambiente", "Baterias de celular são de **íons de lítio**, recarregáveis: na recarga, a corrente externa força a reação inversa. Pilhas e baterias contêm metais como mercúrio, chumbo e cádmio, que contaminam solo e água se descartados no lixo comum.\n\nNo Brasil, a resolução do Conama e a Política Nacional de Resíduos Sólidos preveem a **logística reversa**: lojas devem receber pilhas e baterias usadas para que os fabricantes deem destino adequado."]

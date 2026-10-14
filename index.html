@@ -1064,6 +1064,11 @@ ex:["Um viajante diz que a comida de outro país é 'nojenta' por ser diferente 
 <script src="conteudo/matematica-1.js"></script>
 <script src="conteudo/matematica-2.js"></script>
 <script src="conteudo/matematica-3.js"></script>
+<script src="conteudo/figuras-qui.js"></script>
+<script src="conteudo/quimica-1.js"></script>
+<script src="conteudo/quimica-2.js"></script>
+<script src="conteudo/quimica-3.js"></script>
+<script src="conteudo/quimica-4.js"></script>
 <script src="conteudo/figuras-basica.js"></script>
 <script src="conteudo/matematica-basica.js"></script>
 <script src="conteudo/extras-natureza.js"></script>
@@ -1107,17 +1112,24 @@ const MAT_MAPA={0:2,1:1,2:9,3:10,4:5,5:12,6:15};
   const ord=["basico",1,0,"eq","fconc",4,"explog","seq","matriz",2,3,"binom",5,"triang","trig",6,"ganal","circ","poli","complex"];
   const novo=ord.map(k=>typeof k==="number"?Object.assign(o[k],ren[k]?{t:ren[k]}:{}):N[k]);
   if(novo.every(Boolean))MOD["Matemática"]=novo;})();
+// Química completa: 20 módulos novos intercalados com os 7 originais
+const QUI_MAPA={0:2,1:6,2:11,3:13,4:14,5:21,6:19};
+(function(){const N=window.QUI_NOVOS,o=MOD["Química"];if(!N||!o||o.length!==7)return;
+  const ren={0:"Atomística e tabela periódica: visão geral",1:"Geometria, polaridade e forças intermoleculares",2:"Estequiometria: cálculos químicos",3:"Soluções e concentrações",4:"Físico-química: visão geral",5:"Química orgânica: visão geral"};
+  const ord=["materia","misturas",0,"modelos","periodica","ligacoes",1,"acidobase","saisoxidos","reacoes","mol",2,"gases",3,4,"termo","cinetica","equilibrio","ionico",6,"radio",5,"org1","funcoesorg","isomeria","reacorg","ambiental"];
+  const novo=ord.map(k=>typeof k==="number"?Object.assign(o[k],ren[k]?{t:ren[k]}:{}):N[k]);
+  if(novo.every(Boolean))MOD["Química"]=novo;})();
 function migrarMods(st,subj,mapa,flag,minLen){ // remapeia o progresso salvo quando a ordem dos módulos de uma matéria muda
   if(!st||st[flag]>=2)return; st[flag]=2; if((MOD[subj]||[]).length<minLen)return;
   const re=new RegExp("^"+subj+"#(\\d+)(\\|.*)?$");
   const mv=k=>{const m=re.exec(k);return m&&mapa[m[1]]!==undefined?subj+"#"+mapa[m[1]]+(m[2]||""):k;};
   const remap=obj=>{const n={};for(const k of Object.keys(obj))n[mv(k)]=obj[k];return n;};
-  for(const f of ["read","modDone","lessons","watched"])if(st[f])st[f]=remap(st[f]);
+  for(const f of ["read","modDone","lessons","watched","touch"])if(st[f])st[f]=remap(st[f]);if(st.gps&&st.gps.plano)delete st.gps.plano;
   if(st.fc&&st.fc.r)st.fc.r=remap(st.fc.r);
   if(st.fc&&st.fc.ai)st.fc.ai=remap(st.fc.ai);
   if(st.lastMod)st.lastMod=mv(st.lastMod);
 }
-function migrarBio(st){migrarMods(st,"Biologia",BIO_MAPA,"bioV",23);migrarMods(st,"História",HIS_MAPA,"hisV",23);migrarMods(st,"Matemática",MAT_MAPA,"matV",20);}
+function migrarBio(st){migrarMods(st,"Biologia",BIO_MAPA,"bioV",23);migrarMods(st,"História",HIS_MAPA,"hisV",23);migrarMods(st,"Matemática",MAT_MAPA,"matV",20);migrarMods(st,"Química",QUI_MAPA,"quiV",27);}
 // Conteúdo extra dos módulos (seções, figuras, tabelas, como cai na prova, fontes abertas)
 (function(){const EX=window.EXTRA||{};for(const s of Object.keys(MOD))MOD[s].forEach((m,i)=>{const x=EX[s+"#"+i]||EX[s+":"+m.t];if(!x)return;
   if(x.s)m.s=m.s.concat(x.s);if(x.fig)m.fig=[].concat(x.fig);if(x.tab)m.tab=[].concat(x.tab);if(x.prova)m.prova=x.prova;if(x.ler)m.ler=x.ler;if(x.sabia)m.sabia=x.sabia;});})();
