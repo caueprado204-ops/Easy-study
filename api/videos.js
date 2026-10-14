@@ -61,17 +61,49 @@ async function buscaPagina(q, soKhan) {
   const url = soKhan
     ? `https://www.youtube.com/@${KHAN_HANDLE}/search?query=${encodeURIComponent(q)}&hl=pt-BR&gl=BR`
     : `https://www.youtube.com/results?search_query=${encodeURIComponent(q)}&sp=EgIQAQ%253D%253D&hl=pt-BR&gl=BR`;
-  const r = await fetch(url, { headers: { "user-agent": UA, "accept-language": "pt-BR,pt;q=0.9", cookie: "CONSENT=YES+1; SOCS=CAI" } });
+  const r = await fetch(url, { signal: AbortSignal.timeout(6000), headers: { "user-agent": UA, "accept-language": "pt-BR,pt;q=0.9", cookie: "CONSENT=YES+1; SOCS=CAI" } });
   if (!r.ok) throw new Error("youtube " + r.status);
   const vs = extraiVideos(await r.text());
   return soKhan ? vs.map((v) => ({ ...v, canal: v.canal || "Khan Academy Brasil" })) : vs;
 }
 
+/* ---------- espelhos públicos (Invidious / Piped), usados se o YouTube recusar ---------- */
+const INVIDIOUS = ["https://inv.nadeko.net", "https://invidious.nerdvpn.de", "https://yewtu.be", "https://invidious.f5.si"];
+const PIPED = ["https://pipedapi.kavin.rocks", "https://api.piped.private.coffee"];
+const comTempo = (ms) => ({ signal: AbortSignal.timeout(ms) });
+const fmtDur = (s) => (s > 0 ? `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}` : "");
+async function buscaEspelhos(q, soKhan) {
+  const termo = soKhan ? q + " Khan Academy Brasil" : q;
+  for (const base of INVIDIOUS) {
+    try {
+      const r = await fetch(`${base}/api/v1/search?q=${encodeURIComponent(termo)}&type=video&region=BR&hl=pt`, comTempo(5000));
+      if (!r.ok) throw new Error(base + " " + r.status);
+      let vs = (await r.json()).filter((v) => v.type === "video" && v.videoId && v.lengthSeconds > 60)
+        .map((v) => ({ id: v.videoId, titulo: v.title, canal: v.author, dur: fmtDur(v.lengthSeconds) }));
+      if (soKhan) vs = vs.filter((v) => /khan/i.test(v.canal));
+      return vs;
+    } catch (e) { erros.push("inv " + e.message); }
+  }
+  for (const base of PIPED) {
+    try {
+      const r = await fetch(`${base}/search?q=${encodeURIComponent(termo)}&filter=videos`, comTempo(5000));
+      if (!r.ok) throw new Error(base + " " + r.status);
+      let vs = ((await r.json()).items || []).filter((v) => v.url && v.duration > 60)
+        .map((v) => ({ id: v.url.split("v=")[1]?.slice(0, 11), titulo: v.title, canal: v.uploaderName, dur: fmtDur(v.duration) })).filter((v) => v.id);
+      if (soKhan) vs = vs.filter((v) => /khan/i.test(v.canal));
+      return vs;
+    } catch (e) { erros.push("piped " + e.message); }
+  }
+  return [];
+}
+
+let erros = [];
 async function busca(q, soKhan) {
   if (process.env.YOUTUBE_API_KEY) {
-    try { return await buscaAPI(q, soKhan); } catch (e) { console.warn("[videos] api:", e.message); }
+    try { const v = await buscaAPI(q, soKhan); if (v.length || soKhan) return v; } catch (e) { erros.push("api " + e.message); }
   }
-  return buscaPagina(q, soKhan);
+  try { const v = await buscaPagina(q, soKhan); if (v.length) return v; erros.push("pagina vazia"); } catch (e) { erros.push("pagina " + e.message); }
+  return buscaEspelhos(q, soKhan);
 }
 
 export { extraiVideos };
@@ -84,6 +116,7 @@ export default async function handler(req, res) {
   const khan = url.searchParams.get("khan") !== "0";
   if (!q) { res.statusCode = 400; res.setHeader("content-type", "application/json"); return res.end('{"erro":"q vazio"}'); }
   let videos = [], fonte = "";
+  erros = [];
   try {
     if (khan) {
       for (const termo of [q, alt].filter(Boolean)) {
@@ -94,10 +127,9 @@ export default async function handler(req, res) {
     if (!videos.length) { videos = await busca(geral, false); fonte = "youtube"; }
   } catch (e) {
     console.warn("[videos]", e.message);
-    res.statusCode = 502; res.setHeader("content-type", "application/json"); res.setHeader("cache-control", "no-store");
-    return res.end('{"erro":"busca indisponível"}');
+    erros.push(e.message);
   }
   res.setHeader("content-type", "application/json; charset=utf-8");
-  res.setHeader("cache-control", videos.length ? "public, s-maxage=604800, stale-while-revalidate=86400" : "public, s-maxage=3600");
-  res.end(JSON.stringify({ fonte, videos: videos.slice(0, 6) }));
+  res.setHeader("cache-control", videos.length ? "public, s-maxage=604800, stale-while-revalidate=86400" : "no-store");
+  res.end(JSON.stringify({ fonte, videos: videos.slice(0, 6), ...(videos.length ? {} : { erros }) }));
 }
