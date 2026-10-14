@@ -243,6 +243,29 @@ td .sub{display:block;font-size:12px;color:var(--muted)}
 .lesson .thumb.has-img .h-big{color:#fff;position:relative}
 .lesson .thumb .play{border:0;cursor:pointer;z-index:1}
 .lesson .vsrc{font-size:12px;color:var(--muted)}
+.fc-top{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:4px 0 18px}
+.fc-top .card{padding:14px}.fc-top b{display:block;font-size:26px;font-family:var(--display);line-height:1.1}
+.fc-decks{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px}
+.fc-deck{border:1.5px solid var(--line);border-radius:18px;padding:16px;display:flex;flex-direction:column;gap:8px;background:var(--white)}
+.fc-deck h3{font-size:17px;margin:0}.fc-deck .foot{margin-top:auto;display:flex;gap:8px;flex-wrap:wrap}
+.fc-cols{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px;margin-top:18px}
+.fc-form{display:grid;gap:8px}.fc-form textarea,.fc-form select{width:100%;border:1.5px solid var(--line);border-radius:12px;padding:10px;font:inherit;background:var(--white);resize:vertical}
+.fc-stage{max-width:680px;margin:0 auto}
+.fc-card{perspective:1400px;cursor:pointer;margin:12px 0 16px}
+.fc-inner{position:relative;min-height:320px;transition:transform .5s;transform-style:preserve-3d}
+.fc-card.flip .fc-inner{transform:rotateY(180deg)}
+.fc-face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border:1.5px solid var(--line);border-radius:24px;padding:26px;display:flex;flex-direction:column;gap:12px;overflow:auto}
+.fc-face.front{background:var(--white)}.fc-face.back{background:var(--ink);color:var(--white);transform:rotateY(180deg)}
+.fc-face .txt{font-size:20px;line-height:1.45;font-weight:600;white-space:pre-line;margin:auto 0}
+.fc-face.back .txt{font-size:18px;font-weight:500}
+.fc-face .hint{font-size:13px;color:var(--muted)}.fc-face.back .hint{color:#bbb}
+.fc-rate{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.fc-rate button{border-radius:14px;padding:12px 8px;border:1.5px solid var(--line);font:inherit;font-weight:700;cursor:pointer;background:var(--white)}
+.fc-rate button small{display:block;font-weight:500;font-size:11.5px;color:var(--muted);margin-top:2px}
+.fc-rate .r0{background:var(--rose)}.fc-rate .r1{background:var(--butter)}.fc-rate .r2{background:var(--lime)}
+.fc-mine{display:flex;flex-direction:column;gap:8px;max-height:340px;overflow:auto}
+.fc-mine div{border:1.5px solid var(--hair);border-radius:12px;padding:8px 10px;font-size:13px;display:flex;gap:8px;align-items:flex-start;justify-content:space-between}
+@media (max-width:720px){.fc-top{grid-template-columns:repeat(2,minmax(0,1fr))}.fc-cols{grid-template-columns:minmax(0,1fr)}.fc-face .txt{font-size:18px}.fc-inner{min-height:300px}}
 .vmodal{position:fixed;inset:0;z-index:80;background:rgba(20,18,30,.72);display:grid;place-items:center;padding:16px}
 .vmodal[hidden]{display:none}
 .vbox{background:var(--white);border-radius:22px;width:min(980px,100%);max-height:calc(100vh - 32px);overflow:auto;border:1.5px solid var(--line)}
@@ -1117,13 +1140,14 @@ const I={
  painel:'<path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h6v6h-6z"/>',
  modulos:'<path d="M4 5a2 2 0 0 1 2-2h12v16H6a2 2 0 0 0-2 2z"/><path d="M4 21V5M8 7h6M8 11h6"/>',
  aulas:'<rect x="3" y="5" width="18" height="14" rx="3"/><path d="m10 9 5 3-5 3z"/>',
+ flash:'<rect x="6" y="3" width="14" height="17" rx="3"/><path d="M4 7v12a2 2 0 0 0 2 2h10"/><path d="M10 9h6M10 13h4"/>',
  questoes:'<rect x="4" y="3" width="16" height="18" rx="3"/><path d="m8 12 3 3 5-6"/>',
  simulados:'<path d="M9 3h6M12 3v3"/><circle cx="12" cy="14" r="7"/><path d="M12 10v4l3 2"/>',
  redacao:'<path d="M4 20h4L19 9l-4-4L4 16z"/><path d="m13 7 4 4"/>',
  rotina:'<rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/>',
  foco:'<path d="M9 18V6l11-2v12"/><circle cx="6" cy="18" r="3"/><circle cx="17" cy="16" r="3"/>'
 };
-const LABEL={planos:"Planos",conta:"Minha conta",painel:"Painel",modulos:"Módulos",aulas:"Videoaulas",questoes:"Questões",simulados:"Simulados e provas",redacao:"Redação",rotina:"Rotina e calendário",foco:"Foco e música"};
+const LABEL={planos:"Planos",conta:"Minha conta",painel:"Painel",modulos:"Módulos",aulas:"Videoaulas",flash:"Flashcards",questoes:"Questões",simulados:"Simulados e provas",redacao:"Redação",rotina:"Rotina e calendário",foco:"Foco e música"};
 const svg=(p,s=21)=>`<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${p}</svg>`;
 const FLAME='<svg viewBox="0 0 24 24"><path d="M12 2c1 4 5 5.5 5 11a5 5 0 0 1-10 0c0-2.5 1.2-4 2.5-5 .2 2 1.2 3 2.5 3-1.5-3 0-6 0-9z" fill="#FF5B37" stroke="#1C1B1A" stroke-width="1.5" stroke-linejoin="round"/></svg>';
 const STAR=(c,s,x,y,r=0)=>`<svg class="star" style="width:${s}px;height:${s}px;${x};${y};transform:rotate(${r}deg)" viewBox="0 0 40 40"><g fill="${c}">${[0,45,90,135].map(a=>`<rect x="17" y="2" width="6" height="36" rx="3" transform="rotate(${a} 20 20)"/>`).join("")}</g></svg>`;
@@ -1235,7 +1259,7 @@ function showLanding(on){
   if(on) renderLanding();
   window.scrollTo({top:0});
 }
-const NAV_ORDER=["painel","modulos","aulas","questoes","simulados","redacao","rotina","foco","planos","conta"];
+const NAV_ORDER=["painel","modulos","aulas","flash","questoes","simulados","redacao","rotina","foco","planos","conta"];
 function buildNav(){const livre=!ACC||planoAtual();document.getElementById("nav").innerHTML=NAV_ORDER.filter(k=>livre||VIEWS_SEM_PLANO.includes(k)).map(k=>`<button data-go="${k}" aria-label="${LABEL[k]}" class="${k===VIEW?"on":""}">${svg(I[k])}<span class="tip">${LABEL[k]}</span></button>`).join("")+`<span class="sep"></span><button class="navbtn" data-logout aria-label="Sair da conta">${svg('<path d="M15 4h4v16h-4"/><path d="M10 8l-4 4 4 4M6 12h10"/>')}<span class="tip">Sair da conta</span></button>`;}
 function go(v){if(ACC&&!planoAtual()&&!VIEWS_SEM_PLANO.includes(v)){toast("Assine um plano para liberar a plataforma.");v="planos";}VIEW=v;buildNav();render();try{history.replaceState(null,"","#"+v);}catch(e){}window.scrollTo({top:0});}
 function paintTop(){
@@ -1307,7 +1331,7 @@ function mdBlock(t){
 
 /* ---------- render ---------- */
 function render(){
-  const map={planos:vPlanos,conta:vConta,painel:vPainel,modulos:vModulos,aulas:vAulas,questoes:vQuestoes,simulados:vSimulados,redacao:vRedacao,rotina:vRotina,foco:vFoco};
+  const map={planos:vPlanos,conta:vConta,painel:vPainel,modulos:vModulos,aulas:vAulas,flash:vFlash,questoes:vQuestoes,simulados:vSimulados,redacao:vRedacao,rotina:vRotina,foco:vFoco};
   document.getElementById("view").innerHTML=map[VIEW]();
   if(VIEW==="foco")paintPomo();
   if(VIEW==="aulas")prepararThumbs();
@@ -1440,7 +1464,7 @@ function vReader(m){
     const qs=modQuestions(m); const qi=Math.min(modState.qi,Math.max(0,qs.length-1)); const qq=qs[qi];
     body=`<div class="lesson-card"><div class="eyebrow">Revisão e prática</div><h2>Feche o módulo</h2>
       ${mm.prova?`<div class="provabox"><h3>Como cai na prova</h3><p>${esc(mm.prova)}</p></div>`:""}
-      <div class="keybox"><h3>Conceitos-chave</h3><ul>${mm.k.map(x=>`<li>${esc(x)}</li>`).join("")}</ul></div>
+      <div class="keybox"><h3>Conceitos-chave</h3><ul>${mm.k.map(x=>`<li>${esc(x)}</li>`).join("")}</ul><button class="btn sm ink" style="margin-top:6px" data-fcmodule="${m.id}">Revisar em flashcards (${fcAuto(m).length} cartas)</button></div>
       <div class="exbox"><h3>Exemplo resolvido</h3><p style="margin:0 0 8px"><b>${esc(mm.ex[0])}</b></p>
         <details><summary style="cursor:pointer;font-weight:700;color:var(--violet)">Ver resolução</summary><p style="margin:8px 0 0">${esc(mm.ex[1])}</p></details></div>
       ${qs.length?`<h3 style="margin:22px 0 10px;font-size:18px">Questões do ENEM sobre este módulo <span class="small muted num">(${qi+1} de ${qs.length})</span></h3>${qCardHTML(qq,"train")}
@@ -1934,6 +1958,90 @@ function genRoutine(start,hours,sat,sun,block){
 
 /* foco */
 let pomo={mode:25,brk:5,phase:"focus",left:25*60,running:false,endAt:0,subj:"Biologia"};
+/* ---------- flashcards (repetição espaçada) ---------- */
+const FC_INT=[0,1,3,7,16,35,80]; // dias até rever, por caixa
+const FC_STOP=new Set("sobre entre quando porque também apenas sempre outras outros podem pode ser são está estão cada mais menos muito muita".split(" "));
+function fcStore(){if(!S.fc)S.fc={r:{},mine:[],ai:{}};S.fc.r=S.fc.r||{};S.fc.mine=S.fc.mine||[];S.fc.ai=S.fc.ai||{};return S.fc;}
+function fcCloze(t){if(/[=→×÷]/.test(t))return null;const ws=t.split(/\s+/);if(ws.length<5)return null;let best=-1,bl=0;
+  ws.forEach((w,i)=>{const c=w.replace(/[^\p{L}\p{N}₀-₉⁺⁻²³]/gu,"");if(c.length>=6&&!FC_STOP.has(c.toLowerCase())&&c.length>bl){bl=c.length;best=i;}});
+  if(best<0)return null;const w=ws[best];ws[best]=w.replace(/[\p{L}\p{N}₀-₉⁺⁻²³]+/u,"_____");return ws.join(" ");}
+function fcAuto(m){const mm=MOD[m.s][m.i],out=[];
+  (mm.tab||[]).forEach((t,ti)=>{if(t.head.length<2)return;t.rows.forEach((r,ri)=>{
+    out.push({id:`${m.id}|t${ti}.${ri}`,f:`${t.title||mm.t}\n${t.head[0]?t.head[0]+": ":""}${r[0]}`,q:t.head.slice(1).filter(Boolean).join(" · ")+"?",b:t.head.slice(1).map((h,i)=>(h?h+": ":"")+r[i+1]).join("\n")});});});
+  (mm.k||[]).forEach((k,ki)=>{const cz=fcCloze(k);if(cz)out.push({id:`${m.id}|k${ki}`,f:cz,q:"Complete a lacuna",b:k});});
+  if(mm.ex)out.push({id:`${m.id}|ex`,f:mm.ex[0],q:"Resolva antes de virar",b:mm.ex[1]});
+  (fcStore().ai[m.id]||[]).forEach((c,i)=>out.push({id:`${m.id}|ai${i}`,f:c.f,b:c.b,q:"Carta da Easier"}));
+  return out.map(c=>({...c,s:m.s,mod:m.id,mt:m.t}));}
+function fcAll(){const cs=ALL_MODS.flatMap(fcAuto);fcStore().mine.forEach(c=>cs.push({id:"mine|"+c.id,f:c.f,b:c.b,q:"Sua carta",s:c.s||"Minhas cartas",mine:1,mt:"Minhas cartas"}));return cs;}
+const fcDue=c=>{const r=fcStore().r[c.id];return r&&r.d<=todayKey();};
+const fcNew=c=>!fcStore().r[c.id];
+let fcS=null,fcScope="Todas",fcGenBusy=false;
+function fcStart(scope,mod){const all=fcAll();let pool=all.filter(c=>mod?c.mod===mod:scope==="Todas"?true:scope==="Minhas cartas"?c.mine:c.s===scope);
+  const due=pool.filter(fcDue),novas=pool.filter(fcNew).slice(0,mod?60:20);
+  let q=[...due,...novas];if(!q.length&&mod)q=pool.slice();
+  if(!q.length){toast(pool.length?"Nada para revisar agora. Volte amanhã!":"Esse baralho ainda não tem cartas.");return;}
+  q.sort(()=>Math.random()-.5);fcS={q:q.map(c=>c.id),map:Object.fromEntries(pool.map(c=>[c.id,c])),i:0,flip:false,res:[0,0,0],total:q.length,title:mod?MODMAP[mod].t:scope};
+  go("flash");}
+function fcRate(g){const c=fcS.map[fcS.q[fcS.i]],st=fcStore(),r=st.r[c.id]||{b:0,n:0};
+  if(g===0){r.b=0;r.d=todayKey();fcS.q.push(c.id);}else{r.b=g===1?Math.max(1,r.b):Math.min(FC_INT.length-1,Math.max(r.b+1,(r.n?0:2)));const d=new Date();d.setDate(d.getDate()+(g===1?1:FC_INT[r.b]));r.d=dkey(d);}
+  r.n=(r.n||0)+1;st.r[c.id]=r;fcS.res[g]++;fcS.i++;fcS.flip=false;addXP(2,"fc");render();}
+function fcNextTxt(c,g){const r=fcStore().r[c.id]||{b:0};if(g===0)return"de novo agora";const b=g===1?Math.max(1,r.b):Math.min(FC_INT.length-1,Math.max(r.b+1,(r.n?0:2)));const d=g===1?1:FC_INT[b];return d===1?"amanhã":`em ${d} dias`;}
+function vFlash(){
+  if(fcS&&fcS.i<fcS.q.length){const c=fcS.map[fcS.q[fcS.i]];
+    return `<div class="fc-stage"><div class="row-head" style="margin-top:4px"><h1 class="h-sec" style="font-size:22px">${esc(fcS.title)}</h1><button class="btn ghost sm" data-fcquit>Encerrar</button></div>
+    <div class="bar"><i style="width:${Math.min(100,fcS.i/fcS.q.length*100)}%"></i></div>
+    <div class="fc-card ${fcS.flip?"flip":""}" data-fcflip role="button" tabindex="0" aria-label="Virar carta"><div class="fc-inner">
+      <div class="fc-face front"><div><span class="chip" style="background:${subjColor(c.s)}">${esc(c.s)}</span> <span class="small muted">${esc(c.mt||"")}</span></div><div class="txt">${esc(c.f)}</div><div class="hint">${esc(c.q||"")}${c.q?" · ":""}toque para ver a resposta</div></div>
+      <div class="fc-face back"><div class="hint">${esc(c.f.split("\n").pop().slice(0,140))}</div><div class="txt">${esc(c.b)}</div></div></div></div>
+    ${fcS.flip?`<div class="fc-rate"><button class="r0" data-fcrate="0">Errei<small>${fcNextTxt(c,0)}</small></button><button class="r1" data-fcrate="1">Difícil<small>${fcNextTxt(c,1)}</small></button><button class="r2" data-fcrate="2">Fácil<small>${fcNextTxt(c,2)}</small></button></div>`
+      :`<button class="btn" style="width:100%" data-fcflip>Mostrar resposta</button>`}
+    <p class="note" style="text-align:center;margin-top:12px">Atalhos: espaço vira a carta · 1, 2, 3 respondem</p></div>`;}
+  if(fcS){const [e,d,f]=fcS.res,t=e+d+f;const html=`<div class="fc-stage"><div class="lesson-card" style="text-align:center"><div class="eyebrow">Sessão concluída</div><h2>${t} ${t===1?"carta revisada":"cartas revisadas"}</h2>
+    <p class="muted">Fácil: <b>${f}</b> · Difícil: <b>${d}</b> · Errei: <b>${e}</b> · +${t*2} XP</p><p class="small muted">As cartas voltam no dia certo para você não esquecer: quanto mais fácil, mais tempo até a próxima revisão.</p>
+    <div class="lnav-row" style="justify-content:center"><button class="btn" data-fcquit>Voltar aos baralhos</button></div></div></div>`;return html;}
+  const st=fcStore(),all=fcAll();const due=all.filter(fcDue).length,dom=all.filter(c=>(st.r[c.id]?.b||0)>=4).length,vistas=all.filter(c=>st.r[c.id]).length;
+  const decks=[...SUBJECT_KEYS,"Minhas cartas"].map(s=>{const cs=all.filter(c=>s==="Minhas cartas"?c.mine:c.s===s&&!c.mine);return{s,n:cs.length,due:cs.filter(fcDue).length,nov:cs.filter(fcNew).length};}).filter(d=>d.n||d.s==="Minhas cartas");
+  const modOpts=ALL_MODS.map(m=>`<option value="${esc(m.id)}">${esc(m.s)} · ${esc(m.t)}</option>`).join("");
+  return `<div class="row-head" style="margin-top:4px"><h1 class="h-sec">Flashcards</h1><span class="small muted">Repetição espaçada: você revisa cada carta no momento certo</span></div>
+  <div class="fc-top"><div class="card"><span class="small muted">Para revisar hoje</span><b class="num">${due}</b></div><div class="card"><span class="small muted">Cartas vistas</span><b class="num">${vistas}</b></div><div class="card"><span class="small muted">Dominadas</span><b class="num">${dom}</b></div><div class="card"><span class="small muted">Total de cartas</span><b class="num">${all.length}</b></div></div>
+  <div class="lnav-row" style="margin:0 0 16px"><button class="btn" data-fcgo="Todas">${due?`Revisar ${due} ${due===1?"carta":"cartas"} de hoje`:"Estudar cartas novas"}</button></div>
+  <div class="fc-decks">${decks.map(d=>`<div class="fc-deck"><div><span class="dot" style="width:12px;height:12px;background:${d.s==="Minhas cartas"?"var(--violet)":subjColor(d.s)}"></span></div><h3>${esc(d.s)}</h3>
+    <div class="small muted">${d.n} cartas · ${d.due} para hoje · ${d.nov} novas</div>
+    <div class="foot"><button class="btn sm" data-fcgo="${esc(d.s)}" ${d.n?"":"disabled"}>Estudar</button></div></div>`).join("")}</div>
+  <div class="fc-cols">
+    <div class="card"><h3 style="font-size:16px;margin:0 0 6px">Gerar cartas com a Easier</h3><p class="small muted" style="margin:0 0 10px">A Easier cria 8 cartas novas sobre o módulo escolhido. Usa 1 crédito da Easier.</p>
+      <div class="fc-form"><select id="fcGenMod" aria-label="Módulo">${modOpts}</select><button class="btn violet" data-fcgen ${fcGenBusy?"disabled":""}>${fcGenBusy?"Criando cartas…":"Gerar 8 cartas"}</button></div>
+      <div class="fc-form" style="margin-top:14px"><label class="small" for="fcStudyMod" style="font-weight:700">Estudar um módulo específico</label><select id="fcStudyMod">${modOpts}</select><button class="btn ghost sm" data-fcmod>Estudar este módulo</button></div></div>
+    <div class="card"><h3 style="font-size:16px;margin:0 0 6px">Criar minha carta</h3>
+      <form class="fc-form" id="fcNew"><textarea id="fcF" rows="2" placeholder="Frente: pergunta ou termo" required maxlength="400"></textarea><textarea id="fcB" rows="3" placeholder="Verso: resposta" required maxlength="800"></textarea>
+        <select id="fcSub" aria-label="Matéria">${SUBJECT_KEYS.map(s=>`<option>${esc(s)}</option>`).join("")}</select><button class="btn">Salvar carta</button></form>
+      ${st.mine.length?`<div class="small muted" style="margin:12px 0 6px;font-weight:700">Minhas cartas (${st.mine.length})</div><div class="fc-mine">${st.mine.slice().reverse().map(c=>`<div><span><b>${esc(c.f)}</b><br><span class="muted">${esc(c.b)}</span></span><button class="btn ghost sm" data-fcdel="${esc(c.id)}" aria-label="Apagar">×</button></div>`).join("")}</div>`:""}</div>
+  </div>`;
+}
+async function fcGerar(id){const m=MODMAP[id];if(!m)return;const mm=MOD[m.s][m.i];const sample=await getSample();if(!sample){toast("A Easier está indisponível agora.");return;}
+  fcGenBusy=true;render();
+  const prompt=`Seu nome é Easier, tutora da plataforma Easy Study. Crie 8 flashcards em português do Brasil sobre "${mm.t}" (${m.s}) para um aluno de pré-vestibular (ENEM, FUVEST, Unicamp). Cada carta deve testar um único conceito, com frente curta (pergunta direta, até 25 palavras) e verso objetivo (até 40 palavras), cientificamente correto. Não repita estas perguntas que o aluno já tem: ${fcAuto(m).map(c=>c.f.replace(/\n/g," ")).slice(0,12).join(" | ")}
+Base do conteúdo:
+${mm.s.map(x=>"- "+x[0]+": "+x[1].slice(0,500)).join("\n")}
+Responda SOMENTE com JSON no formato {"cartas":[{"frente":"...","verso":"..."}]}`;
+  try{const j=await sample.json(prompt,{kb:m.s==="Redação"?"redacao":undefined});const cs=(j.cartas||[]).filter(c=>c&&c.frente&&c.verso).slice(0,8).map(c=>({f:String(c.frente).slice(0,400),b:String(c.verso).slice(0,800)}));
+    if(!cs.length)throw {code:"bad_json"};const st=fcStore();st.ai[id]=[...(st.ai[id]||[]),...cs];save();toast(`${cs.length} cartas novas em ${m.t}`);fcGenBusy=false;fcStart(null,id);return;}
+  catch(e){toast(e&&e.code==="bad_json"?"A Easier não conseguiu montar as cartas. Tente de novo.":errMsg(e));}
+  fcGenBusy=false;render();}
+document.addEventListener("submit",e=>{if(e.target.id!=="fcNew")return;e.preventDefault();const f=document.getElementById("fcF").value.trim(),b=document.getElementById("fcB").value.trim();if(!f||!b)return;
+  fcStore().mine.push({id:Date.now().toString(36),f,b,s:document.getElementById("fcSub").value});save();toast("Carta salva!");render();});
+document.addEventListener("keydown",e=>{if(VIEW!=="flash"||!fcS||fcS.i>=fcS.q.length||/INPUT|TEXTAREA|SELECT/.test(e.target.tagName))return;
+  if(e.key===" "||e.key==="Enter"){e.preventDefault();fcS.flip=!fcS.flip;render();}else if(fcS.flip&&["1","2","3"].includes(e.key)){fcRate(+e.key-1);}});
+document.addEventListener("click",e=>{const t=e.target.closest("[data-fcflip],[data-fcrate],[data-fcgo],[data-fcquit],[data-fcgen],[data-fcmod],[data-fcdel],[data-fcmodule]");if(!t)return;const d=t.dataset;
+  if(d.fcflip!==undefined){fcS.flip=!fcS.flip;render();}
+  else if(d.fcrate!==undefined)fcRate(+d.fcrate);
+  else if(d.fcgo)fcStart(d.fcgo);
+  else if(d.fcmodule)fcStart(null,d.fcmodule);
+  else if(d.fcquit!==undefined){fcS=null;render();}
+  else if(d.fcgen!==undefined)fcGerar(document.getElementById("fcGenMod").value);
+  else if(d.fcmod!==undefined)fcStart(null,document.getElementById("fcStudyMod").value);
+  else if(d.fcdel){const st=fcStore();st.mine=st.mine.filter(c=>c.id!==d.fcdel);delete st.r["mine|"+d.fcdel];save();render();}});
+
 function vFoco(){return `<div class="row-head" style="margin-top:4px"><h1 class="h-sec">Foco e música</h1><span class="small muted">Cada 25 min de foco valem +20 XP e mantêm sua ofensiva</span></div>
   <div class="focus"><div class="pomo">${STAR("var(--lime)",44,"left:20px","top:20px",10)}${STAR("var(--pink)",30,"right:26px","bottom:30px",-20)}
     <div class="pills">${[[25,5],[50,10],[90,15]].map(([f,b])=>`<button class="pill ${pomo.mode===f?"on":""}" data-pmode="${f}-${b}">${f}/${b}</button>`).join("")}</div>
