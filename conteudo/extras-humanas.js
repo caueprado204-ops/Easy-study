@@ -15,7 +15,7 @@ window.EXTRA = window.EXTRA || {};
   const CONST = ["Constituição Federal de 1988 (Planalto)", "https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm"];
 
   /* ===================== HISTÓRIA ===================== */
-  E["História#0"] = {
+  E["História#2"] = {
     s: [["Democracia antiga x democracia atual", "A democracia ateniense era **direta**: os cidadãos votavam pessoalmente na Assembleia (Eclésia). Mas só eram cidadãos homens adultos, livres e filhos de atenienses; mulheres, estrangeiros (metecos) e escravizados ficavam de fora, a maior parte da população.\n\nA democracia atual é **representativa**: elegemos quem decide por nós, e o voto é universal. Roma deixou outra herança: o **direito romano**, base do sistema jurídico brasileiro, e a ideia de república (res publica, 'coisa pública'). O ENEM gosta de comparar esses modelos e discutir quem era excluído."]],
     fig: [{ id: "tl_antiga", at: 0, cap: "Da Antiguidade à crise do século XIV (ilustração Easy Study)." }],
     tab: [{ at: 2, title: "Fases de Roma", head: ["Fase", "Período", "Destaque"], rows: [["Monarquia", "753–509 a.C.", "reis etruscos"], ["República", "509–27 a.C.", "Senado, cônsules, conflitos entre patrícios e plebeus"], ["Império", "27 a.C.–476 d.C.", "expansão, pão e circo, cristianismo oficial"]] }],
@@ -24,7 +24,7 @@ window.EXTRA = window.EXTRA || {};
     ler: [W("Democracia ateniense"), W("Roma Antiga"), KHAN_HIS]
   };
 
-  E["História#1"] = {
+  E["História#4"] = {
     s: [["O Islã e o Oriente medieval", "Enquanto a Europa Ocidental se ruralizava, o mundo islâmico florescia. Fundado por Maomé no século VII, o Islã se expandiu da Península Arábica à Península Ibérica. Os árabes preservaram e traduziram obras gregas, desenvolveram a álgebra (palavra de origem árabe), a medicina e a astronomia, e difundiram os algarismos que usamos hoje, criados na Índia.\n\nO **Império Bizantino**, com capital em Constantinopla, manteve a tradição romana no Oriente até 1453. A presença árabe na Península Ibérica por cerca de sete séculos deixou marcas no português: azeite, alface, almofada, açúcar."]],
     fig: [{ id: "tl_antiga", at: 3, cap: "Linha do tempo da Antiguidade à Baixa Idade Média (ilustração Easy Study)." }],
     tab: [{ at: 0, title: "Sociedade feudal", head: ["Grupo", "Função"], rows: [["Clero", "rezar (oratores)"], ["Nobreza", "guerrear e proteger (bellatores)"], ["Servos", "trabalhar a terra (laboratores)"]] }],
@@ -33,7 +33,7 @@ window.EXTRA = window.EXTRA || {};
     ler: [W("Feudalismo"), W("Idade de Ouro islâmica"), KHAN_HIS]
   };
 
-  E["História#2"] = {
+  E["História#6"] = {
     s: [["A conquista da América", "A chegada dos europeus à América foi um encontro violento. Astecas e incas, civilizações com cidades grandes e sistemas agrícolas sofisticados, foram conquistados por pequenos grupos espanhóis graças a alianças com povos rivais, armas de ferro, cavalos e, principalmente, **epidemias** (varíola e sarampo), que mataram a maior parte da população nativa.\n\nA exploração se baseou no trabalho forçado indígena (encomienda e mita) e, depois, na escravidão africana. O ENEM pede que você entenda a conquista do ponto de vista dos povos indígenas, não só dos europeus."]],
     fig: [{ id: "tl_moderna", at: 0, cap: "Das Grandes Navegações às revoluções (ilustração Easy Study)." }],
     tab: [{ at: 3, title: "Pensadores iluministas", head: ["Pensador", "Ideia central"], rows: [["Locke", "direitos naturais: vida, liberdade e propriedade"], ["Montesquieu", "separação dos três poderes"], ["Voltaire", "liberdade de expressão e tolerância religiosa"], ["Rousseau", "soberania popular e vontade geral"], ["Adam Smith", "liberalismo econômico, livre mercado"]] }],
@@ -42,7 +42,7 @@ window.EXTRA = window.EXTRA || {};
     ler: [W("Iluminismo"), W("Reforma Protestante"), W("Conquista do Império Asteca")]
   };
 
-  E["História#3"] = {
+  E["História#10"] = {
     s: [["Imperialismo e neocolonialismo", "No século XIX, as potências industriais (Inglaterra, França, Alemanha, Bélgica e, depois, EUA e Japão) disputaram territórios na África e na Ásia em busca de matérias-primas, mercados consumidores e áreas de investimento.\n\nA **Conferência de Berlim** (1884–1885) dividiu a África entre os europeus, com fronteiras traçadas sem respeitar povos e culturas locais, o que gera conflitos até hoje. A justificativa ideológica incluía o **darwinismo social** e a ideia de 'missão civilizadora', hoje entendidas como racistas."]],
     fig: [{ id: "tl_moderna", at: 1, cap: "Do Renascimento ao Manifesto Comunista (ilustração Easy Study)." }],
     tab: [{ at: 3, title: "Ideologias do século XIX", head: ["Ideologia", "Proposta"], rows: [["Liberalismo", "liberdades individuais, Estado mínimo"], ["Socialismo utópico", "sociedade igualitária por reformas e cooperação"], ["Socialismo científico (Marx)", "luta de classes e fim da propriedade privada dos meios de produção"], ["Anarquismo", "fim do Estado e de toda autoridade"], ["Nacionalismo", "unidade de um povo em torno de um Estado"]] }],
@@ -51,7 +51,7 @@ window.EXTRA = window.EXTRA || {};
     ler: [W("Revolução Industrial"), W("Conferência de Berlim"), W("Revolução Francesa")]
   };
 
-  E["História#4"] = {
+  E["História#8"] = {
     s: [["Povos indígenas e a colonização", "Quando os portugueses chegaram, havia milhões de indígenas no território, com centenas de povos e línguas. A colonização trouxe guerras, escravização, doenças e a ação dos **jesuítas**, que catequizavam em aldeamentos e, ao mesmo tempo, se opunham à escravização indígena por colonos.\n\nOs **bandeirantes** paulistas capturavam indígenas e buscavam metais. A historiografia atual, cobrada nas provas, destaca a **resistência** e o protagonismo indígena, e não apenas sua posição de vítima. A Constituição de 1988 reconhece aos povos indígenas o direito às terras que tradicionalmente ocupam."]],
     fig: [{ id: "tl_colonia", at: 0, cap: "Marcos do Brasil Colônia (ilustração Easy Study)." }],
     tab: [{ at: 3, title: "Revoltas coloniais", head: ["Revolta", "Ano", "Caráter"], rows: [["Revolta de Beckman", "1684", "nativista, contra o monopólio comercial"], ["Guerra dos Emboabas", "1707–1709", "nativista, disputa pelas minas"], ["Revolta de Vila Rica", "1720", "nativista, contra as casas de fundição"], ["Inconfidência Mineira", "1789", "separatista, elite, contra a derrama"], ["Conjuração Baiana", "1798", "separatista, popular, contra a escravidão"]] }],
@@ -60,7 +60,7 @@ window.EXTRA = window.EXTRA || {};
     ler: [W("Brasil Colônia"), W("Quilombo dos Palmares"), BBM, ARQ]
   };
 
-  E["História#5"] = {
+  E["História#12"] = {
     s: [["Escravidão e abolição no Império", "O Brasil foi o país que mais recebeu africanos escravizados nas Américas e o último a abolir a escravidão. A abolição foi gradual e cheia de pressões: a Inglaterra pressionava pelo fim do tráfico; o movimento abolicionista crescia nas cidades com nomes como **Joaquim Nabuco, André Rebouças, Luiz Gama e José do Patrocínio**; e os próprios escravizados resistiam com fugas em massa.\n\nA Lei Áurea (1888) libertou cerca de 700 mil pessoas, mas **não previu indenização, terra nem educação** para os libertos, o que ajuda a explicar desigualdades raciais que existem até hoje."]],
     fig: [{ id: "tl_imperio", at: 0, cap: "Da Independência à Proclamação da República (ilustração Easy Study)." }],
     tab: [{ at: 3, title: "Leis abolicionistas", head: ["Lei", "Ano", "O que fez"], rows: [["Eusébio de Queirós", "1850", "proibiu o tráfico de africanos"], ["Ventre Livre", "1871", "filhos de escravizadas nasciam livres"], ["Sexagenários", "1885", "libertou maiores de 60 anos"], ["Áurea", "1888", "aboliu a escravidão"]] }],
@@ -69,7 +69,7 @@ window.EXTRA = window.EXTRA || {};
     ler: [W("Abolição da escravatura no Brasil"), W("Lei de Terras"), W("Luiz Gama"), ARQ]
   };
 
-  E["História#6"] = {
+  E["História#18"] = {
     s: [["Constituição de 1988 e direitos", "A **Constituição Cidadã** de 1988 marcou o fim da ditadura. Ela garantiu voto direto, inclusive para analfabetos e jovens de 16 e 17 anos (facultativo), criou o **SUS**, reconheceu direitos indígenas e quilombolas, tornou o racismo crime inafiançável e ampliou direitos trabalhistas e sociais.\n\nDepois dela, o país viveu o impeachment de Collor (1992), o Plano Real (1994), que controlou a hiperinflação, e a ampliação de políticas sociais. As provas pedem para relacionar os artigos da Constituição a situações concretas de cidadania."]],
     fig: [{ id: "tl_republica", at: 0, cap: "Marcos da República brasileira (ilustração Easy Study)." }],
     tab: [{ at: 0, title: "Revoltas da República Velha", head: ["Revolta", "Ano", "Motivo"], rows: [["Canudos", "1896–1897", "comunidade de sertanejos liderada por Antônio Conselheiro"], ["Vacina", "1904", "vacinação obrigatória e reformas urbanas no Rio"], ["Chibata", "1910", "castigos físicos na Marinha"], ["Contestado", "1912–1916", "disputa de terras em SC e PR"], ["Tenentismo", "anos 1920", "jovens oficiais contra as oligarquias"]] }],
@@ -78,7 +78,7 @@ window.EXTRA = window.EXTRA || {};
     ler: [W("Era Vargas"), W("Ditadura militar brasileira"), CONST, ARQ]
   };
 
-  E["História#7"] = {
+  E["História#16"] = {
     s: [["O mundo depois de 1991", "Com o fim da União Soviética (1991), a ordem bipolar da Guerra Fria deu lugar a um mundo de **hegemonia dos EUA** e, depois, à multipolaridade, com a ascensão da China, da União Europeia e de blocos como os BRICS.\n\nMarcos do período: globalização acelerada pela internet, atentados de 11 de setembro de 2001 e a 'guerra ao terror', crise financeira de 2008, Primavera Árabe (2010–2012) e a pandemia de covid-19. O ENEM liga esses fatos à geopolítica e aos direitos humanos."]],
     fig: [{ id: "tl_seculo20", at: 0, cap: "O século XX em sete marcos (ilustração Easy Study)." }],
     tab: [{ at: 3, title: "Guerra Fria em resumo", head: ["", "Bloco capitalista (EUA)", "Bloco socialista (URSS)"], rows: [["Economia", "mercado e propriedade privada", "planificada e estatal"], ["Aliança militar", "OTAN (1949)", "Pacto de Varsóvia (1955)"], ["Plano econômico", "Plano Marshall", "Comecon"], ["Conflitos indiretos", "Coreia, Vietnã, Cuba, Afeganistão", "(os mesmos, do outro lado)"]] }],

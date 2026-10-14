@@ -1055,6 +1055,10 @@ ex:["Um viajante diz que a comida de outro país é 'nojenta' por ser diferente 
 <script src="conteudo/biologia-1.js"></script>
 <script src="conteudo/biologia-2.js"></script>
 <script src="conteudo/biologia-3.js"></script>
+<script src="conteudo/figuras-his.js"></script>
+<script src="conteudo/historia-1.js"></script>
+<script src="conteudo/historia-2.js"></script>
+<script src="conteudo/historia-3.js"></script>
 <script src="conteudo/extras-natureza.js"></script>
 <script src="conteudo/extras-exatas-linguagens.js"></script>
 <script src="conteudo/extras-humanas.js"></script>
@@ -1080,12 +1084,24 @@ const BIO_MAPA={0:1,1:2,2:16,3:21,4:14,5:19,6:8}; // índice antigo -> novo
   const ord=["seres",0,1,"metab","dna","repro","histo","sistem",6,"protofungos","botan1","botan2","zoo1","zoo2",4,"fisio2",2,"gen2","biotec",5,"popul",3,"biomas"];
   const novo=ord.map(k=>typeof k==="number"?Object.assign(o[k],ren[k]?{t:ren[k]}:{},k===4?{d:"Digestão, circulação, respiração e imunidade."}:{}):N[k]);
   if(novo.every(Boolean))MOD["Biologia"]=novo;})();
-function migrarBio(st){ // progresso salvo antes da reorganização de Biologia
-  if(!st||st.bioV>=2)return; st.bioV=2; if(MOD["Biologia"].length<23)return;
-  const mv=k=>{const m=/^Biologia#(\d+)$/.exec(k);return m&&BIO_MAPA[m[1]]!==undefined?"Biologia#"+BIO_MAPA[m[1]]:k;};
-  for(const f of ["read","modDone","lessons"]){const obj=st[f];if(!obj)continue;const n={};for(const k of Object.keys(obj))n[mv(k)]=obj[k];st[f]=n;}
+// História completa: 15 módulos novos intercalados com os 8 originais (ordem cronológica)
+const HIS_MAPA={0:2,1:4,2:6,3:10,4:8,5:12,6:18,7:16};
+(function(){const N=window.HIS_NOVOS,o=MOD["História"];if(!N||!o||o.length!==8)return;
+  const ren={0:["Antiguidade clássica: Grécia e Roma","Pólis gregas, democracia ateniense, cultura grega, Roma da monarquia ao império e o legado clássico."],2:["Idade Moderna: navegações, absolutismo e Reforma",null],6:["Brasil República: visão geral",null],7:["Século XX em revisão: guerras e Guerra Fria",null]};
+  const ord=["intro","civ",0,"amafr",1,"renasc",2,"conq",4,"indep",3,"ind",5,"sul","imp","ww2",7,"gfria",6,"rep1","vargas","dit","nova"];
+  const novo=ord.map(k=>typeof k==="number"?Object.assign(o[k],ren[k]?{t:ren[k][0]}:{},ren[k]&&ren[k][1]?{d:ren[k][1]}:{}):N[k]);
+  if(novo.every(Boolean))MOD["História"]=novo;})();
+function migrarMods(st,subj,mapa,flag,minLen){ // remapeia o progresso salvo quando a ordem dos módulos de uma matéria muda
+  if(!st||st[flag]>=2)return; st[flag]=2; if((MOD[subj]||[]).length<minLen)return;
+  const re=new RegExp("^"+subj+"#(\\d+)(\\|.*)?$");
+  const mv=k=>{const m=re.exec(k);return m&&mapa[m[1]]!==undefined?subj+"#"+mapa[m[1]]+(m[2]||""):k;};
+  const remap=obj=>{const n={};for(const k of Object.keys(obj))n[mv(k)]=obj[k];return n;};
+  for(const f of ["read","modDone","lessons","watched"])if(st[f])st[f]=remap(st[f]);
+  if(st.fc&&st.fc.r)st.fc.r=remap(st.fc.r);
+  if(st.fc&&st.fc.ai)st.fc.ai=remap(st.fc.ai);
   if(st.lastMod)st.lastMod=mv(st.lastMod);
 }
+function migrarBio(st){migrarMods(st,"Biologia",BIO_MAPA,"bioV",23);migrarMods(st,"História",HIS_MAPA,"hisV",23);}
 // Conteúdo extra dos módulos (seções, figuras, tabelas, como cai na prova, fontes abertas)
 (function(){const EX=window.EXTRA||{};for(const s of Object.keys(MOD))MOD[s].forEach((m,i)=>{const x=EX[s+"#"+i]||EX[s+":"+m.t];if(!x)return;
   if(x.s)m.s=m.s.concat(x.s);if(x.fig)m.fig=[].concat(x.fig);if(x.tab)m.tab=[].concat(x.tab);if(x.prova)m.prova=x.prova;if(x.ler)m.ler=x.ler;if(x.sabia)m.sabia=x.sabia;});})();
@@ -1562,7 +1578,7 @@ async function askQuestion(){
 }
 
 /* videoaulas: player dentro do site (Khan Academy Brasil primeiro, depois YouTube em geral) */
-const VKEY="easystudy.videos.v1";let VCACHE={};try{VCACHE=JSON.parse(localStorage.getItem(VKEY)||"{}");}catch(e){}
+const VKEY="easystudy.videos.v2";let VCACHE={};try{VCACHE=JSON.parse(localStorage.getItem(VKEY)||"{}");}catch(e){}
 const KHAN_SUBJ=["Biologia","Química","Física","Matemática"];
 const VPEND={};let vState={id:null,i:0};
 function vQuery(m){const t=m.t.replace(/\s+(I|II|III)(?=[:\s]|$)/g,"").replace(/\s+—\s+/g,": ");const parts=t.split(":");
