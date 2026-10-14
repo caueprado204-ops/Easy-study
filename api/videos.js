@@ -80,7 +80,7 @@ async function buscaEspelhos(q, soKhan) {
       if (!r.ok) throw new Error(base + " " + r.status);
       let vs = (await r.json()).filter((v) => v.type === "video" && v.videoId && v.lengthSeconds > 60)
         .map((v) => ({ id: v.videoId, titulo: v.title, canal: v.author, dur: fmtDur(v.lengthSeconds) }));
-      if (soKhan) vs = vs.filter((v) => /khan/i.test(v.canal));
+      if (soKhan) vs = vs.filter((v) => /khan academy brasil/i.test(v.canal));
       return vs;
     } catch (e) { erros.push("inv " + e.message); }
   }
@@ -90,13 +90,15 @@ async function buscaEspelhos(q, soKhan) {
       if (!r.ok) throw new Error(base + " " + r.status);
       let vs = ((await r.json()).items || []).filter((v) => v.url && v.duration > 60)
         .map((v) => ({ id: v.url.split("v=")[1]?.slice(0, 11), titulo: v.title, canal: v.uploaderName, dur: fmtDur(v.duration) })).filter((v) => v.id);
-      if (soKhan) vs = vs.filter((v) => /khan/i.test(v.canal));
+      if (soKhan) vs = vs.filter((v) => /khan academy brasil/i.test(v.canal));
       return vs;
     } catch (e) { erros.push("piped " + e.message); }
   }
   return [];
 }
 
+// O canal do Khan Brasil tem alguns vídeos em inglês; ficamos só com os de título em português.
+const EH_PT = (t) => /[ãõçáéíóúâêô]|\b(de|do|da|dos|das|e|o|a|os|as|em|no|na|para|com|uma|um)\b/i.test(t) && !/\b(the|of|and|with|introduction|overview)\b/i.test(t);
 let erros = [];
 async function busca(q, soKhan) {
   if (process.env.YOUTUBE_API_KEY) {
@@ -120,7 +122,7 @@ export default async function handler(req, res) {
   try {
     if (khan) {
       for (const termo of [q, alt].filter(Boolean)) {
-        videos = await busca(termo, true);
+        videos = (await busca(termo, true)).filter((v) => EH_PT(v.titulo));
         if (videos.length) { fonte = "khan"; break; }
       }
     }
