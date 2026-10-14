@@ -665,7 +665,7 @@
       ${destino ? `<div class="gwhy"><b>Por quê?</b> ${esc(destino.why[0])}${destino.why[1] ? " " + esc(destino.why[1]) : ""}</div>` : ""}
     </div>
 
-    ${!g.diag?.done && ctx.nResp < 12 ? `<div class="card gdiag"><div><h3>Comece pelo diagnóstico</h3><p class="small muted" style="margin:4px 0 0">Cerca de 20 questões reais do ENEM, sem gabarito na hora. O GPS usa o resultado para saber de onde você parte.</p></div>
+    ${!g.diag?.done && ctx.nResp < 12 ? `<div class="card gdiag"><div><h3>Comece pelo diagnóstico</h3><p class="small muted" style="margin:4px 0 0">Cerca de 20 questões reais de ENEM, FUVEST e Unicamp, sem gabarito na hora. O GPS usa o resultado para saber de onde você parte.</p></div>
       <div class="gbtns"><button class="btn" data-gx="diag">Fazer diagnóstico</button><button class="btn ghost sm" data-gx="skipdiag">Pular por agora</button></div></div>` : ""}
 
     <div class="row-head"><h2 class="h-sec">O que estudar hoje?</h2>
@@ -779,9 +779,9 @@
       ${barra(resp / dg.ids.length, "var(--violet)")}
       <p class="small muted">Responda com sinceridade. Se não souber, pule: o GPS entende como conteúdo a estudar. O gabarito aparece no Laboratório de Erros depois.</p>
       <article class="qcard">
-        <div class="qmeta"><span class="chip dark">ENEM ${q.y}</span><span class="chip">Questão ${dg.cur + 1} de ${dg.ids.length}</span><span class="chip" style="background:${corS(q.s)}">${esc(q.s)}</span></div>
-        ${q.c ? `<div class="qctx">${md(q.c)}</div>` : ""}${q.q ? `<div class="qintro">${md(q.q)}</div>` : ""}
-        <div class="alts">${q.o.map((o, i) => `<button class="alt ${i === ch ? "sel" : ""}" data-gx="dans" data-i="${i}"><span class="L">${"ABCDE"[i]}</span><span>${md(o)}</span></button>`).join("")}</div>
+        <div class="qmeta"><span class="chip dark">${qProva(q)} ${q.y}</span><span class="chip">Questão ${dg.cur + 1} de ${dg.ids.length}</span><span class="chip" style="background:${corS(q.s)}">${esc(q.s)}</span></div>
+        ${q.c ? `<div class="qctx">${qmd(q.c, q)}</div>` : ""}${q.q ? `<div class="qintro">${qmd(q.q, q)}</div>` : ""}
+        <div class="alts">${q.o.map((o, i) => `<button class="alt ${i === ch ? "sel" : ""}" data-gx="dans" data-i="${i}"><span class="L">${"ABCDE"[i]}</span><span>${qmd(o, q)}</span></button>`).join("")}</div>
       </article>
       <div class="qnav"><button class="btn ghost sm" data-gx="dgo" data-i="${dg.cur - 1}" ${dg.cur === 0 ? "disabled" : ""}>Anterior</button>
         <button class="btn ghost sm" data-gx="dgo" data-i="${dg.cur + 1}" ${dg.cur >= dg.ids.length - 1 ? "disabled" : ""}>Pular</button>
@@ -863,9 +863,9 @@
     const er = S.erros[q.id] || {};
     const vezes = e.topic ? (ctx.errHist[e.topic] || []).length : 0;
     const quando = r.t ? new Date(r.t).toLocaleDateString("pt-BR") : "antes do registro";
-    const txt = (q.q || q.c || "").replace(/\s+/g, " ").slice(0, 170);
+    const txt = qPlain(q.q || q.c || "").replace(/\s+/g, " ").slice(0, 170);
     return `<div class="lab-err" id="lab-${q.id}">
-      <div class="lab-eh"><span class="chip dark">ENEM ${q.y} · Q${q.n}</span><span class="chip" style="background:${corS(q.s)}">${esc(q.s)}</span>${e.topic ? `<span class="chip">${esc(MODMAP[e.topic].t)}</span>` : ""}<span class="small muted">${quando}${r.src === "diag" ? " · diagnóstico" : r.src === "sim" ? " · simulado" : ""}</span></div>
+      <div class="lab-eh"><span class="chip dark">${qProva(q)} ${q.y} · Q${q.n}</span><span class="chip" style="background:${corS(q.s)}">${esc(q.s)}</span>${e.topic ? `<span class="chip">${esc(MODMAP[e.topic].t)}</span>` : ""}<span class="small muted">${quando}${r.src === "diag" ? " · diagnóstico" : r.src === "sim" ? " · simulado" : ""}</span></div>
       <p class="lab-q">${esc(txt)}${txt.length >= 170 ? "…" : ""}</p>
       <div class="lab-ans small"><span>Sua resposta: <b style="color:var(--bad)">${r.ch === undefined || r.ch === null ? "—" : "ABCDE"[r.ch]}</b></span><span>Correta: <b style="color:var(--ok)">${"ABCDE"[q.k]}</b></span>${vezes > 1 ? `<span>Você errou <b>${vezes}</b> vezes este conteúdo</span>` : ""}</div>
       ${catChips(q.id, er.cat)}
@@ -965,7 +965,7 @@
       case "flash": fcStart("Todas"); break;
       case "redacao": go("redacao"); break;
       case "diag": iniciarDiag(); go("gps"); break;
-      case "questoes": qf = { s: t.s, y: "Todos", pend: true }; rebuildQ(); go("questoes"); break;
+      case "questoes": { const pv = PROVAS.find((p) => p.toUpperCase() === String(st().cfg?.vest || "").toUpperCase()); qf = { s: t.s, y: "Todos", pend: true, v: pv && Q.some((q) => qProva(q) === pv && q.s === t.s) ? pv : "Todas" }; rebuildQ(); go("questoes"); break; }
       case "sim": go("simulados"); break;
       default: if (t.mod) openModule(t.mod);
     }
@@ -989,7 +989,7 @@
     }
     if (gname === "Tempo") return go("simulados");
     if (gname === "Chute") return go("gps");
-    if (gname === "Atenção") { qf = { s: "Todas", y: "Todos", pend: true }; rebuildQ(); return go("questoes"); }
+    if (gname === "Atenção") { qf = { s: "Todas", y: "Todos", pend: true, v: "Todas" }; rebuildQ(); return go("questoes"); }
     if (gname === "Conceitos" && topErr) return fcStart(null, topErr);
     if (topErr) return gname === "Aplicação" ? abrirRevisao(topErr) : openModule(topErr);
     go("modulos");
@@ -1049,7 +1049,7 @@
       case "singles": ui.labSingles = !ui.labSingles; render(); return;
       case "revisar": abrirRevisao(d.mod); return;
       case "fcmod": fcStart(null, d.mod); return;
-      case "refazer": qf = { s: "Todas", y: "Todos", pend: false }; rebuildQ(d.q); go("questoes"); return;
+      case "refazer": qf = { s: "Todas", y: "Todos", pend: false, v: "Todas" }; rebuildQ(d.q); go("questoes"); return;
       case "interv": intervir(d.g); return;
     }
   });

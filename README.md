@@ -7,6 +7,8 @@ Plataforma de estudos para o curso dos sonhos (Medicina, Psicologia, Engenharia,
 ```
 index.html        landing page + plataforma (tudo em um arquivo)
 questoes.json     876 questões reais do ENEM 2016–2023 (projeto aberto enem-api)
+questoes-vest.json 1.257 questões da FUVEST e da Unicamp 2018–2024 (conjunto aberto BLUEX)
+img/              figuras das questões da FUVEST e da Unicamp (webp)
 api/easier.js     função serverless que conversa com a IA (a chave fica no servidor)
 app/gps-lab.js    GPS de Estudos + Laboratório de Erros
 conteudo/         textos dos módulos, figuras e conteúdos extras
@@ -128,3 +130,9 @@ Ficam em `app/gps-lab.js`. Os dados vão junto com o progresso do aluno (mesma s
 Cada questão do ENEM é ligada ao módulo pelo campo `kw` (palavras-chave) dos módulos. Os pré-requisitos ficam na lista `PRE_DEF`, escritos pelo título dos módulos.
 
 A prioridade de cada conteúdo é calculada por `GPS.motor(ctx, idDoModulo)`, uma função de pontuação. Para trocar essa lógica por IA no futuro, substitua `GPS.motor`, ou monte o plano no servidor a partir de `GPS.retrato()`.
+
+## Banco de questões de vestibulares
+
+- ENEM: `questoes.json` (projeto aberto enem-api).
+- FUVEST e Unicamp: `questoes-vest.json`, convertido do conjunto aberto BLUEX (github.com/Portuguese-Benchmark-Datasets/BLUEX). As figuras ficam em `img/`. O campo `v` indica a prova e o campo `im` lista as figuras, referenciadas no texto como `[IMAGE n]`.
+- Para incluir Unesp e Provão Paulista, gere um arquivo no mesmo formato (`id, v, y, n, a, s, c, q, o, k, im`), carregue-o junto em `index.html` e acrescente o nome da prova à lista `PROVAS`.
