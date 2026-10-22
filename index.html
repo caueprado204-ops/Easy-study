@@ -307,6 +307,19 @@ select,.inp{border:1.5px solid var(--line);border-radius:10px;padding:7px 10px;b
 .qnav{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px;align-items:center}
 .explain{margin-top:12px;border:1.5px dashed var(--violet);border-radius:14px;padding:12px 14px;background:#F3F1FF;white-space:pre-wrap;font-size:14px}
 .feedback{margin-top:12px;font-weight:700}
+.qmode{display:inline-flex;border:1.5px solid var(--ink);border-radius:12px;overflow:hidden;margin:4px 0 6px;max-width:100%}
+.qmode button{border:0;background:var(--white);padding:7px 14px;font-weight:600;font-size:14px;color:var(--ink)}
+.qmode button.on{background:var(--ink);color:var(--white)}
+.sheet.dta{min-height:128px;box-sizing:border-box}
+.dbtns{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.dres{margin-top:14px;border:1.5px solid var(--line);border-radius:14px;padding:12px 14px}
+.dres-top{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+.dres-it{border-top:1px dashed var(--line);margin-top:10px;padding-top:8px}.dres-it p{margin:4px 0 0;overflow-wrap:anywhere}
+.desp{margin-top:14px;border:1.5px dashed var(--violet);border-radius:14px;padding:12px 14px}
+.desp-it{margin:0 0 12px;line-height:1.55;overflow-wrap:anywhere}
+.dcrit{display:grid;gap:6px;margin-top:8px}.dcrit label{display:flex;gap:8px;align-items:flex-start;font-size:14px}.dcrit input{margin-top:3px;flex:none}
+.dcrit-l{margin:6px 0 0;padding-left:18px}
+.ddet{margin-top:12px}.ddet summary{cursor:pointer;font-weight:600}
 .stat{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1.5px solid var(--hair);font-size:14px}
 .stat:last-child{border-bottom:0}
 
@@ -1078,7 +1091,9 @@ ex:["Um viajante diz que a comida de outro país é 'nojenta' por ser diferente 
 <script src="conteudo/extras-natureza.js"></script>
 <script src="conteudo/extras-exatas-linguagens.js"></script>
 <script src="conteudo/extras-humanas.js"></script>
+<script src="conteudo/dissertativas.js"></script>
 <script src="app/gps-lab.js"></script>
+<script src="app/disc.js"></script>
 <script>
 /* ---------- matérias ---------- */
 const SUBJ = {
@@ -1684,7 +1699,7 @@ function vAulas(){
 }
 
 /* questões */
-let qf={s:"Todas",y:"Todos",pend:false,v:"Todas"},qList=[],qIdx=0,qExplain={},qBuilt=false;
+let qMode="obj",qf={s:"Todas",y:"Todos",pend:false,v:"Todas"},qList=[],qIdx=0,qExplain={},qBuilt=false;
 function rebuildQ(keepId){qList=Q.filter(q=>(!qf.v||qf.v==="Todas"||qProva(q)===qf.v)&&(qf.s==="Todas"||q.s===qf.s||(qf.s==="Linguagens"&&q.s==="Inglês")||(SUBJ[qf.s]&&["Biologia","Química","Física"].includes(qf.s)&&false))&&(qf.y==="Todos"||String(q.y)===qf.y)&&(!qf.pend||S.ans[q.id]===undefined));qIdx=keepId?Math.max(0,qList.findIndex(q=>q.id===keepId)):0;qBuilt=true;}
 function qCardHTML(q,mode){
   const chosen=mode==="sim"||mode==="review"?S.sim?.ans?.[q.id]:S.ans[q.id];
@@ -1698,7 +1713,12 @@ function qCardHTML(q,mode){
       <div id="exp-${q.id}">${qExplain[q.id]?`<div class="explain">${esc(qExplain[q.id])}</div>`:`<button class="btn sm ink" style="margin-top:10px" data-explain="${q.id}">Explicar com a Easier</button>`}</div>${chosen!==undefined&&chosen!==q.k&&window.labInline?labInline(q,chosen):""}`:""}
   </article>`;
 }
+const qModeHTML=()=>`<div class="qmode" role="tablist" aria-label="Tipo de questão"><button class="${qMode==="obj"?"on":""}" data-qmode="obj" role="tab" aria-selected="${qMode==="obj"}">Objetivas</button><button class="${qMode==="disc"?"on":""}" data-qmode="disc" role="tab" aria-selected="${qMode==="disc"}">Dissertativas · 2ª fase</button></div>`;
 function vQuestoes(){
+  if(qMode==="disc"&&window.vDisc)return qModeHTML()+vDisc();
+  return qModeHTML()+vQuestoesObj();
+}
+function vQuestoesObj(){
   if(QREADY!==true)return `<h1 class="h-sec">Questões</h1><div class="empty" style="margin-top:16px">${QREADY==="erro"?"Não foi possível carregar o banco de questões. Recarregue a página.":"Carregando questões do ENEM…"}</div>`;
   if(!qBuilt)rebuildQ();
   const q=qList[qIdx],st=qStats();
@@ -2143,14 +2163,16 @@ document.addEventListener("click",e=>{
   if(d.mq!==undefined){modState.qi=+d.mq;render();return;}
   if(d.moddone){S.modDone[d.moddone]=1;addXP(30);render();toast("Módulo concluído! +30 XP");return;}
   if(d.ailesson){genLesson(d.ailesson);return;}
-  if(d.subject){qf={s:d.subject,y:"Todos",pend:false};rebuildQ();go("questoes");return;}
-  if(d.openq){qf={s:"Todas",y:"Todos",pend:false};rebuildQ(d.openq);go("questoes");return;}
+  if(d.subject){qMode="obj";qf={s:d.subject,y:"Todos",pend:false};rebuildQ();go("questoes");return;}
+  if(d.openq){qMode="obj";qf={s:"Todas",y:"Todos",pend:false};rebuildQ(d.openq);go("questoes");return;}
   if(d.aula){aulaFilter=d.aula;render();return;}
   if(d.watch){S.watched[d.watch]=1;addXP(10);render();if(vState.id)paintVideo();toast("+10 XP");return;}
   if(d.clearsearch!==undefined){modState.search="";document.getElementById("searchInput").value="";render();return;}
   if(d.ans!==undefined){const q=QMAP[d.qid],i=+d.ans;
     if(d.mode==="train"){if(S.ans[q.id]!==undefined)return;S.ans[q.id]=i;if(window.gpsLog)gpsLog(q.id,i,"train");addXP(i===q.k?10:5,"q");render();}
     else if(d.mode==="sim"){S.sim.ans[q.id]=i;save();render();}return;}
+  if(d.qmode){qMode=d.qmode;render();return;}
+  if(window.discClick&&discClick(d))return;
   if(d.qprova){qf.v=d.qprova;qf.y="Todos";rebuildQ();render();return;}
   if(d.qmove){qIdx=Math.max(0,Math.min(qList.length-1,qIdx+(+d.qmove)));render();return;}
   if(d.qrand!==undefined){qIdx=Math.floor(Math.random()*qList.length);render();return;}
@@ -2170,11 +2192,13 @@ document.addEventListener("click",e=>{
   if(d.preset!==undefined){pomo.running=false;pomo.phase="focus";pomo.left=pomo.mode*60;render();return;}
 });
 document.addEventListener("change",e=>{const t=e.target;
+  if(window.discChange&&discChange(t))return;
   if(t.id==="qfS"){qf.s=t.value;rebuildQ();render();}else if(t.id==="qfY"){qf.y=t.value;rebuildQ();render();}else if(t.id==="qfP"){qf.pend=t.checked;rebuildQ();render();}
   else if(t.id==="essayTheme"){S.essayTheme=t.value;save();render();}else if(t.id==="pSubj"){pomo.subj=t.value;}
   else if(t.dataset.examname!==undefined){S.exams[+t.dataset.examname].n=t.value;save();}
   else if(t.dataset.examdate!==undefined){S.exams[+t.dataset.examdate].d=t.value;save();render();}});
 document.addEventListener("input",e=>{const t=e.target;
+  if(window.discInput&&discInput(t))return;
   if(t.id==="essayText"){S.essayDraft=t.value;save();const w=t.value.trim()?t.value.trim().split(/\s+/).length:0,l=t.value.trim()?lineEstimate(t.value):0,c=document.getElementById("essayCount");c.textContent=`${w} palavras · cerca de ${l}/30 linhas`;c.style.color=l>30?"var(--bad)":"";}
   else if(t.id==="essayCustom"){S.essayTheme=t.value||"__custom";save();}
   else if(t.id==="askInput"){modState.ask=t.value;}});

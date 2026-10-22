@@ -139,6 +139,14 @@ A prioridade de cada conteúdo é calculada por `GPS.motor(ctx, idDoModulo)`, um
 - Provão Paulista: `questoes-provao.json`, extraído das provas e gabaritos oficiais (1ª, 2ª e 3ª série, 2024 e 2025). Fórmulas, gráficos e figuras viram recortes de imagem; o campo `sr` indica a série.
 - Para incluir a Unesp, gere um arquivo no mesmo formato (`id, v, y, n, a, s, c, q, o, k, im`), carregue-o junto em `index.html` e acrescente o nome da prova à lista `PROVAS`.
 
+## Dissertativas (2ª fase)
+
+Na aba Questões, o botão "Dissertativas · 2ª fase" abre questões discursivas autorais no estilo FUVEST e Unicamp (`conteudo/dissertativas.js`, lógica em `app/disc.js`).
+- Cada questão tem itens com resposta esperada e critérios de correção. O campo `mt` liga a questão ao módulo pelo início do título.
+- "Corrigir com a Easier" manda a resposta, a resposta esperada e os critérios; a Easier devolve nota por item, acertos, o que faltou e uma dica (conta 1 uso).
+- Sem a Easier, o aluno vê a resposta esperada, marca os critérios cumpridos e a nota é calculada.
+- As tentativas ficam em `S.disc` (sincroniza com o progresso) e alimentam o GPS de Estudos.
+
 ## Pagamento automático (Mercado Pago)
 
 O aluno assina na aba Planos digitando o cartão no próprio site (formulário seguro do Mercado Pago, sem precisar de conta no Mercado Pago). A cobrança se repete todo mês sem ninguém precisar liberar nada. Como alternativa, ele pode pagar pelo site do Mercado Pago.
