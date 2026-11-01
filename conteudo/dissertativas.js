@@ -358,7 +358,7 @@ window.DISC = [
         crit: ["Contrasta direta com representativa ou restrita com universal.", "A explicação está correta."] },
     ] },
   // ---------------- Geografia ----------------
-  { id: "d-geo-1", s: "Geografia", mt: "Clima", est: "FUVEST",
+  { id: "d-geo-1", s: "Geografia", mt: "Clima e questões", est: "FUVEST",
     c: "No inverno, a cidade de São Paulo registra com frequência dias de céu limpo, pouco vento e alta concentração de poluentes perto do solo.",
     itens: [
       { q: "Explique o fenômeno da inversão térmica.", pts: 5,

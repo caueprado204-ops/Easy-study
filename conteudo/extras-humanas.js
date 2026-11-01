@@ -88,7 +88,7 @@ window.EXTRA = window.EXTRA || {};
   };
 
   /* ===================== GEOGRAFIA ===================== */
-  E["Geografia#0"] = {
+  E["Geografia#1"] = {
     s: [["Tecnologias da cartografia", "Hoje os mapas são feitos com **sensoriamento remoto** (imagens de satélite), **GPS** (que localiza um ponto por sinais de vários satélites) e **SIG**, os Sistemas de Informação Geográfica, que cruzam camadas de dados num mapa digital.\n\nO Brasil usa satélites para monitorar o desmatamento em tempo quase real (sistemas DETER e PRODES do INPE), prever safras e planejar cidades. Aplicativos de trânsito e entrega também são cartografia aplicada."]],
     fig: [{ id: "fusos", at: 1, cap: "Coordenadas geográficas e fusos horários (ilustração Easy Study)." }],
     tab: [{ at: 3, title: "Projeções cartográficas", head: ["Projeção", "Mantém", "Distorce", "Uso"], rows: [["Mercator (cilíndrica)", "formas e ângulos", "áreas perto dos polos", "navegação"], ["Peters (cilíndrica)", "proporção das áreas", "formas", "crítica ao eurocentrismo"], ["Azimutal (plana)", "distâncias a partir do centro", "bordas", "rotas aéreas, regiões polares"], ["Cônica", "boa precisão em latitudes médias", "regiões distantes do paralelo de contato", "mapas de países"]] }],
@@ -97,7 +97,7 @@ window.EXTRA = window.EXTRA || {};
     ler: [W("Projeção cartográfica"), W("Fuso horário"), ATLAS, INPE]
   };
 
-  E["Geografia#1"] = {
+  E["Geografia#3"] = {
     s: [["O relevo brasileiro", "O Brasil está no centro da Placa Sul-Americana, por isso tem poucos terremotos fortes e não tem vulcões ativos. O relevo é antigo e muito desgastado pela erosão: predominam **planaltos, planícies e depressões**, com altitudes modestas. O ponto mais alto é o Pico da Neblina (cerca de 2.995 m), no Amazonas.\n\nA classificação mais usada é a de **Jurandyr Ross**, que divide o relevo em planaltos, planícies e depressões com base em imagens de radar do projeto RadamBrasil."]],
     fig: [{ id: "terra", at: 0, cap: "Camadas internas da Terra (ilustração Easy Study)." }],
     tab: [{ at: 1, title: "Tipos de rocha", head: ["Tipo", "Como se forma", "Exemplos"], rows: [["Ígnea (magmática)", "resfriamento do magma", "granito, basalto"], ["Sedimentar", "acúmulo e compactação de sedimentos", "arenito, calcário"], ["Metamórfica", "transformação por calor e pressão", "mármore, ardósia"]] }],
@@ -106,7 +106,7 @@ window.EXTRA = window.EXTRA || {};
     ler: [W("Placas tectônicas"), W("Relevo do Brasil"), IBGE]
   };
 
-  E["Geografia#2"] = {
+  E["Geografia#10"] = {
     s: [["Acordos climáticos", "O **Protocolo de Kyoto** (1997) estabeleceu metas de redução de emissões para países desenvolvidos. O **Acordo de Paris** (2015) envolveu quase todos os países, com o objetivo de limitar o aquecimento global a bem menos de 2 °C, buscando 1,5 °C, cada país definindo suas metas (NDCs).\n\nO Brasil tem papel central por causa da Amazônia e da matriz energética limpa. A maior fonte de emissões brasileiras, historicamente, vem da **mudança no uso da terra**, principalmente o desmatamento, e não da indústria. Em 2025, Belém sediou a COP30."]],
     fig: [{ id: "climas", at: 1, cap: "Principais climas do Brasil (ilustração Easy Study)." }],
     tab: [{ at: 2, title: "Fenômenos urbanos e atmosféricos", head: ["Fenômeno", "O que é"], rows: [["Ilha de calor", "centro urbano mais quente pela concentração de asfalto e concreto"], ["Inversão térmica", "ar frio preso embaixo do quente, concentrando poluentes (inverno)"], ["Chuva ácida", "óxidos de enxofre e nitrogênio formando ácidos na chuva"], ["Rios voadores", "umidade da Amazônia levada pelo vento ao Centro-Sul"]] }],
@@ -115,7 +115,7 @@ window.EXTRA = window.EXTRA || {};
     ler: [W("Acordo de Paris"), W("Rios voadores"), INPE]
   };
 
-  E["Geografia#3"] = {
+  E["Geografia#13"] = {
     s: [["Unidades de conservação e povos tradicionais", "O **SNUC** (Sistema Nacional de Unidades de Conservação) divide as áreas protegidas em dois grupos: de **proteção integral** (parques nacionais, reservas biológicas, sem moradia nem exploração direta) e de **uso sustentável** (reservas extrativistas, florestas nacionais, onde comunidades vivem e usam os recursos de forma controlada).\n\nTerras indígenas e territórios quilombolas estão entre as áreas mais preservadas da Amazônia, segundo dados de satélite. Isso mostra que conservação e presença de povos tradicionais caminham juntas."]],
     tab: [{ at: 0, title: "Biomas brasileiros", head: ["Bioma", "Clima", "Ameaça principal"], rows: [["Amazônia", "equatorial", "desmatamento, garimpo"], ["Cerrado", "tropical com estação seca", "expansão agropecuária"], ["Caatinga", "semiárido", "desertificação"], ["Mata Atlântica", "tropical úmido", "urbanização (restam poucos remanescentes)"], ["Pantanal", "tropical", "queimadas, assoreamento"], ["Pampa", "subtropical", "monoculturas, arenização"]] }],
     sabia: "O Cerrado é chamado de 'berço das águas': nele nascem rios de oito das doze grandes regiões hidrográficas do Brasil.",
@@ -123,7 +123,7 @@ window.EXTRA = window.EXTRA || {};
     ler: [W("Biomas do Brasil"), W("Aquífero Guarani"), ANA, INPE]
   };
 
-  E["Geografia#4"] = {
+  E["Geografia#21"] = {
     s: [["Migrações no Brasil", "O Brasil foi marcado por grandes migrações internas: nordestinos para o Sudeste (especialmente São Paulo) entre as décadas de 1950 e 1980, gaúchos e paranaenses para o Centro-Oeste e a Amazônia com a expansão agrícola, e o **êxodo rural** que esvaziou o campo.\n\nHoje há **migração de retorno** ao Nordeste e o crescimento de cidades médias. O país também recebe imigrantes e refugiados, como haitianos e venezuelanos. As provas cobram as causas (fatores de expulsão e de atração) e os efeitos sobre as cidades."]],
     fig: [{ id: "transicao", at: 3, cap: "Transição demográfica: a mortalidade cai antes da natalidade (ilustração Easy Study)." }],
     tab: [{ at: 1, title: "Problemas urbanos e causas", head: ["Problema", "Causa principal"], rows: [["Favelização", "falta de moradia acessível e especulação imobiliária"], ["Enchentes", "impermeabilização do solo e ocupação de várzeas"], ["Mobilidade ruim", "prioridade ao carro, transporte público insuficiente"], ["Segregação socioespacial", "pobres empurrados para periferias distantes"]] }],
@@ -132,7 +132,7 @@ window.EXTRA = window.EXTRA || {};
     ler: [W("Transição demográfica"), W("Urbanização do Brasil"), IBGE]
   };
 
-  E["Geografia#5"] = {
+  E["Geografia#22"] = {
     s: [["Agronegócio e agricultura familiar", "O **agronegócio** brasileiro é um dos maiores exportadores do mundo de soja, carne, café, açúcar e suco de laranja. É muito mecanizado, ocupa grandes áreas e é voltado ao mercado externo.\n\nA **agricultura familiar** ocupa uma área bem menor, mas produz boa parte dos alimentos que chegam à mesa dos brasileiros e emprega mais gente no campo. O ENEM cobra os conflitos fundiários, a concentração de terras, o uso de agrotóxicos e a expansão da fronteira agrícola sobre o Cerrado e a Amazônia."]],
     tab: [{ at: 3, title: "Principais blocos econômicos", head: ["Bloco", "Membros de destaque", "Tipo"], rows: [["Mercosul", "Brasil, Argentina, Uruguai, Paraguai", "união aduaneira (imperfeita)"], ["União Europeia", "27 países europeus", "união econômica e monetária"], ["USMCA (antigo Nafta)", "EUA, México, Canadá", "zona de livre comércio"], ["BRICS", "Brasil, Rússia, Índia, China, África do Sul e novos membros", "grupo político-econômico"]] }],
     sabia: "A soja chegou a ser cultivada com sucesso no Cerrado graças a pesquisas da Embrapa, que adaptaram a planta e corrigiram a acidez do solo com calcário.",

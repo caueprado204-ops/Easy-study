@@ -1088,6 +1088,11 @@ ex:["Um viajante diz que a comida de outro país é 'nojenta' por ser diferente 
 <script src="conteudo/quimica-4.js"></script>
 <script src="conteudo/figuras-basica.js"></script>
 <script src="conteudo/matematica-basica.js"></script>
+<script src="conteudo/figuras-geo.js"></script>
+<script src="conteudo/geografia-1.js"></script>
+<script src="conteudo/geografia-2.js"></script>
+<script src="conteudo/geografia-3.js"></script>
+<script src="conteudo/geografia-4.js"></script>
 <script src="conteudo/extras-natureza.js"></script>
 <script src="conteudo/extras-exatas-linguagens.js"></script>
 <script src="conteudo/extras-humanas.js"></script>
@@ -1139,6 +1144,13 @@ const QUI_MAPA={0:2,1:6,2:11,3:13,4:14,5:21,6:19};
   const ord=["materia","misturas",0,"modelos","periodica","ligacoes",1,"acidobase","saisoxidos","reacoes","mol",2,"gases",3,4,"termo","cinetica","equilibrio","ionico",6,"radio",5,"org1","funcoesorg","isomeria","reacorg","ambiental"];
   const novo=ord.map(k=>typeof k==="number"?Object.assign(o[k],ren[k]?{t:ren[k]}:{}):N[k]);
   if(novo.every(Boolean))MOD["Química"]=novo;})();
+// Geografia completa: 20 módulos novos intercalados com os 6 originais
+const GEO_MAPA={0:1,1:3,2:10,3:13,4:21,5:22};
+(function(){const N=window.GEO_NOVOS,o=MOD["Geografia"];if(!N||!o||o.length!==6)return;
+  const ren={0:"Cartografia: coordenadas, fusos, escalas e projeções",1:"Geologia, relevo e solos: visão geral",2:"Clima e questões ambientais: visão geral",3:"Biomas e recursos hídricos: visão geral",4:"Urbanização e população no Brasil",5:"Geografia econômica e globalização: visão geral"};
+  const ord=["terra",0,"cartotema",1,"tecton","relevo","solos","hidro","climat","climas",2,"biomasmundo","dominios",3,"ambiente","energia","industria","indbr","agrario","populacao","urbano",4,5,"ordem","conflitos","america"];
+  const novo=ord.map(k=>typeof k==="number"?Object.assign(o[k],ren[k]?{t:ren[k]}:{}):N[k]);
+  if(novo.every(Boolean))MOD["Geografia"]=novo;})();
 function migrarMods(st,subj,mapa,flag,minLen){ // remapeia o progresso salvo quando a ordem dos módulos de uma matéria muda
   if(!st||st[flag]>=2)return; st[flag]=2; if((MOD[subj]||[]).length<minLen)return;
   const re=new RegExp("^"+subj+"#(\\d+)(\\|.*)?$");
@@ -1149,7 +1161,7 @@ function migrarMods(st,subj,mapa,flag,minLen){ // remapeia o progresso salvo qua
   if(st.fc&&st.fc.ai)st.fc.ai=remap(st.fc.ai);
   if(st.lastMod)st.lastMod=mv(st.lastMod);
 }
-function migrarBio(st){migrarMods(st,"Biologia",BIO_MAPA,"bioV",23);migrarMods(st,"História",HIS_MAPA,"hisV",23);migrarMods(st,"Matemática",MAT_MAPA,"matV",20);migrarMods(st,"Química",QUI_MAPA,"quiV",27);}
+function migrarBio(st){migrarMods(st,"Biologia",BIO_MAPA,"bioV",23);migrarMods(st,"História",HIS_MAPA,"hisV",23);migrarMods(st,"Matemática",MAT_MAPA,"matV",20);migrarMods(st,"Química",QUI_MAPA,"quiV",27);migrarMods(st,"Geografia",GEO_MAPA,"geoV",26);}
 // Conteúdo extra dos módulos (seções, figuras, tabelas, como cai na prova, fontes abertas)
 (function(){const EX=window.EXTRA||{};for(const s of Object.keys(MOD))MOD[s].forEach((m,i)=>{const x=EX[s+"#"+i]||EX[s+":"+m.t];if(!x)return;
   if(x.s)m.s=m.s.concat(x.s);if(x.fig)m.fig=[].concat(x.fig);if(x.tab)m.tab=[].concat(x.tab);if(x.prova)m.prova=x.prova;if(x.ler)m.ler=x.ler;if(x.sabia)m.sabia=x.sabia;});})();
