@@ -45,7 +45,12 @@
 .scard .sc-foot{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-top:8px;font-size:12.5px;color:rgba(255,255,255,.9)}
 .scard .sc-go{background:#fff;color:var(--g2);border:0;border-radius:12px;padding:7px 14px;font-weight:700;font-size:13px;box-shadow:0 4px 10px -4px rgba(0,0,0,.3)}
 .scard .sc-go:hover{transform:translateY(-1px)}
-@media (max-width:640px){.grid.subjects{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.scard.sc-link{text-align:left;border:0;font:inherit;cursor:pointer;transition:transform .15s,box-shadow .15s}
+.scard.sc-link:hover{transform:translateY(-3px);box-shadow:0 22px 38px -14px var(--sh),inset 0 1px 0 rgba(255,255,255,.28)}
+.scard.sc-link:focus-visible{outline:3px solid var(--ink);outline-offset:3px}
+.scard .sc-arrow{font-weight:700;font-size:13px;color:#fff}
+.subj-grid{gap:18px}
+@media (max-width:640px){.grid.subjects,.grid.subj-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
   .scard{min-height:0;padding:14px 13px 13px;border-radius:20px;gap:4px}.scard .sc-top{margin-bottom:4px}
   .scard .sc-ic{width:38px;height:38px}.scard .sc-acc{display:none}.scard h3{font-size:15.5px}.scard p{font-size:12px;margin-bottom:8px}
   .scard .sc-foot{flex-direction:column;align-items:stretch;gap:8px;font-size:11.5px}.scard .sc-go{width:100%}}
@@ -53,6 +58,19 @@
   const st = document.createElement("style");
   st.textContent = css;
   document.head.appendChild(st);
+
+  // cartão da aba Módulos: o cartão inteiro abre a matéria
+  window.cartaoMateriaModulos = function (s, p) {
+    const m = M[s] || { g: ["#6B6660", "#2B2927"], sh: "rgba(0,0,0,.3)", d: "" };
+    const ic = I[s] ? `<svg class="sc-ic" viewBox="0 0 48 48" aria-hidden="true" focusable="false">${I[s](m.g[1])}</svg>` : "";
+    const pct = p.total ? Math.round((p.done / p.total) * 100) : 0;
+    return `<button class="scard sc-link" style="--g1:${m.g[0]};--g2:${m.g[1]};--sh:${m.sh}" data-subjopen="${esc(s)}">
+      <div class="sc-top">${ic}<span class="sc-acc num">${p.total} módulos</span></div>
+      <h3>${esc(s)}</h3><p>${m.d}</p>
+      <div class="sc-bar" aria-hidden="true"><i style="width:${pct}%"></i></div>
+      <div class="sc-foot"><span class="num">${p.done}/${p.total} concluídos</span><span class="sc-arrow" aria-hidden="true">Abrir →</span></div>
+    </button>`;
+  };
 
   // p = subjProgress(s); next = id do próximo módulo
   window.cartaoMateria = function (s, p, next) {
