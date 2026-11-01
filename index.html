@@ -1094,6 +1094,7 @@ ex:["Um viajante diz que a comida de outro país é 'nojenta' por ser diferente 
 <script src="conteudo/dissertativas.js"></script>
 <script src="app/gps-lab.js"></script>
 <script src="app/disc.js"></script>
+<script src="app/capas.js"></script>
 <script>
 /* ---------- matérias ---------- */
 const SUBJ = {
@@ -1508,7 +1509,7 @@ function vModulos(){
   }
   return `<div class="row-head" style="margin-top:4px"><h1 class="h-sec">Módulos por matéria</h1><span class="small muted num">${Object.keys(S.modDone).length}/${ALL_MODS.length} concluídos</span></div>
   <div class="grid subj-grid">${SUBJECT_KEYS.map(s=>{const p=subjProgress(s);return `<button class="sg" style="background:${SUBJ[s].c}" data-subjopen="${esc(s)}">
-    <div style="display:flex;justify-content:space-between;width:100%"><span class="chip">${p.total} módulos</span><span class="small num">${p.done}/${p.total}</span></div>
+    <div style="display:flex;justify-content:space-between;width:100%"><span class="chip">${p.total} módulos</span><span class="small num">${p.done}/${p.total}</span></div>${window.capaSVG?capaSVG(s):""}
     <h3>${esc(s)}</h3><div class="bar" style="width:100%;background:rgba(255,255,255,.7)"><i style="width:${p.done/p.total*100}%"></i></div></button>`}).join("")}</div>`;
 }
 function modRow(m,showSubj){
