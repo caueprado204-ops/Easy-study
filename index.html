@@ -1095,6 +1095,7 @@ ex:["Um viajante diz que a comida de outro país é 'nojenta' por ser diferente 
 <script src="app/gps-lab.js"></script>
 <script src="app/disc.js"></script>
 <script src="app/capas.js"></script>
+<script src="app/cartoes.js"></script>
 <script>
 /* ---------- matérias ---------- */
 const SUBJ = {
@@ -1460,13 +1461,7 @@ function vPainel(){
   </div>
   <div class="row-head"><h2 class="h-sec">Minhas matérias</h2>
     <div class="pills">${["Todas","Natureza","Exatas","Humanas","Linguagens"].map(a=>`<button class="pill ${a===areaFilter?"on":""}" data-area="${a}">${a}</button>`).join("")}</div></div>
-  <div class="grid subjects">${subs.map((s,i)=>{const p=subjProgress(s);return `
-    <div class="subj" style="background:${SUBJ[s].c}">
-      <div class="t"><span class="chip ${i%2?"":"dark"}">${SUBJ[s].area}</span><span class="small num">${p.acc===null?"sem questões":p.acc+"% de acerto"}</span></div>
-      <h3>${esc(s)}</h3>
-      <div><div class="pr"><span>Progresso</span><span class="num">${p.done}/${p.total} módulos</span></div><div class="bar"><i style="width:${p.done/p.total*100}%"></i></div></div>
-      <div class="foot"><span class="small num">${p.qn} questões feitas</span><button class="btn sm" data-mod="${nextModule(s)}">Continuar</button></div>
-    </div>`}).join("")}</div>
+  <div class="grid subjects">${subs.map(s=>window.cartaoMateria?cartaoMateria(s,subjProgress(s),nextModule(s)):"").join("")}</div>
   <div class="grid lower">
     <div class="card">
       <div class="row-head" style="margin:0 0 6px"><h2 class="h-sec" style="font-size:19px">Rotina de hoje</h2><button class="btn sm ghost" data-go="rotina">Ver semana</button></div>
