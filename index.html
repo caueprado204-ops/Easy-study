@@ -1445,7 +1445,7 @@ function vPainel(){
   const essayBest=Math.max(0,...S.essays.map(e=>e.total||0)), mods=Object.keys(S.modDone).length;
   const badges=[["Primeira questão",qs.n>=1],["Primeiro módulo",mods>=1],["10 módulos",mods>=10],["100 questões",qs.n>=100],["3 dias seguidos",bestStreak()>=3],["7 dias seguidos",bestStreak()>=7],["30 dias seguidos",bestStreak()>=30],["Simulado feito",S.sims.length>0],["Redação 900+",essayBest>=900]];
   const lastMod=S.lastMod&&MODMAP[S.lastMod];
-  return contaStripHTML()+(window.gpsDashHTML?gpsDashHTML():"")+`
+  return contaStripHTML()+`
   <div class="hero">
     <div class="hero-main">${STAR("var(--lime)",54,"right:22px","top:20px",10)}${STAR("var(--pink)",30,"right:90px","bottom:86px",-15)}
       <h1 class="h-big">${lastMod?`Continue<br><em>${esc(lastMod.t)}</em>`:`Meta:<br><em>${esc(ACC?.perfil?.curso_foco||"curso dos sonhos")}</em><br>${ACC?.perfil?.faculdade?"na "+esc(ACC.perfil.faculdade):"sem parar"}`}</h1>
