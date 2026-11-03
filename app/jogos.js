@@ -319,11 +319,11 @@
       <b class="num jg-pts" style="margin-left:auto">${st.pts} pts${st.fb && st.fb.ok ? `<span class="jg-float">+${st.fb.ganho}</span>` : ""}</b></div>
       <div class="rl-bar"><i id="${idBar}" class="${left <= 10 ? "low" : ""}" style="width:${Math.min(100, (left / tot) * 100)}%"></i></div>`;
   }
-  function fimHTML(st, nome, best, extra) {
-    return `<div class="rl"><div class="tm-top"><button class="btn sm ghost" data-jvolta>← Jogos</button><b>${nome} · ${esc(st.s === "Todas" ? "todas as matérias" : st.s)}</b></div>
+  function fimHTML(st, nome, best, extra, rotulo) {
+    return `<div class="rl"><div class="tm-top"><button class="btn sm ghost" data-jvolta>← Jogos</button><b>${nome} · ${esc(rotulo || (st.s === "Todas" ? "todas as matérias" : st.s))}</b></div>
       <div class="rl-fim jg-in"><div class="h-big num jg-score" data-contar="${st.pts}">0</div><b>${st.recorde ? "Novo recorde! 🏆" : `pontos · recorde: ${best}`}</b>
         <div class="jg-stats"><span><b class="num">${st.ac}</b> acertos</span><span><b class="num">${st.erros.length}</b> erros</span><span><b class="num">${st.maxc}</b> maior sequência</span>${extra || ""}</div></div>
-      ${st.erros.length ? `<div class="card jg-in" style="animation-delay:.25s"><h3 style="font-size:16px;margin:0 0 8px">Revise o que errou</h3>${st.erros.slice(0, 8).map((q) => `<div class="rl-rev"><span class="small muted">${esc(q.tt)}</span><br><b>${esc(q.p)}</b> → ${esc(q.certo)} <button class="btn sm ghost" data-mod="${q.mod}">Abrir módulo</button></div>`).join("")}</div>` : `<p class="jg-in" style="text-align:center">Nenhum erro. Mandou muito bem!</p>`}`;
+      ${st.erros.length ? `<div class="card jg-in" style="animation-delay:.25s"><h3 style="font-size:16px;margin:0 0 8px">Revise o que errou</h3>${st.erros.slice(0, 8).map((q) => `<div class="rl-rev"><span class="small muted">${esc(q.tt)}</span><br><b>${esc(q.p)}</b> → ${esc(q.certo)} ${q.mod ? `<button class="btn sm ghost" data-mod="${q.mod}">Abrir módulo</button>` : ""}</div>`).join("")}</div>` : `<p class="jg-in" style="text-align:center">Nenhum erro. Mandou muito bem!</p>`}`;
   }
   function relHTML() {
     if (rel.fim) return fimHTML(rel, "Desafio relâmpago", J().rel.best[rel.s] || 0) + `<div class="dbtns">${saldo() > 0 ? `<button class="btn" data-reliniciar="${esc(rel.s)}">Jogar de novo (1 ficha)</button>` : `<span class="small muted">Sem fichas: estude para ganhar mais.</span>`}</div></div>`;
@@ -396,9 +396,265 @@
       <div class="lg-cols"><div class="lg-col">${lig.esq.map((id, k) => item("L", id, lig.pares[id].a, k)).join("")}</div><div class="lg-col">${lig.dir.map((id, k) => item("R", id, lig.pares[id].b, k + 2)).join("")}</div></div></div>`;
   }
 
+  /* ===================== Linha do tempo ===================== */
+  // [ano (negativo = a.C.), fato, "br" | "mundo"]
+  const FATOS = [
+    [-3500, "Surge a escrita cuneiforme na Mesopotâmia (aprox.)", "mundo"], [-2560, "Construção da Grande Pirâmide de Gizé (aprox.)", "mundo"], [-753, "Fundação lendária de Roma", "mundo"],
+    [-508, "Reformas de Clístenes criam a democracia em Atenas", "mundo"], [-431, "Começa a Guerra do Peloponeso", "mundo"], [-27, "Augusto se torna o primeiro imperador romano", "mundo"],
+    [313, "Édito de Milão dá liberdade de culto aos cristãos", "mundo"], [476, "Queda do Império Romano do Ocidente", "mundo"], [622, "Hégira: Maomé vai de Meca para Medina", "mundo"],
+    [800, "Carlos Magno é coroado imperador", "mundo"], [1054, "Cisma do Oriente divide a Igreja cristã", "mundo"], [1096, "Começa a Primeira Cruzada", "mundo"],
+    [1215, "Assinatura da Magna Carta na Inglaterra", "mundo"], [1347, "A Peste Negra chega à Europa", "mundo"], [1453, "Queda de Constantinopla", "mundo"],
+    [1492, "Colombo chega à América", "mundo"], [1498, "Vasco da Gama chega à Índia", "mundo"], [1517, "Lutero publica as 95 teses", "mundo"],
+    [1543, "Copérnico publica a teoria heliocêntrica", "mundo"], [1648, "Paz de Vestfália", "mundo"], [1688, "Revolução Gloriosa na Inglaterra", "mundo"],
+    [1776, "Independência dos Estados Unidos", "mundo"], [1789, "Começa a Revolução Francesa", "mundo"], [1804, "Independência do Haiti", "mundo"],
+    [1815, "Congresso de Viena", "mundo"], [1848, "Publicação do Manifesto Comunista", "mundo"], [1859, "Darwin publica A Origem das Espécies", "mundo"],
+    [1861, "Começa a Guerra de Secessão nos EUA", "mundo"], [1884, "Começa a Conferência de Berlim (partilha da África)", "mundo"], [1914, "Começa a Primeira Guerra Mundial", "mundo"],
+    [1917, "Revolução Russa", "mundo"], [1929, "Quebra da Bolsa de Nova York", "mundo"], [1933, "Hitler chega ao poder na Alemanha", "mundo"],
+    [1939, "Começa a Segunda Guerra Mundial", "mundo"], [1945, "Bombas atômicas em Hiroshima e Nagasaki", "mundo"], [1948, "Declaração Universal dos Direitos Humanos", "mundo"],
+    [1949, "Revolução Chinesa", "mundo"], [1959, "Revolução Cubana", "mundo"], [1961, "Construção do Muro de Berlim", "mundo"],
+    [1962, "Crise dos Mísseis em Cuba", "mundo"], [1969, "Chegada do ser humano à Lua", "mundo"], [1989, "Queda do Muro de Berlim", "mundo"],
+    [1991, "Fim da União Soviética", "mundo"], [1994, "Mandela é eleito na África do Sul", "mundo"], [2001, "Atentados de 11 de setembro nos EUA", "mundo"],
+    [2008, "Crise financeira global", "mundo"], [2011, "Primavera Árabe", "mundo"], [2020, "OMS declara a pandemia de covid-19", "mundo"], [2022, "A Rússia invade a Ucrânia", "mundo"],
+    [1500, "Chegada da esquadra de Cabral ao Brasil", "br"], [1532, "Fundação de São Vicente, a primeira vila", "br"], [1534, "Criação das capitanias hereditárias", "br"],
+    [1549, "Governo-geral de Tomé de Sousa e fundação de Salvador", "br"], [1554, "Fundação de São Paulo pelos jesuítas", "br"], [1565, "Fundação do Rio de Janeiro", "br"],
+    [1630, "Holandeses ocupam Pernambuco", "br"], [1695, "Morte de Zumbi dos Palmares", "br"], [1763, "A capital da colônia passa para o Rio de Janeiro", "br"],
+    [1792, "Execução de Tiradentes", "br"], [1808, "Chegada da família real portuguesa", "br"], [1822, "Independência do Brasil", "br"],
+    [1824, "Primeira Constituição do Brasil", "br"], [1835, "Começa a Revolução Farroupilha", "br"], [1850, "Lei Eusébio de Queirós e Lei de Terras", "br"],
+    [1864, "Começa a Guerra do Paraguai", "br"], [1871, "Lei do Ventre Livre", "br"], [1888, "Lei Áurea abole a escravidão", "br"],
+    [1889, "Proclamação da República", "br"], [1897, "Destruição de Canudos", "br"], [1904, "Revolta da Vacina no Rio de Janeiro", "br"],
+    [1922, "Semana de Arte Moderna", "br"], [1930, "Revolução de 1930 leva Vargas ao poder", "br"], [1932, "Código Eleitoral garante o voto feminino", "br"],
+    [1937, "Começa o Estado Novo", "br"], [1943, "Criação da CLT", "br"], [1953, "Criação da Petrobras", "br"],
+    [1960, "Inauguração de Brasília", "br"], [1964, "Golpe civil-militar", "br"], [1968, "Decretação do AI-5", "br"],
+    [1979, "Lei da Anistia", "br"], [1984, "Campanha das Diretas Já", "br"], [1988, "Promulgação da Constituição Cidadã", "br"],
+    [1992, "Rio-92, conferência da ONU sobre meio ambiente", "br"], [1994, "Lançamento do Plano Real", "br"],
+  ].map(([a, f, t], i) => ({ id: i, a, f, t }));
+  const ANO = (a) => (a < 0 ? `${-a} a.C.` : String(a));
+  let lt = null;
+  function iniciarLt(modo) {
+    const deck = shuffle(FATOS.filter((e) => modo === "tudo" || e.t === modo));
+    if (deck.length < 10 || !gastar()) return;
+    lt = { s: modo, deck, linha: [deck.pop()], atual: deck.pop(), vidas: 3, pts: 0, ac: 0, combo: 0, maxc: 0, erros: [], fim: false, fb: null };
+    desenhar({ entra: true });
+  }
+  function fimLt() {
+    if (!lt || lt.fim) return;
+    lt.fim = true;
+    const j = J(); j.lt = j.lt || { best: {} }; const b = j.lt.best[lt.s] || 0;
+    lt.recorde = lt.pts > b && lt.pts > 0; if (lt.recorde) j.lt.best[lt.s] = lt.pts;
+    save(); render(); contar(); if (lt.recorde) setTimeout(confete, 500);
+  }
+  function colocarLt(k) {
+    if (!lt || lt.fim || lt.fb) return;
+    const L = lt.linha, e = lt.atual;
+    const ok = (k === 0 || L[k - 1].a <= e.a) && (k === L.length || e.a <= L[k].a);
+    let pos = k, ganho = 0;
+    if (ok) { lt.combo++; lt.maxc = Math.max(lt.maxc, lt.combo); ganho = mult(lt.combo); lt.pts += ganho; lt.ac++; }
+    else { lt.combo = 0; lt.vidas--; pos = L.findIndex((x) => x.a > e.a); if (pos < 0) pos = L.length; lt.erros.push({ tt: "Linha do tempo", p: e.f, certo: ANO(e.a) }); }
+    L.splice(pos, 0, e);
+    lt.fb = { ok, id: e.id, ganho };
+    render();
+    const el = document.querySelector(".lt-ok,.lt-bad"); if (el && el.scrollIntoView) el.scrollIntoView({ block: "center", behavior: semMov() ? "auto" : "smooth" });
+    setTimeout(() => {
+      if (!lt || lt.fim) return;
+      lt.fb = null;
+      if (lt.vidas <= 0) { fimLt(); return; }
+      if (!lt.deck.length) { lt.pts += 10; toast("Você colocou todos os fatos! +10 pts"); fimLt(); return; }
+      lt.atual = lt.deck.pop();
+      desenhar({ entra: true });
+      const c = document.querySelector(".lt-cur"); if (c && c.scrollIntoView) c.scrollIntoView({ block: "nearest" });
+    }, ok ? 800 : 1500);
+  }
+  function ltHTML() {
+    if (lt.fim) { const j = J(); return fimHTML(lt, "Linha do tempo", (j.lt && j.lt.best[lt.s]) || 0, `<span><b class="num">${lt.linha.length}</b> fatos na linha</span>`, { tudo: "Brasil e mundo", br: "Brasil", mundo: "Mundo" }[lt.s]) + `<div class="dbtns">${saldo() > 0 ? `<button class="btn" data-ltiniciar="${lt.s}">Jogar de novo (1 ficha)</button>` : `<span class="small muted">Sem fichas: estude para ganhar mais.</span>`}</div></div>`; }
+    const entra = fx.entra ? " rl-in" : "", e = lt.atual;
+    const vidas = [0, 1, 2].map((i) => `<span class="lt-vida${i < lt.vidas ? "" : " off"}${lt.fb && !lt.fb.ok && i === lt.vidas ? " jg-shake" : ""}">${i < lt.vidas ? "❤️" : "🖤"}</span>`).join("");
+    const slot = (k) => `<button class="lt-slot" data-lt="${k}" ${lt.fb ? "disabled" : ""}><span>＋ colocar aqui</span></button>`;
+    const itens = lt.linha.map((x, k) => {
+      const st = lt.fb && lt.fb.id === x.id ? (lt.fb.ok ? " lt-ok jg-pop" : " lt-bad jg-shake") : "";
+      return `${k === 0 ? slot(0) : ""}<div class="lt-ev${st}"><b class="num">${ANO(x.a)}</b><span>${esc(x.f)}</span>${st && lt.fb.ok ? `<span class="jg-float">+${lt.fb.ganho}</span>` : ""}</div>${slot(k + 1)}`;
+    }).join("");
+    return `<div class="rl lt"><div class="tm-top"><button class="btn sm ghost" data-jvolta>Encerrar</button><span class="lt-vidas" aria-label="${lt.vidas} vidas">${vidas}</span>
+        ${lt.combo >= 3 ? `<span class="jg-combo${lt.fb && lt.fb.ok && (lt.combo === 3 || lt.combo === 6) ? " novo" : ""}">🔥 ×${mult(lt.combo)}</span>` : ""}<b class="num jg-pts" style="margin-left:auto">${lt.pts} pts</b></div>
+      <div class="lt-cur${entra}"><span class="small">Onde entra este fato?</span><b>${esc(e.f)}</b><span class="chip">${e.t === "br" ? "Brasil" : "Mundo"}</span></div>
+      <div class="lt-linha">${itens}</div></div>`;
+  }
+
+  /* ===================== Mapa do Brasil ===================== */
+  let mp = null;
+  const REG = ["Norte", "Nordeste", "Centro-Oeste", "Sudeste", "Sul"];
+  function filaMp(modo) {
+    const E = window.MAPA_BR.estados;
+    if (modo === "regioes") return shuffle(Array.from({ length: 30 }, (_, i) => REG[i % 5])).map((r) => ({ texto: `Toque em um estado do ${r}`, certos: E.filter((e) => e.reg === r).map((e) => e.id), resp: r }));
+    return shuffle(E).map((e) => modo === "capitais" ? { texto: `Onde fica ${e.cap}?`, sub: "capital", certos: [e.id], resp: `${e.cap} é a capital de ${e.nome}` } : { texto: `Toque em: ${e.nome}`, certos: [e.id], resp: e.nome });
+  }
+  function iniciarMp(modo) {
+    if (!window.MAPA_BR || !gastar()) return;
+    mp = { s: modo, fila: filaMp(modo), i: 0, pts: 0, ac: 0, combo: 0, maxc: 0, erros: [], fim: false, t0: Date.now(), dur: DUR * 1000, fb: null, achados: {} };
+    desenhar({ entra: true });
+  }
+  function fimMp() {
+    if (!mp || mp.fim) return;
+    mp.fim = true;
+    const j = J(); j.mp = j.mp || { best: {} }; const b = j.mp.best[mp.s] || 0;
+    mp.recorde = mp.pts > b && mp.pts > 0; if (mp.recorde) j.mp.best[mp.s] = mp.pts;
+    save(); render(); contar(); if (mp.recorde) setTimeout(confete, 500);
+  }
+  function clicarMp(id) {
+    if (!mp || mp.fim || mp.fb) return;
+    const q = mp.fila[mp.i], ok = q.certos.includes(id);
+    let ganho = 0;
+    if (ok) { mp.combo++; mp.maxc = Math.max(mp.maxc, mp.combo); ganho = mult(mp.combo); mp.pts += ganho; mp.ac++; mp.dur = Math.min(mp.dur + 1000, Date.now() - mp.t0 + DUR * 1000); if (mp.s !== "regioes") mp.achados[id] = 1; }
+    else { mp.combo = 0; mp.dur -= 2000; mp.erros.push({ tt: "Mapa do Brasil", p: q.texto.replace("Toque em: ", "").replace("Toque em um estado do ", "Região "), certo: q.resp }); }
+    mp.fb = { ok, id, ganho };
+    render();
+    setTimeout(() => {
+      if (!mp || mp.fim) return;
+      mp.fb = null; mp.i++;
+      if (mp.i >= mp.fila.length) { mp.pts += 10; toast("Mapa completo! +10 pts"); mp.fila = filaMp(mp.s); mp.i = 0; mp.achados = {}; }
+      desenhar({ entra: true });
+    }, ok ? 450 : 1300);
+  }
+  function mpHTML() {
+    const nomes = { estados: "Estados", capitais: "Capitais", regioes: "Regiões" };
+    if (mp.fim) { const j = J(); return fimHTML(mp, "Mapa do Brasil", (j.mp && j.mp.best[mp.s]) || 0, "", nomes[mp.s]) + `<div class="dbtns">${saldo() > 0 ? `<button class="btn" data-mpiniciar="${mp.s}">Jogar de novo (1 ficha)</button>` : `<span class="small muted">Sem fichas: estude para ganhar mais.</span>`}</div></div>`; }
+    const q = mp.fila[mp.i], M = window.MAPA_BR, entra = fx.entra ? " rl-in" : "";
+    const cls = (e) => {
+      if (mp.fb) { if (e.id === mp.fb.id) return mp.fb.ok ? " mp-ok" : " mp-bad"; if (!mp.fb.ok && q.certos.includes(e.id)) return " mp-show"; }
+      return mp.achados[e.id] ? " mp-found" : "";
+    };
+    const df = M.estados.find((e) => e.id === "df");
+    return `<div class="rl mp">${hudHTML(mp, "mpT", "mpBar", DUR)}
+      <div class="mp-q${entra}"><b>${esc(q.texto)}</b>${mp.s !== "regioes" ? `<span class="small muted">${Object.keys(mp.achados).length}/27 no mapa</span>` : ""}</div>
+      <svg class="mp-map" viewBox="${M.viewBox}" role="img" aria-label="Mapa do Brasil por estados">${M.estados.map((e) => `<path class="mp-st${cls(e)}" d="${e.d}" data-mp="${e.id}"><title>${mp.fb || mp.achados[e.id] ? esc(e.nome) : "estado"}</title></path>`).join("")}
+        <circle class="mp-hit" cx="${df.cx}" cy="${df.cy}" r="11" data-mp="df"/></svg>
+      <p class="small muted" style="margin:0;text-align:center">${esc(M.credito)}</p></div>`;
+  }
+
+  /* ===================== Química 2048 ===================== */
+  const EL = [null,
+    ["H", "Hidrogênio", "nm", "O elemento mais abundante do Universo e combustível das estrelas."], ["He", "Hélio", "gn", "Gás nobre dos balões: quase não reage com nada."],
+    ["Li", "Lítio", "al", "Metal das baterias de celulares e carros elétricos."], ["Be", "Berílio", "at", "Metal leve usado em ligas aeroespaciais."],
+    ["B", "Boro", "sm", "Semimetal presente no bórax e no vidro que resiste ao calor."], ["C", "Carbono", "nm", "Base da química orgânica: forma grafite, diamante e a vida."],
+    ["N", "Nitrogênio", "nm", "Cerca de 78% do ar; está nas proteínas e no DNA."], ["O", "Oxigênio", "nm", "Cerca de 21% do ar; essencial à respiração celular."],
+    ["F", "Flúor", "ha", "O elemento mais eletronegativo; protege os dentes nas pastas."], ["Ne", "Neônio", "gn", "Brilha em vermelho-alaranjado nos letreiros luminosos."],
+    ["Na", "Sódio", "al", "Com o cloro, forma o sal de cozinha (NaCl)."], ["Mg", "Magnésio", "at", "Fica no centro da molécula de clorofila."],
+    ["Al", "Alumínio", "mt", "O metal mais abundante da crosta, extraído da bauxita."], ["Si", "Silício", "sm", "Base dos chips eletrônicos e da areia (SiO₂)."],
+    ["P", "Fósforo", "nm", "Está no DNA, no ATP e nos fertilizantes."], ["S", "Enxofre", "nm", "Seus óxidos formam a chuva ácida."],
+    ["Cl", "Cloro", "ha", "Desinfeta a água tratada e das piscinas."], ["Ar", "Argônio", "gn", "Cerca de 1% do ar; usado dentro de lâmpadas."],
+    ["K", "Potássio", "al", "Essencial para nervos e músculos; está na banana."], ["Ca", "Cálcio", "at", "Forma ossos, dentes e o calcário."],
+  ];
+  const FAM = { nm: "não metal", gn: "gás nobre", al: "metal alcalino", at: "alcalino-terroso", sm: "semimetal", ha: "halogênio", mt: "metal" };
+  let q2 = null, q2seq = 0;
+  const Q2 = () => { const j = J(); j.q2 = j.q2 || { best: 0, desc: {} }; return j.q2; };
+  function q2vazias() { const v = []; for (let r = 0; r < 4; r++) for (let c = 0; c < 4; c++) if (!q2.g[r][c]) v.push([r, c]); return v; }
+  function q2nova() {
+    const v = q2vazias(); if (!v.length) return null;
+    const [r, c] = v[Math.floor(Math.random() * v.length)];
+    const t = { id: ++q2seq, z: Math.random() < 0.9 ? 1 : 2, r, c, nova: true };
+    q2.g[r][c] = t; return t;
+  }
+  function iniciarQ2() {
+    if (!gastar()) return;
+    q2 = { g: [0, 1, 2, 3].map(() => [null, null, null, null]), pts: 0, fim: false, max: 1, ultimo: null, morrendo: [] };
+    q2nova(); q2nova();
+    render();
+  }
+  function q2podeMover() {
+    if (q2vazias().length) return true;
+    for (let r = 0; r < 4; r++) for (let c = 0; c < 4; c++) { const z = q2.g[r][c].z; if ((c < 3 && q2.g[r][c + 1].z === z) || (r < 3 && q2.g[r + 1][c].z === z)) return true; }
+    return false;
+  }
+  function q2mover(dir) {
+    if (!q2 || q2.fim || q2.anim) return;
+    let moveu = false, ganho = 0; const formados = [];
+    const linhas = [0, 1, 2, 3].map((i) => [0, 1, 2, 3].map((k) => dir === "L" ? [i, k] : dir === "R" ? [i, 3 - k] : dir === "U" ? [k, i] : [3 - k, i]));
+    const g2 = [0, 1, 2, 3].map(() => [null, null, null, null]);
+    linhas.forEach((cells) => {
+      const ts = cells.map(([r, c]) => q2.g[r][c]).filter(Boolean), out = [];
+      ts.forEach((t) => { const u = out[out.length - 1]; if (u && !u.m && u.t.z === t.z) u.m = t; else out.push({ t }); });
+      out.forEach((o, k) => {
+        const [r, c] = cells[k];
+        if (o.t.r !== r || o.t.c !== c) moveu = true;
+        o.t.r = r; o.t.c = c; o.t.nova = false; g2[r][c] = o.t;
+        if (o.m) { moveu = true; o.m.r = r; o.m.c = c; q2.morrendo.push(o.m); o.t.vira = o.t.z + 1; ganho += (o.t.z + 1) * 2; formados.push(o.t.z + 1); }
+      });
+    });
+    if (!moveu) { const b = document.getElementById("q2b"); if (b) { b.classList.remove("jg-shake"); void b.offsetWidth; b.classList.add("jg-shake"); } return; }
+    q2.g = g2; q2.pts += ganho; q2.anim = true;
+    q2pintar();
+    setTimeout(() => {
+      q2.morrendo = [];
+      let novo = null;
+      for (const lin of q2.g) for (const t of lin) if (t && t.vira) { t.z = t.vira; delete t.vira; t.pop = true; q2.max = Math.max(q2.max, t.z); if (!Q2().desc[t.z]) { Q2().desc[t.z] = 1; novo = t.z; } }
+      q2nova();
+      q2.ultimo = novo || q2.ultimo;
+      if (novo) { save(); q2.anuncio = novo; }
+      if (!q2podeMover()) q2fim();
+      q2.anim = false;
+      q2pintar();
+      for (const lin of q2.g) for (const t of lin) if (t) { t.pop = false; t.nova = false; }
+    }, 130);
+  }
+  function q2fim() {
+    q2.fim = true;
+    const d = Q2(); q2.recorde = q2.pts > d.best && q2.pts > 0; if (q2.recorde) d.best = q2.pts;
+    save(); setTimeout(() => { render(); contar(); if (q2.recorde) confete(); }, 400);
+  }
+  const q2tile = (t, morre) => {
+    const e = EL[Math.min(t.z, 20)] || ["?", "?", "mt"];
+    return `<div class="q2-t q2-${e[2]}${t.nova ? " q2-nova" : ""}${t.pop ? " q2-pop" : ""}${morre ? " q2-morre" : ""}" data-t="${t.id}" style="--r:${t.r};--c:${t.c}"><b>${e[0]}</b><span>${t.z}</span></div>`;
+  };
+  function q2tiles() { const out = []; q2.g.forEach((lin) => lin.forEach((t) => t && out.push(q2tile(t)))); q2.morrendo.forEach((t) => out.push(q2tile(t, true))); return out.join(""); }
+  // atualiza só o tabuleiro, para os blocos deslizarem
+  function q2pintar() {
+    const b = document.getElementById("q2b"); if (!b) return;
+    const vivos = {}; q2.g.forEach((lin) => lin.forEach((t) => t && (vivos[t.id] = t))); q2.morrendo.forEach((t) => (vivos[t.id] = t));
+    b.querySelectorAll(".q2-t").forEach((el) => { if (!vivos[el.dataset.t]) el.remove(); });
+    Object.values(vivos).forEach((t) => {
+      let el = b.querySelector(`[data-t="${t.id}"]`);
+      const html = q2tile(t, q2.morrendo.includes(t));
+      if (!el) { b.insertAdjacentHTML("beforeend", html); return; }
+      const tmp = document.createElement("div"); tmp.innerHTML = html; const n = tmp.firstChild;
+      el.style.setProperty("--r", t.r); el.style.setProperty("--c", t.c);
+      if (el.innerHTML !== n.innerHTML || el.className !== n.className) { el.className = n.className; el.innerHTML = n.innerHTML; }
+    });
+    const p = document.getElementById("q2pts"); if (p) p.textContent = q2.pts + " pts";
+    if (q2.anuncio) { const a = document.getElementById("q2info"); if (a) a.outerHTML = q2info(q2.anuncio, true); q2.anuncio = null; const t = document.getElementById("q2tab"); if (t) t.outerHTML = q2tabela(); }
+  }
+  function q2info(z, novo) {
+    if (!z) return `<div id="q2info" class="q2-info"><span class="small muted">Junte dois blocos iguais para formar o próximo elemento da tabela periódica: H + H = He, He + He = Li…</span></div>`;
+    const e = EL[z];
+    return `<div id="q2info" class="q2-info${novo ? " jg-in" : ""}"><span class="q2-mini q2-${e[2]}"><b>${e[0]}</b></span><div><b>${novo ? "Novo elemento: " : ""}${e[1]} (Z = ${z})</b><span class="small muted"> · ${FAM[e[2]]}</span><br><span class="small">${e[3]}</span></div></div>`;
+  }
+  function q2tabela() {
+    const d = Q2().desc;
+    return `<div id="q2tab" class="q2-tab" aria-label="Elementos descobertos">${EL.slice(1).map((e, i) => d[i + 1] || i === 0 ? `<span class="q2-mini q2-${e[2]}" title="${e[1]}"><b>${e[0]}</b></span>` : `<span class="q2-mini q2-lock" title="ainda não descoberto">?</span>`).join("")}</div>`;
+  }
+  function q2HTML() {
+    if (q2.fim) {
+      const e = EL[q2.max];
+      return `<div class="rl"><div class="tm-top"><button class="btn sm ghost" data-jvolta>← Jogos</button><b>Química 2048</b></div>
+        <div class="rl-fim jg-in"><div class="h-big num jg-score" data-contar="${q2.pts}">0</div><b>${q2.recorde ? "Novo recorde! 🏆" : `pontos · recorde: ${Q2().best}`}</b>
+          <div class="jg-stats"><span>Maior elemento: <b>${e[1]} (${e[0]})</b></span></div></div>
+        ${q2info(q2.max)}<h3 style="font-size:15px;margin:4px 0 0">Seus elementos descobertos</h3>${q2tabela()}
+        <div class="dbtns">${saldo() > 0 ? `<button class="btn" data-jq2>Jogar de novo (1 ficha)</button>` : `<span class="small muted">Sem fichas: estude para ganhar mais.</span>`}</div></div>`;
+    }
+    return `<div class="rl q2"><div class="tm-top"><button class="btn sm ghost" data-jvolta>Encerrar</button><b>Química 2048</b><b class="num" id="q2pts" style="margin-left:auto">${q2.pts} pts</b></div>
+      <div class="q2-b" id="q2b" aria-label="Tabuleiro: use as setas do teclado ou deslize o dedo">${[...Array(16)].map((_, i) => `<span class="q2-cel" style="--r:${Math.floor(i / 4)};--c:${i % 4}"></span>`).join("")}${q2tiles()}</div>
+      <div class="q2-setas"><button class="btn sm ghost" data-q2="L" aria-label="Esquerda">←</button><button class="btn sm ghost" data-q2="U" aria-label="Cima">↑</button><button class="btn sm ghost" data-q2="D" aria-label="Baixo">↓</button><button class="btn sm ghost" data-q2="R" aria-label="Direita">→</button></div>
+      ${q2info(q2.ultimo)}${q2tabela()}</div>`;
+  }
+  let toque = null;
+  document.addEventListener("touchstart", (e) => { if (e.target.closest && e.target.closest("#q2b")) { const t = e.touches[0]; toque = [t.clientX, t.clientY]; } }, { passive: true });
+  document.addEventListener("touchend", (e) => {
+    if (!toque) return; const t = e.changedTouches[0], dx = t.clientX - toque[0], dy = t.clientY - toque[1]; toque = null;
+    if (Math.max(Math.abs(dx), Math.abs(dy)) < 28) return;
+    q2mover(Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? "R" : "L") : dy > 0 ? "D" : "U");
+  });
+
   /* relógio dos jogos com tempo */
   setInterval(() => {
-    [[rel, "rlT", "rlBar", fimRel], [lig, "lgT", "lgBar", fimLig]].forEach(([st, idT, idB, fim]) => {
+    [[rel, "rlT", "rlBar", fimRel], [lig, "lgT", "lgBar", fimLig], [mp, "mpT", "mpBar", fimMp]].forEach(([st, idT, idB, fim]) => {
       if (!st || st.fim) return;
       const left = restante(st), t = document.getElementById(idT), b = document.getElementById(idB);
       if (t) { t.textContent = "⏱ " + Math.ceil(left) + " s"; t.classList.toggle("low", left <= 10); }
@@ -413,6 +669,9 @@
     if (tela === "termo" && termo) return termoHTML();
     if (tela === "rel" && rel) return relHTML();
     if (tela === "lig" && lig) return ligHTML();
+    if (tela === "lt" && lt) return ltHTML();
+    if (tela === "mp" && mp) return mpHTML();
+    if (tela === "q2" && q2) return q2HTML();
     const g = ganhos(), sal = saldo(), j = J(), hoje = j.termo[todayKey()];
     const todas = ["Todas", ...new Set(ALL_MODS.map((m) => m.s))];
     const subjs = todas.filter((s) => s === "Todas" || perguntas(s).length >= 8);
@@ -432,14 +691,20 @@
       <div class="jg-card" style="--g1:#A78BFA;--g2:#6D28D9"><div class="jg-ic" aria-hidden="true" style="animation-delay:.8s">🔗</div><h3>Ligue os pares</h3><p>Ligue cada termo à sua definição antes do tempo acabar. Pares certos somem, rodadas novas aparecem e o relógio ganha +2 s a cada acerto.</p>
         <div class="jg-foot"><select id="ligSubj" aria-label="Matéria do Ligue os pares">${subjsL.map((s) => `<option value="${esc(s)}">${s === "Todas" ? "Todas as matérias" : esc(s)}${lb[s] ? ` · recorde ${lb[s]}` : ""}</option>`).join("")}</select>
           <button class="btn" data-jlig ${sal < 1 ? "disabled" : ""}>Jogar · 1 ficha</button></div></div>
-    </div>
-    <div class="row-head"><h2 class="h-sec">Em breve</h2></div>
-    <div class="jg-soon">${[["🕰️", "Linha do tempo", "ponha os fatos históricos na ordem"], ["🗺️", "Mapa do Brasil", "estados, capitais e biomas"], ["⚗️", "Química 2048", "junte elementos e monte moléculas"]].map(([i, n, d]) => `<div class="jg-s"><span aria-hidden="true">${i}</span><b>${n}</b><span class="small muted">${d}</span></div>`).join("")}</div>`;
+    <div class="jg-card" style="--g1:#38BDF8;--g2:#1D4ED8"><div class="jg-ic" aria-hidden="true" style="animation-delay:1.2s">🕰️</div><h3>Linha do tempo</h3><p>Coloque cada fato histórico no lugar certo da linha do tempo. Você tem 3 vidas, e acertos seguidos multiplicam os pontos.</p>
+        <div class="jg-foot"><select id="ltModo" aria-label="Fatos da linha do tempo">${[["tudo", "Brasil e mundo"], ["br", "História do Brasil"], ["mundo", "História geral"]].map(([v, n]) => `<option value="${v}">${n}${(j.lt && j.lt.best[v]) ? ` · recorde ${j.lt.best[v]}` : ""}</option>`).join("")}</select>
+          <button class="btn" data-jlt ${sal < 1 ? "disabled" : ""}>Jogar · 1 ficha</button></div></div>
+      <div class="jg-card" style="--g1:#2DD4BF;--g2:#0F766E"><div class="jg-ic" aria-hidden="true" style="animation-delay:1.6s">🗺️</div><h3>Mapa do Brasil</h3><p>Ache estados, capitais e regiões no mapa contra o relógio. Errou? O estado certo pisca para você aprender.</p>
+        <div class="jg-foot"><select id="mpModo" aria-label="Modo do mapa">${[["estados", "Estados"], ["capitais", "Capitais"], ["regioes", "Regiões"]].map(([v, n]) => `<option value="${v}">${n}${(j.mp && j.mp.best[v]) ? ` · recorde ${j.mp.best[v]}` : ""}</option>`).join("")}</select>
+          <button class="btn" data-jmp ${sal < 1 ? "disabled" : ""}>Jogar · 1 ficha</button></div></div>
+      <div class="jg-card" style="--g1:#F472B6;--g2:#BE185D"><div class="jg-ic" aria-hidden="true" style="animation-delay:2s">⚗️</div><h3>Química 2048</h3><p>Deslize os blocos e junte elementos iguais para formar o próximo da tabela periódica: H + H vira He, até chegar ao Cálcio. Cada elemento novo traz uma curiosidade.</p>
+        <div class="jg-foot"><button class="btn" data-jq2 ${sal < 1 ? "disabled" : ""}>Jogar · 1 ficha</button>${(j.q2 && j.q2.best) ? `<span class="small">recorde ${j.q2.best} · ${Object.keys(j.q2.desc || {}).length + 1}/20 elementos</span>` : ""}</div></div>
+    </div>`;
   };
 
   /* ===================== eventos ===================== */
   document.addEventListener("click", (e) => {
-    const t = e.target.closest("[data-jtermo],[data-jtreino],[data-jrel],[data-jlig],[data-jvolta],[data-tmk],[data-tmdica],[data-relop],[data-reliniciar],[data-liginiciar],[data-lg]");
+    const t = e.target.closest("[data-jtermo],[data-jtreino],[data-jrel],[data-jlig],[data-jvolta],[data-tmk],[data-tmdica],[data-relop],[data-reliniciar],[data-liginiciar],[data-lg],[data-jlt],[data-ltiniciar],[data-lt],[data-jmp],[data-mpiniciar],[data-mp],[data-jq2],[data-q2]");
     if (!t) return;
     const d = t.dataset;
     if (d.jtermo !== undefined) { if (novoTermo(true)) { tela = "termo"; render(); } return; }
@@ -448,10 +713,21 @@
     if (d.reliniciar !== undefined) { rel = null; tela = "rel"; iniciarRel(d.reliniciar); if (!rel) { tela = "home"; render(); } return; }
     if (d.jlig !== undefined) { lig = null; tela = "lig"; iniciarLig(document.getElementById("ligSubj").value); if (!lig) tela = "home"; return; }
     if (d.liginiciar !== undefined) { lig = null; tela = "lig"; iniciarLig(d.liginiciar); if (!lig) { tela = "home"; render(); } return; }
+    if (d.jlt !== undefined) { lt = null; tela = "lt"; iniciarLt(document.getElementById("ltModo").value); if (!lt) tela = "home"; return; }
+    if (d.ltiniciar !== undefined) { lt = null; tela = "lt"; iniciarLt(d.ltiniciar); if (!lt) { tela = "home"; render(); } return; }
+    if (d.lt !== undefined) { colocarLt(+d.lt); return; }
+    if (d.jmp !== undefined) { mp = null; tela = "mp"; iniciarMp(document.getElementById("mpModo").value); if (!mp) tela = "home"; return; }
+    if (d.mpiniciar !== undefined) { mp = null; tela = "mp"; iniciarMp(d.mpiniciar); if (!mp) { tela = "home"; render(); } return; }
+    if (d.mp) { clicarMp(d.mp); return; }
+    if (d.jq2 !== undefined) { q2 = null; tela = "q2"; iniciarQ2(); if (!q2) { tela = "home"; render(); } return; }
+    if (d.q2) { q2mover(d.q2); return; }
     if (d.jvolta !== undefined) {
       if (tela === "rel" && rel && !rel.fim) { fimRel(); return; }
       if (tela === "lig" && lig && !lig.fim) { fimLig(); return; }
-      tela = "home"; rel = null; lig = null; render(); return;
+      if (tela === "lt" && lt && !lt.fim) { fimLt(); return; }
+      if (tela === "mp" && mp && !mp.fim) { fimMp(); return; }
+      if (tela === "q2" && q2 && !q2.fim) { q2fim(); return; }
+      tela = "home"; rel = null; lig = null; lt = null; mp = null; q2 = null; render(); return;
     }
     if (d.tmk) { tecla(d.tmk); return; }
     if (d.tmdica !== undefined) { termo.dica = true; salvarTermo(); render(); return; }
@@ -459,6 +735,11 @@
     if (d.lg) { const [lado, id] = d.lg.split("|"); clicarLig(lado, +id); return; }
   });
   document.addEventListener("keydown", (e) => {
+    if (typeof VIEW !== "undefined" && VIEW === "jogos" && tela === "q2" && q2 && !q2.fim && !/INPUT|TEXTAREA|SELECT/.test(e.target.tagName)) {
+      const dir = { ArrowLeft: "L", ArrowRight: "R", ArrowUp: "U", ArrowDown: "D", a: "L", d: "R", w: "U", s: "D" }[e.key];
+      if (dir) { e.preventDefault(); q2mover(dir); }
+      return;
+    }
     if (typeof VIEW === "undefined" || VIEW !== "jogos" || tela !== "termo" || !termo || termo.fim) return;
     if (/INPUT|TEXTAREA|SELECT/.test(e.target.tagName) || e.ctrlKey || e.metaKey || e.altKey) return;
     let k = e.key;
@@ -544,11 +825,45 @@
 @keyframes jg-coin{0%,70%,100%{transform:rotateY(0)}85%{transform:rotateY(180deg)}}
 @keyframes jg-wiggle{0%,85%,100%{transform:rotate(0)}88%{transform:rotate(-4deg)}92%{transform:rotate(4deg)}96%{transform:rotate(-2deg)}}
 @media (max-width:560px){.lg-cols{grid-template-columns:minmax(0,1fr) minmax(0,1.2fr);gap:8px}.lg-it{font-size:13px;padding:9px 10px}.jg-score{font-size:52px}}
+
+.lt-vidas{font-size:18px;letter-spacing:2px}.lt-vida.off{opacity:.45}
+.lt-cur{border:2px solid var(--ink);border-radius:18px;padding:14px;background:var(--butter);display:flex;flex-direction:column;gap:6px;position:sticky;top:8px;z-index:2;box-shadow:0 10px 20px -12px rgba(0,0,0,.4)}
+.lt-cur b{font-size:18px;line-height:1.3}.lt-cur .chip{align-self:flex-start}
+.lt-linha{display:flex;flex-direction:column;gap:4px;border-left:3px solid var(--violet);margin-left:10px;padding-left:12px}
+.lt-ev{position:relative;border:1.5px solid var(--line);border-radius:14px;padding:8px 12px;background:var(--white);display:flex;gap:10px;align-items:baseline}
+.lt-ev::before{content:"";position:absolute;left:-20px;top:14px;width:11px;height:11px;border-radius:50%;background:var(--violet);border:2px solid var(--panel)}
+.lt-ev b{min-width:68px;font-family:var(--display);font-weight:800}
+.lt-ok{background:#DCFCE7;border-color:#16A34A}.lt-bad{background:#FEE2E2;border-color:var(--bad)}
+.lt-slot{border:1.5px dashed var(--violet);border-radius:10px;background:transparent;color:var(--violet);font:inherit;font-weight:700;font-size:13px;padding:5px;cursor:pointer;transition:background .15s,transform .15s}
+.lt-slot:hover:not(:disabled){background:var(--lav);transform:scale(1.02)}.lt-slot:disabled{opacity:.35}
+.mp-q{border:1.5px solid var(--line);border-radius:16px;padding:12px 14px;background:var(--white);display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap}.mp-q b{font-size:18px}
+.mp-map{width:100%;max-width:520px;margin:0 auto;display:block;touch-action:manipulation}
+.mp-st{fill:#E8F5EE;stroke:var(--ink);stroke-width:1;cursor:pointer;transition:fill .2s}
+.mp-st:hover{fill:#C6F0D6}
+.mp-found{fill:#86EFAC}
+.mp-ok{fill:#22C55E;animation:mp-flash .45s}
+.mp-bad{fill:#F87171}
+.mp-show{fill:#FACC15;animation:mp-pulse .5s ease-in-out 2}
+.mp-hit{fill:transparent;cursor:pointer}
+@keyframes mp-flash{50%{fill:#BBF7D0}}@keyframes mp-pulse{50%{fill:#FEF08A}}
+.q2{max-width:460px}
+.q2-b{position:relative;width:100%;aspect-ratio:1;background:#3B3547;border-radius:18px;touch-action:none;user-select:none}
+.q2-cel,.q2-t{position:absolute;left:0;top:0;width:calc((100% - 50px)/4);height:calc((100% - 50px)/4);border-radius:12px;transform:translate(calc(10px + var(--c) * (100% + 10px)),calc(10px + var(--r) * (100% + 10px)))}
+.q2-b{--gap:10px}.q2-cel{background:rgba(255,255,255,.1)}
+.q2-t{display:flex;flex-direction:column;align-items:center;justify-content:center;transition:transform .12s ease-in-out;color:#fff;box-shadow:inset 0 -4px 0 rgba(0,0,0,.18)}
+.q2-t b{font-family:var(--display);font-weight:800;font-size:clamp(20px,7vw,34px);line-height:1}.q2-t span{font-size:11px;opacity:.85;margin-top:2px}
+.q2-nova{animation:q2-nova .2s ease-out}.q2-pop{animation:q2-pop .2s ease-out}.q2-morre{z-index:0;opacity:.9}
+.q2-nm{background:#6366F1}.q2-gn{background:#A855F7}.q2-al{background:#EF4444}.q2-at{background:#F97316}.q2-sm{background:#14B8A6}.q2-ha{background:#22C55E}.q2-mt{background:#64748B}.q2-lock{background:var(--hair);color:var(--muted)}
+.q2-setas{display:flex;gap:8px;justify-content:center}
+.q2-info{display:flex;gap:10px;align-items:center;border:1.5px solid var(--line);border-radius:14px;padding:10px 12px;background:var(--white)}
+.q2-mini{width:38px;height:38px;border-radius:9px;display:grid;place-items:center;color:#fff;flex:none;font-size:14px}.q2-mini b{font-family:var(--display);font-weight:800}
+.q2-tab{display:grid;grid-template-columns:repeat(10,minmax(0,1fr));gap:4px}.q2-tab .q2-mini{width:auto;height:auto;aspect-ratio:1;font-size:12px}
+@keyframes q2-nova{from{opacity:0;scale:.3}}@keyframes q2-pop{50%{scale:1.18}}
 `;
   const st = document.createElement("style");
   st.textContent = css;
   document.head.appendChild(st);
 
   window.JOGOS_PALAVRAS = P;
-  window.jogosEstado = () => ({ tela, rel, lig, termo });
+  window.jogosEstado = () => ({ tela, rel, lig, termo, lt, mp, q2 });
 })();
