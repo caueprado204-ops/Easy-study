@@ -1104,6 +1104,7 @@ ex:["Um viajante diz que a comida de outro país é 'nojenta' por ser diferente 
 <script src="conteudo/dissertativas.js"></script>
 <script src="app/easier-loader.js"></script>
 <script src="app/musica.js"></script>
+<script src="app/jogos.js"></script>
 <script src="app/gps-lab.js"></script>
 <script src="app/disc.js"></script>
 <script src="app/cartoes.js"></script>
@@ -1233,9 +1234,10 @@ const I={
  simulados:'<path d="M9 3h6M12 3v3"/><circle cx="12" cy="14" r="7"/><path d="M12 10v4l3 2"/>',
  redacao:'<path d="M4 20h4L19 9l-4-4L4 16z"/><path d="m13 7 4 4"/>',
  rotina:'<rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/>',
- foco:'<path d="M9 18V6l11-2v12"/><circle cx="6" cy="18" r="3"/><circle cx="17" cy="16" r="3"/>'
+ foco:'<path d="M9 18V6l11-2v12"/><circle cx="6" cy="18" r="3"/><circle cx="17" cy="16" r="3"/>',
+ jogos:'<rect x="2.5" y="7" width="19" height="11" rx="5"/><path d="M7 10.5v4M5 12.5h4"/><circle cx="15.5" cy="11.5" r="1"/><circle cx="18" cy="13.5" r="1"/>'
 };
-const LABEL={planos:"Planos",conta:"Minha conta",painel:"Painel",gps:"GPS de Estudos",erros:"Laboratório de Erros",modulos:"Módulos",aulas:"Videoaulas",flash:"Flashcards",questoes:"Questões",simulados:"Simulados e provas",redacao:"Redação",rotina:"Rotina e calendário",foco:"Foco e música"};
+const LABEL={jogos:"Jogos",planos:"Planos",conta:"Minha conta",painel:"Painel",gps:"GPS de Estudos",erros:"Laboratório de Erros",modulos:"Módulos",aulas:"Videoaulas",flash:"Flashcards",questoes:"Questões",simulados:"Simulados e provas",redacao:"Redação",rotina:"Rotina e calendário",foco:"Foco e música"};
 const svg=(p,s=21)=>`<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${p}</svg>`;
 const FLAME='<svg viewBox="0 0 24 24"><path d="M12 2c1 4 5 5.5 5 11a5 5 0 0 1-10 0c0-2.5 1.2-4 2.5-5 .2 2 1.2 3 2.5 3-1.5-3 0-6 0-9z" fill="#FF5B37" stroke="#1C1B1A" stroke-width="1.5" stroke-linejoin="round"/></svg>';
 const STAR=(c,s,x,y,r=0)=>`<svg class="star" style="width:${s}px;height:${s}px;${x};${y};transform:rotate(${r}deg)" viewBox="0 0 40 40"><g fill="${c}">${[0,45,90,135].map(a=>`<rect x="17" y="2" width="6" height="36" rx="3" transform="rotate(${a} 20 20)"/>`).join("")}</g></svg>`;
@@ -1347,7 +1349,7 @@ function showLanding(on){
   if(on) renderLanding();
   window.scrollTo({top:0});
 }
-const NAV_ORDER=["painel","gps","modulos","aulas","flash","questoes","erros","simulados","redacao","rotina","foco","planos","conta"];
+const NAV_ORDER=["painel","gps","modulos","aulas","flash","questoes","erros","simulados","redacao","rotina","foco","jogos","planos","conta"];
 function buildNav(){const livre=!ACC||planoAtual();document.getElementById("nav").innerHTML=NAV_ORDER.filter(k=>livre||VIEWS_SEM_PLANO.includes(k)).map(k=>`<button data-go="${k}" aria-label="${LABEL[k]}" class="${k===VIEW?"on":""}">${svg(I[k])}<span class="tip">${LABEL[k]}</span></button>`).join("")+`<span class="sep"></span><button class="navbtn" data-logout aria-label="Sair da conta">${svg('<path d="M15 4h4v16h-4"/><path d="M10 8l-4 4 4 4M6 12h10"/>')}<span class="tip">Sair da conta</span></button>`;}
 function go(v){if(ACC&&!planoAtual()&&!VIEWS_SEM_PLANO.includes(v)){toast("Assine um plano para liberar a plataforma.");v="planos";}VIEW=v;buildNav();render();try{history.replaceState(null,"","#"+v);}catch(e){}window.scrollTo({top:0});}
 function paintTop(){
@@ -1429,7 +1431,7 @@ function mdBlock(t){
 
 /* ---------- render ---------- */
 function render(){
-  const map={planos:vPlanos,conta:vConta,painel:vPainel,gps:()=>window.vGPS(),erros:()=>window.vErros(),modulos:vModulos,aulas:vAulas,flash:vFlash,questoes:vQuestoes,simulados:vSimulados,redacao:vRedacao,rotina:vRotina,foco:vFoco};
+  const map={planos:vPlanos,conta:vConta,painel:vPainel,gps:()=>window.vGPS(),erros:()=>window.vErros(),modulos:vModulos,aulas:vAulas,flash:vFlash,questoes:vQuestoes,simulados:vSimulados,redacao:vRedacao,rotina:vRotina,foco:vFoco,jogos:()=>window.vJogos()};
   document.getElementById("view").innerHTML=map[VIEW]();
   if(VIEW==="foco")paintPomo();
   if(VIEW==="aulas")prepararThumbs();
