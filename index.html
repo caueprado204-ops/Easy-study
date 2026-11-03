@@ -1097,6 +1097,7 @@ ex:["Um viajante diz que a comida de outro país é 'nojenta' por ser diferente 
 <script src="conteudo/extras-exatas-linguagens.js"></script>
 <script src="conteudo/extras-humanas.js"></script>
 <script src="conteudo/dissertativas.js"></script>
+<script src="app/easier-loader.js"></script>
 <script src="app/gps-lab.js"></script>
 <script src="app/disc.js"></script>
 <script src="app/cartoes.js"></script>
@@ -1572,7 +1573,7 @@ function vReader(m){
         <div class="eyebrow">Aprofundar</div><h2 style="font-size:20px">Aula completa com a Easier</h2>
         ${lesson?`<div class="prose" id="aiText">${mdBlock(lesson)}</div><div class="lnav-row"><button class="btn ghost sm" data-ailesson="${m.id}" data-regen="1">Gerar de novo</button></div>`
         :`<p class="muted" style="margin:0 0 10px">Uma aula longa sobre ${esc(mm.t)}, com explicação passo a passo, como cai no ENEM, FUVEST e Unicamp, exemplos e exercícios com gabarito.</p>
-          <div id="aiText" class="prose"></div><button class="btn violet" data-ailesson="${m.id}" ${modState.aiBusy?"disabled":""}>${modState.aiBusy?"Escrevendo a aula…":"Gerar aula completa"}</button>`}
+          <div id="aiText" class="prose">${modState.aiBusy&&ezAtivo("aula:"+m.id)?ezLoader("aula:"+m.id,"aula"):""}</div><button class="btn violet" data-ailesson="${m.id}" ${modState.aiBusy?"disabled":""}>${modState.aiBusy?"Escrevendo a aula…":"Gerar aula completa"}</button>`}
       </div>
     </div>
     <aside class="side">
@@ -1580,7 +1581,7 @@ function vReader(m){
       <div class="card"><h4>Videoaula</h4>${vPrevHTML(m.id)}<p class="small muted" style="margin:8px 0 0">${KHAN_SUBJ.includes(m.s)?"Khan Academy Brasil":"Aula do YouTube"}, sem sair do Easy Study.</p></div>
       <div class="card"><h4>Tire uma dúvida</h4>
         <form class="ask" id="askForm"><input class="inp" id="askInput" placeholder="Ex.: o que é codominância?" value="${esc(modState.ask)}"><button class="btn sm" ${modState.askBusy?"disabled":""}>Perguntar</button></form>
-        <div id="askOut">${modState.askOut?`<div class="ai-out small">${mdBlock(modState.askOut)}</div>`:""}</div>
+        <div id="askOut">${modState.askBusy&&ezAtivo("duvida")?ezLoader("duvida","duvida"):modState.askOut?`<div class="ai-out small">${mdBlock(modState.askOut)}</div>`:""}</div>
       </div>
       <div class="card"><h4>Pesquisar mais</h4><div class="linklist">
         <a href="https://www.google.com/search?q=${q}" target="_blank" rel="noopener"><span class="ic" style="background:var(--white)">G</span>Pesquisar no Google</a>
@@ -1610,7 +1611,7 @@ async function genLesson(id){
   const sample=await getSample();
   const box=()=>document.getElementById("aiText");
   if(!sample){if(box())box().innerHTML=`<p class="muted">A Easier está indisponível agora. Tente de novo em instantes.</p>`;return;}
-  modState.aiBusy=true; delete S.lessons[id]; render(); if(box())box().innerHTML="<p class='muted'>Pensando na melhor forma de explicar…</p>";
+  modState.aiBusy=true; delete S.lessons[id]; ezStart("aula:"+id,"aula"); render(); if(box())box().innerHTML=ezLoader("aula:"+id,"aula");
   const prompt=`Seu nome é Easier, a tutora de IA da plataforma Easy Study. Você é uma professora de cursinho pré-vestibular no Brasil. ${cursoAluno()} Escreva uma aula completa e didática sobre "${mm.t}" (${m.s}), para um aluno que se prepara para ENEM, FUVEST, Unicamp e Unesp.
 
 Use este resumo da plataforma como base e aprofunde muito além dele:
@@ -1627,19 +1628,19 @@ Estrutura obrigatória, com títulos começando por "## ":
 
 Escreva em português do Brasil, em markdown simples (só "## " para títulos, "- " para listas e **negrito**). Seja correto cientificamente. Entre 900 e 1400 palavras.`;
   try{
-    const {text}=await sample(prompt,{modelTier:"default",cache:false,kb:m.s==="Redação"?"redacao":undefined,onText:({text})=>{if(box())box().innerHTML=mdBlock(text);}});
-    S.lessons[id]=text; save(); addXP(10);
-  }catch(e){if(e&&e.text){S.lessons[id]=e.text;save();}else if(box())box().innerHTML=`<p class="muted">${esc(errMsg(e))}</p>`;}
+    const {text}=await sample(prompt,{modelTier:"default",cache:false,kb:m.s==="Redação"?"redacao":undefined,onText:({text})=>{if(box())box().innerHTML=mdBlock(text)+ezWriting(text.split(/\s+/).length);}});
+    S.lessons[id]=text; save(); addXP(10); ezDone("aula:"+id,true);
+  }catch(e){ezDone("aula:"+id,false);if(e&&e.text){S.lessons[id]=e.text;save();}else if(box())box().innerHTML=`<p class="muted">${esc(errMsg(e))}</p>`;}
   modState.aiBusy=false; if(VIEW==="modulos"&&modState.id===id) render();
 }
 async function askQuestion(){
   const m=MODMAP[modState.id]; const mm=MOD[m.s][m.i]; const qtext=modState.ask.trim(); if(!qtext) return;
   const sample=await getSample(); const out=()=>document.getElementById("askOut");
   if(!sample){modState.askOut="A Easier está indisponível agora. Tente de novo em instantes.";render();return;}
-  modState.askBusy=true; if(out())out().innerHTML=`<div class="ai-out small">Pensando…</div>`;
+  modState.askBusy=true; ezStart("duvida","duvida"); if(out())out().innerHTML=ezLoader("duvida","duvida");
   const prompt=`Seu nome é Easier, a tutora de IA da plataforma Easy Study, professora de cursinho pré-vestibular. ${cursoAluno()} Se perguntarem quem você é, diga que é a Easier. O aluno está estudando o módulo "${mm.t}" de ${m.s}. Conteúdo do módulo:\n${mm.s.map(x=>x[0]+": "+x[1]).join("\n")}\n\nPergunta do aluno: ${qtext}\n\nResponda em português do Brasil, de forma clara e correta, em até 150 palavras, com um exemplo se ajudar. Use texto simples ou "- " para listas.`;
-  try{const {text}=await sample(prompt,{modelTier:"default",kb:m.s==="Redação"?"redacao":undefined,onText:({text})=>{if(out())out().innerHTML=`<div class="ai-out small">${mdBlock(text)}</div>`;}});modState.askOut=text;}
-  catch(e){modState.askOut=(e&&e.text)||errMsg(e);}
+  try{const {text}=await sample(prompt,{modelTier:"default",kb:m.s==="Redação"?"redacao":undefined,onText:({text})=>{if(out())out().innerHTML=`<div class="ai-out small">${mdBlock(text)}${ezWriting()}</div>`;}});modState.askOut=text;ezDone("duvida",true);}
+  catch(e){ezDone("duvida",false);modState.askOut=(e&&e.text)||errMsg(e);}
   modState.askBusy=false; if(VIEW==="modulos")render();
 }
 
@@ -1968,7 +1969,7 @@ function vRedacao(){const txt=S.essayDraft||"",lines=txt.trim()?lineEstimate(txt
     <p class="note" style="margin:0">A correção automática é instantânea e não usa IA. A da Easier dá nota por competência e comentários. As duas são treino, não nota oficial.</p>
   </div><div id="essayOut">${essayOutHTML()}</div></div>`;}
 function essayOutHTML(){const r=essayResult;let top="";
-  if(essayBusy)top=`<div class="card"><b>Lendo sua redação…</b><p class="muted small">A correção completa leva de 20 a 60 segundos.</p></div>`;
+  if(essayBusy)top=ezLoader("redacao","redacao");
   else if(r&&r.error)top=`<div class="card" style="border-color:var(--orange)">${esc(r.error)}${autoResult?`<div class="small muted" style="margin-top:6px">Enquanto isso, veja a correção automática.</div>`:""}</div>`;
   else if(r){const names=["Norma-padrão","Proposta e repertório","Argumentação","Coesão","Intervenção"];
     top=`<div class="score"><div class="h-big num">${r.total}</div><div><b>Nota estimada pela Easier</b><br><span class="small">${esc(r.resumo||"")}</span></div></div>
@@ -1983,7 +1984,7 @@ async function correctEssay(){
   if(text.split(/\s+/).length<80){toast("Escreva pelo menos umas 80 palavras para corrigir.");return;}
   if(!theme){toast("Escolha ou escreva um tema.");return;}
   const sample=await getSample();
-  essayBusy=true;essayResult=null;render();
+  essayBusy=true;essayResult=null;ezStart("redacao","redacao");render();
   const prompt=`Seu nome é Easier, a corretora de IA da plataforma Easy Study. Corrija a redação abaixo exatamente como um corretor oficial do ENEM, aplicando as grades a seguir com rigor. Para cada competência, identifique o nível (0 a 5) pelos descritores, aplique as regras de limite e cite trechos curtos do texto que justificam a nota. Comentários em português do Brasil, objetivos e úteis para o aluno melhorar.
 
 ${sample&&sample.server?"Use a BASE DE CRITÉRIOS da redação que você recebeu.":RUBRICA}
@@ -2001,7 +2002,7 @@ As notas de cada competência são 0, 40, 80, 120, 160 ou 200. Em elementos_c5, 
   let failed=false;
   try{if(!sample)throw {code:"server"};const r=await sample.json(prompt,{modelTier:"default",kb:"redacao",tipo:"redacao"});r.competencias=(r.competencias||[]).slice(0,5).map(c=>({nota:Math.max(0,Math.min(200,Math.round((+c.nota||0)/40)*40)),nivel:String(c.nivel||""),comentario:String(c.comentario||"")}));r.total=r.competencias.reduce((a,c)=>a+c.nota,0);essayResult=r;S.essays.push({theme,total:r.total,date:Date.now()});addXP(40);save();}
   catch(e){essayResult={error:errMsg(e)};failed=true;}
-  essayBusy=false;
+  ezDone("redacao",!failed);essayBusy=false;
   // se a IA falhar, a correção automática entra no lugar
   if(failed&&!autoResult){autoResult=analyzeEssay(text,theme);grammar=null;if(VIEW==="redacao")render();checkGrammar(text);return;}
   if(VIEW==="redacao")render();
@@ -2099,7 +2100,7 @@ function vFlash(){
     <div class="foot"><button class="btn sm" data-fcgo="${esc(d.s)}" ${d.n?"":"disabled"}>Estudar</button></div></div>`).join("")}</div>
   <div class="fc-cols">
     <div class="card"><h3 style="font-size:16px;margin:0 0 6px">Gerar cartas com a Easier</h3><p class="small muted" style="margin:0 0 10px">A Easier cria 8 cartas novas sobre o módulo escolhido. Usa 1 crédito da Easier.</p>
-      <div class="fc-form"><select id="fcGenMod" aria-label="Módulo">${modOpts}</select><button class="btn violet" data-fcgen ${fcGenBusy?"disabled":""}>${fcGenBusy?"Criando cartas…":"Gerar 8 cartas"}</button></div>
+      <div class="fc-form"><select id="fcGenMod" aria-label="Módulo">${modOpts}</select><button class="btn violet" data-fcgen ${fcGenBusy?"disabled":""}>${fcGenBusy?"Criando cartas…":"Gerar 8 cartas"}</button></div>${fcGenBusy?ezLoader("cartas","cartas"):""}
       <div class="fc-form" style="margin-top:14px"><label class="small" for="fcStudyMod" style="font-weight:700">Estudar um módulo específico</label><select id="fcStudyMod">${modOpts}</select><button class="btn ghost sm" data-fcmod>Estudar este módulo</button></div></div>
     <div class="card"><h3 style="font-size:16px;margin:0 0 6px">Criar minha carta</h3>
       <form class="fc-form" id="fcNew"><textarea id="fcF" rows="2" placeholder="Frente: pergunta ou termo" required maxlength="400"></textarea><textarea id="fcB" rows="3" placeholder="Verso: resposta" required maxlength="800"></textarea>
@@ -2108,15 +2109,15 @@ function vFlash(){
   </div>`;
 }
 async function fcGerar(id){const m=MODMAP[id];if(!m)return;const mm=MOD[m.s][m.i];const sample=await getSample();if(!sample){toast("A Easier está indisponível agora.");return;}
-  fcGenBusy=true;render();
+  fcGenBusy=true;ezStart("cartas","cartas");render();
   const prompt=`Seu nome é Easier, tutora da plataforma Easy Study. Crie 8 flashcards em português do Brasil sobre "${mm.t}" (${m.s}) para um aluno de pré-vestibular (ENEM, FUVEST, Unicamp). Cada carta deve testar um único conceito, com frente curta (pergunta direta, até 25 palavras) e verso objetivo (até 40 palavras), cientificamente correto. Não repita estas perguntas que o aluno já tem: ${fcAuto(m).map(c=>c.f.replace(/\n/g," ")).slice(0,12).join(" | ")}
 Base do conteúdo:
 ${mm.s.map(x=>"- "+x[0]+": "+x[1].slice(0,500)).join("\n")}
 Responda SOMENTE com JSON no formato {"cartas":[{"frente":"...","verso":"..."}]}`;
   try{const j=await sample.json(prompt,{kb:m.s==="Redação"?"redacao":undefined});const cs=(j.cartas||[]).filter(c=>c&&c.frente&&c.verso).slice(0,8).map(c=>({f:String(c.frente).slice(0,400),b:String(c.verso).slice(0,800)}));
-    if(!cs.length)throw {code:"bad_json"};const st=fcStore();st.ai[id]=[...(st.ai[id]||[]),...cs];save();toast(`${cs.length} cartas novas em ${m.t}`);fcGenBusy=false;fcStart(null,id);return;}
+    if(!cs.length)throw {code:"bad_json"};const st=fcStore();st.ai[id]=[...(st.ai[id]||[]),...cs];save();toast(`${cs.length} cartas novas em ${m.t}`);ezDone("cartas",true);fcGenBusy=false;fcStart(null,id);return;}
   catch(e){toast(e&&e.code==="bad_json"?"A Easier não conseguiu montar as cartas. Tente de novo.":errMsg(e));}
-  fcGenBusy=false;render();}
+  ezDone("cartas",false);fcGenBusy=false;render();}
 document.addEventListener("submit",e=>{if(e.target.id!=="fcNew")return;e.preventDefault();const f=document.getElementById("fcF").value.trim(),b=document.getElementById("fcB").value.trim();if(!f||!b)return;
   fcStore().mine.push({id:Date.now().toString(36),f,b,s:document.getElementById("fcSub").value});save();toast("Carta salva!");render();});
 document.addEventListener("keydown",e=>{if(VIEW!=="flash"||!fcS||fcS.i>=fcS.q.length||/INPUT|TEXTAREA|SELECT/.test(e.target.tagName))return;
@@ -2217,10 +2218,10 @@ document.addEventListener("submit",e=>{e.preventDefault();const f=e.target;
 async function explainQ(id){
   const q=QMAP[id],box=document.getElementById("exp-"+id);if(!box)return;const sample=await getSample();
   if(!sample){box.innerHTML=`<div class="explain">A Easier está indisponível agora. Tente de novo em instantes.</div>`;return;}
-  box.innerHTML=`<div class="explain" id="expT-${id}">Pensando…</div>`;const chosen=S.ans[id]??S.sim?.ans?.[id];
+  ezStart("exp:"+id,"explicar");box.innerHTML=`<div id="expL-${id}">${ezLoader("exp:"+id,"explicar")}</div><div class="explain" id="expT-${id}" hidden></div>`;const mostra=()=>{document.getElementById("expL-"+id)?.remove();const el=document.getElementById("expT-"+id);if(el)el.hidden=false;return el;};const chosen=S.ans[id]??S.sim?.ans?.[id];
   const prompt=`Seu nome é Easier, a tutora de IA da plataforma Easy Study, professora de cursinho pré-vestibular. ${cursoAluno()} Explique a resolução desta questão da prova ${qProva(q)} ${q.y}${q.im?" (a questão tem figuras que você não vê; se precisar, explique o raciocínio geral)":""} de forma clara e curta (até 180 palavras), em português do Brasil, em texto simples sem markdown. Diga por que a alternativa correta está certa, por que a alternativa marcada pelo aluno está errada (se errou) e termine com uma dica de conteúdo para revisar.\n\nTexto-base: ${q.c}\nEnunciado: ${q.q}\nAlternativas:\n${q.o.map((o,i)=>"ABCDE"[i]+") "+o).join("\n")}\nGabarito: ${"ABCDE"[q.k]}\nAlternativa marcada pelo aluno: ${chosen===undefined?"nenhuma":"ABCDE"[chosen]}`;
-  try{const {text}=await sample(prompt,{modelTier:"default",onText:({text})=>{const el=document.getElementById("expT-"+id);if(el)el.textContent=text;}});qExplain[id]=text;const el=document.getElementById("expT-"+id);if(el)el.textContent=text;}
-  catch(err){const el=document.getElementById("expT-"+id);if(el)el.textContent=err&&err.text?err.text:errMsg(err);}
+  try{const {text}=await sample(prompt,{modelTier:"default",onText:({text})=>{const el=mostra();if(el)el.textContent=text;}});qExplain[id]=text;ezDone("exp:"+id,true);const el=mostra();if(el)el.textContent=text;}
+  catch(err){ezDone("exp:"+id,false);const el=mostra();if(el)el.textContent=err&&err.text?err.text:errMsg(err);}
 }
 
 /* ---------- contas (Supabase) ---------- */

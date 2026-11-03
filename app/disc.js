@@ -73,6 +73,7 @@
         <button class="btn ghost" data-discself="${d.id}" ${busy ? "disabled" : ""}>Ver resposta esperada e me autoavaliar</button>
         ${m ? `<button class="btn ghost sm" data-mod="${m.id}">Estudar: ${esc(m.t)}</button>` : ""}
       </div>
+      ${busy === d.id ? ezLoader("disc:" + d.id, "disc") : ""}
       ${r.erro ? `<div class="explain" style="border-color:var(--bad)">${esc(r.erro)}</div>` : ""}
       ${resultadoHTML(d, r)}
       ${modoSelf ? esperadaHTML(d, r, true) : corrigido ? `<details class="ddet"><summary>Ver a resposta esperada</summary>${esperadaHTML(d, r, false)}</details>` : ""}
@@ -106,7 +107,7 @@
     const d = (window.DISC || []).find((x) => x.id === id); if (!d || busy) return;
     const r = reg(id);
     if (!d.itens.some((_, i) => (r.resp[i] || "").trim().length >= 3)) { toast("Escreva sua resposta antes de pedir a correção."); return; }
-    busy = id; r.erro = null; render();
+    busy = id; r.erro = null; ezStart("disc:" + id, "disc"); render();
     const sample = await getSample();
     const prompt = `Seu nome é Easier, a corretora de IA da plataforma Easy Study. Corrija a resposta de um aluno a uma QUESTÃO DISSERTATIVA de 2ª fase de vestibular (estilo ${d.est}), como um corretor da banca: compare com a resposta esperada e os critérios, aceite respostas equivalentes com outras palavras ou caminhos corretos, e desconte erros conceituais, contas erradas e respostas incompletas. Seja justo e objetivo. ${typeof cursoAluno === "function" ? cursoAluno() : ""}
 
@@ -134,8 +135,8 @@ Responda SOMENTE com JSON neste formato, com um objeto por item, na ordem:
       Object.assign(r, { nota, max: total(d), t: Date.now(), via: "ia", tent: (r.tent || 0) + 1, fb: { itens: its, resumo: String(j.resumo || "").slice(0, 400), dica: String(j.dica || "").slice(0, 400) } });
       delete self[id];
       const m = modDe(d); if (m && window.gpsTouch) gpsTouch(m.id);
-      addXP(20, "q"); save();
-    } catch (e) { r.erro = (typeof errMsg === "function" ? errMsg(e) : "A Easier não conseguiu corrigir agora.") + " Enquanto isso, use “Ver resposta esperada e me autoavaliar”."; }
+      addXP(20, "q"); save(); ezDone("disc:" + id, true);
+    } catch (e) { ezDone("disc:" + id, false); r.erro = (typeof errMsg === "function" ? errMsg(e) : "A Easier não conseguiu corrigir agora.") + " Enquanto isso, use “Ver resposta esperada e me autoavaliar”."; }
     busy = null;
     if (VIEW === "questoes") render();
   }
