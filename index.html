@@ -1103,6 +1103,7 @@ ex:["Um viajante diz que a comida de outro país é 'nojenta' por ser diferente 
 <script src="conteudo/extras-humanas.js"></script>
 <script src="conteudo/dissertativas.js"></script>
 <script src="app/easier-loader.js"></script>
+<script src="app/musica.js"></script>
 <script src="app/gps-lab.js"></script>
 <script src="app/disc.js"></script>
 <script src="app/cartoes.js"></script>
@@ -2146,14 +2147,10 @@ function vFoco(){return `<div class="row-head" style="margin-top:4px"><h1 class=
     <label class="small" style="display:flex;gap:8px;align-items:center">Estudando<select id="pSubj" class="inp">${[...SUBJECT_KEYS,"Simulado","Revisão"].map(s=>`<option ${s===pomo.subj?"selected":""}>${s}</option>`).join("")}</select></label>
     <div style="display:flex;gap:10px"><button class="btn lime" data-ptoggle>${pomo.running?"Pausar":"Iniciar"}</button><button class="btn ghost" data-preset>Zerar</button></div>
     <div class="small num">Hoje: ${S.act[todayKey()]?.min||0} min de foco</div></div>
-  <div class="spot"><div class="card" style="display:flex;align-items:center;gap:12px;background:var(--ink);color:var(--white)"><svg width="34" height="34" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="11" fill="#1ED760"/><path d="M6.5 9.3c3.6-1.1 7.8-.8 11 1M7.2 12.4c3-.9 6.4-.6 9 .9M7.8 15.3c2.4-.6 4.9-.4 7 .7" stroke="#1C1B1A" stroke-width="1.8" stroke-linecap="round"/></svg><div><b>Spotify</b><div class="small" style="opacity:.75">Abra uma playlist e deixe tocando enquanto o timer roda.</div></div></div>
-    ${S.spotify?`<div class="pl"><span class="cv" style="background:var(--pink)"></span><div><b>Minha playlist</b><span class="small muted" style="overflow-wrap:anywhere">${esc(S.spotify.replace("https://",""))}</span></div><a class="btn sm" href="${esc(S.spotify)}" target="_blank" rel="noopener">Abrir</a></div>`:""}
-    ${PLAYLISTS.map(p=>`<div class="pl"><span class="cv" style="background:${p.c}"></span><div><b>${p.n}</b><span class="small muted">Playlists no Spotify</span></div><a class="btn sm" href="https://open.spotify.com/search/${encodeURIComponent(p.q)}/playlists" target="_blank" rel="noopener">Abrir</a></div>`).join("")}
-    <form class="card form" id="spForm"><label>Sua playlist do Spotify<input id="spURL" class="inp" placeholder="https://open.spotify.com/playlist/..." value="${esc(S.spotify)}"></label><button class="btn sm ink" style="align-self:flex-start">Salvar playlist</button></form>
-    <p class="note" style="margin:0">O Spotify abre no app ou em outra aba. Esta página não consegue tocar música dentro dela nem controlar o player.</p></div></div>`;}
+  ${window.musicaHTML?musicaHTML():""}</div>`;}
 function paintPomo(){const t=document.getElementById("pTime");if(!t)return;const left=pomo.running?Math.max(0,Math.round((pomo.endAt-Date.now())/1000)):pomo.left;t.textContent=pad(Math.floor(left/60))+":"+pad(left%60);const total=(pomo.phase==="focus"?pomo.mode:pomo.brk)*60;document.getElementById("pArc").setAttribute("stroke-dashoffset",(326.7*(1-left/total)).toFixed(1));document.getElementById("pPhase").textContent=pomo.phase==="focus"?"Foco":"Pausa";}
 setInterval(()=>{if(!pomo.running)return;const left=Math.round((pomo.endAt-Date.now())/1000);
-  if(left<=0){if(pomo.phase==="focus"){const x=Math.round(20*pomo.mode/25);addXP(x,"min",pomo.mode);toast("Sessão de foco concluída! +"+x+" XP");pomo.phase="break";pomo.left=pomo.brk*60;}else{toast("Pausa terminou. Bora para o próximo bloco.");pomo.phase="focus";pomo.left=pomo.mode*60;}pomo.running=false;if(VIEW==="foco")render();return;}
+  if(left<=0){if(pomo.phase==="focus"){const x=Math.round(20*pomo.mode/25);addXP(x,"min",pomo.mode);toast("Sessão de foco concluída! +"+x+" XP");pomo.phase="break";pomo.left=pomo.brk*60;}else{toast("Pausa terminou. Bora para o próximo bloco.");pomo.phase="focus";pomo.left=pomo.mode*60;}pomo.running=false;if(window.musicaTimer)musicaTimer("parado");if(VIEW==="foco")render();return;}
   paintPomo();},500);
 
 /* ---------- eventos ---------- */
@@ -2202,8 +2199,8 @@ document.addEventListener("click",e=>{
   if(d.addexam!==undefined){S.exams.push({n:"Nova prova",d:""});save();render();return;}
   if(d.delexam!==undefined){const i=+d.delexam,ex=S.exams[i];if(!ex)return;S.exams.splice(i,1);save();render();toast(`“${ex.n||"Prova"}” excluída`,"Desfazer",()=>{S.exams.splice(Math.min(i,S.exams.length),0,ex);save();render();});return;}
   if(d.pmode){const [f,b]=d.pmode.split("-").map(Number);pomo={...pomo,mode:f,brk:b,phase:"focus",left:f*60,running:false};render();return;}
-  if(d.ptoggle!==undefined){if(pomo.running){pomo.left=Math.max(0,Math.round((pomo.endAt-Date.now())/1000));pomo.running=false;}else{pomo.endAt=Date.now()+pomo.left*1000;pomo.running=true;}t.textContent=pomo.running?"Pausar":"Iniciar";return;}
-  if(d.preset!==undefined){pomo.running=false;pomo.phase="focus";pomo.left=pomo.mode*60;render();return;}
+  if(d.ptoggle!==undefined){if(pomo.running){pomo.left=Math.max(0,Math.round((pomo.endAt-Date.now())/1000));pomo.running=false;}else{pomo.endAt=Date.now()+pomo.left*1000;pomo.running=true;}t.textContent=pomo.running?"Pausar":"Iniciar";if(window.musicaTimer)musicaTimer(pomo.running&&pomo.phase==="focus"?"foco":"parado");return;}
+  if(d.preset!==undefined){pomo.running=false;pomo.phase="focus";pomo.left=pomo.mode*60;if(window.musicaTimer)musicaTimer("parado");render();return;}
 });
 document.addEventListener("change",e=>{const t=e.target;
   if(window.discChange&&discChange(t))return;
