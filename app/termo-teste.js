@@ -27,7 +27,7 @@
       "Como a plataforma está em fase de testes, algumas funções podem mudar, ficar instáveis ou sair do ar sem aviso prévio.",
     ]],
     ["Confidencialidade", [
-      "As telas, os conteúdos e as funções da plataforma que ainda não foram lançados ao público são <b>informações confidenciais</b>. Sem autorização prévia e por escrito da equipe (vale e-mail ou mensagem pelos canais oficiais), você se compromete a <b>não</b>:",
+      "As telas, os conteúdos e as funções da plataforma que ainda não foram lançados ao público são <b>informações confidenciais</b>. Sem autorização prévia e por escrito da equipe (pelo e-mail <a href='mailto:easystudy.spacebr@gmail.com'>easystudy.spacebr@gmail.com</a>), você se compromete a <b>não</b>:",
       "<ul><li>tirar prints, gravar a tela ou fotografar a plataforma para compartilhar;</li><li>publicar imagens, vídeos ou textos da plataforma em redes sociais, grupos, sites ou aplicativos de mensagem;</li><li>descrever em detalhes funções que ainda não foram lançadas;</li><li>repassar o seu acesso ou o convite a outras pessoas.</li></ul>",
       "Você pode contar que está participando do teste. Quando a divulgação for liberada, a equipe avisa você. Este compromisso continua valendo depois do fim do teste, até o lançamento público ou até a equipe liberar a divulgação.",
     ]],
@@ -46,7 +46,7 @@
     ["Seus dados pessoais (LGPD)", [
       "Tratamos seus dados conforme a <b>Lei Geral de Proteção de Dados (Lei nº 13.709/2018)</b> e o <b>Marco Civil da Internet (Lei nº 12.965/2014)</b>.",
       "<ul><li><b>O que guardamos:</b> nome, e-mail, perfil de estudos (curso, faculdade e vestibulares), progresso, respostas, redações e o uso da Easier.</li><li><b>Para quê:</b> fazer a plataforma funcionar, salvar seu progresso, personalizar seus estudos e melhorar o produto durante o teste.</li><li><b>Com quem:</b> só com os serviços necessários para a plataforma funcionar (hospedagem, banco de dados e o provedor de inteligência artificial que gera as respostas da Easier). <b>Não vendemos seus dados.</b></li></ul>",
-      "Você pode pedir a qualquer momento para ver, corrigir ou apagar seus dados (art. 18 da LGPD), pelos canais oficiais da equipe.",
+      "Você pode pedir a qualquer momento para ver, corrigir ou apagar seus dados (art. 18 da LGPD), pelo e-mail <a href='mailto:easystudy.spacebr@gmail.com'>easystudy.spacebr@gmail.com</a>.",
     ]],
     ["Suas sugestões", [
       "As opiniões e sugestões que você enviar poderão ser usadas para melhorar a plataforma, sem que isso gere pagamento ou direitos sobre o produto. A equipe pode entrar em contato pelo seu e-mail para pedir a sua opinião sobre o teste.",
@@ -60,6 +60,7 @@
     ["Disposições gerais", [
       "Ao marcar a caixa de aceite e ativar o acesso, você concorda com este termo de forma eletrônica, com o mesmo valor de uma assinatura (Lei nº 14.063/2020 e MP nº 2.200-2/2001). Registramos a data, a hora e a versão do termo aceito.",
       "Este termo segue as leis brasileiras. Se houver alguma disputa, vale o foro do seu domicílio.",
+      "Dúvidas, pedidos de autorização ou sobre os seus dados: <a href='mailto:easystudy.spacebr@gmail.com'>easystudy.spacebr@gmail.com</a>.",
     ]],
   ];
 
@@ -85,6 +86,7 @@
 .tt-sec h3::before{content:counter(tts);flex:none;width:24px;height:24px;border-radius:50%;background:var(--ink);color:var(--lime);font-size:12px;display:grid;place-items:center;font-family:var(--display);font-weight:800}
 .tt-sec p,.tt-sec li{font-size:13.5px;line-height:1.55;color:#3b3833}
 .tt-sec p{margin:6px 0}
+.tt-sec a{color:var(--violet);font-weight:700;word-break:break-all}
 .tt-sec ul{margin:6px 0;padding-left:20px}
 .tt-sec li{margin:3px 0}
 .tt-list{counter-reset:tts}
