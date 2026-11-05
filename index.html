@@ -494,7 +494,7 @@ select,.inp{border:1.5px solid var(--line);border-radius:10px;padding:7px 10px;b
 .cv-btn{display:inline-flex;align-items:center;gap:8px;background:var(--white);color:var(--ink);border:0;border-radius:99px;padding:12px 22px;font:inherit;font-weight:700;font-size:15px;cursor:pointer;box-shadow:0 6px 0 -2px rgba(0,0,0,.25);transition:transform .15s}
 .cv-btn:hover{transform:translateY(-1px)} .cv-btn:disabled{opacity:.7;cursor:wait}
 .cv-btn svg{width:17px;height:17px}
-.cv-foot .small span{color:var(--white)!important;background:rgba(0,0,0,.25);padding:3px 8px;border-radius:8px}
+.cv-note{font-size:12.5px;opacity:.85}
 @media (max-width:640px){.cv-body{grid-template-columns:1fr}.convite{padding:18px}.cv-btn{width:100%;justify-content:center}.convite::after{top:auto;display:none}}
 .pay-box{margin-top:14px;border-color:var(--violet)}.card-brick{max-width:560px;min-height:60px}.pay-alt{margin-top:12px}.pay-alt summary{cursor:pointer;color:var(--violet);font-weight:700}.pay-alt[open] summary{margin-bottom:8px}.pay-mail{display:grid;gap:4px;max-width:380px}
 .pay-status{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin-bottom:14px}.card.pay-status{background:var(--white)}
@@ -1136,6 +1136,7 @@ ex:["Um viajante diz que a comida de outro país é 'nojenta' por ser diferente 
 <script src="app/gps-lab.js"></script>
 <script src="app/disc.js"></script>
 <script src="app/cartoes.js"></script>
+<script src="app/termo-teste.js"></script>
 <script>
 /* ---------- matérias ---------- */
 const SUBJ = {
@@ -2402,7 +2403,8 @@ document.addEventListener("click",e=>{const t=e.target.closest("button,a");if(!t
     sair();return;}
   if(d.assinar!==undefined){e.stopImmediatePropagation();assinarHTML(d.assinar);return;}
   if(d.paygo!==undefined){assinarAgora(d.paygo,t);return;}
-  if(d.convite!==undefined){e.stopImmediatePropagation();ativarConvite(t);return;}
+  if(d.convite!==undefined){e.stopImmediatePropagation();window.termoTeste?.abrir({onAtivar:v=>ativarConvite(v)});return;}
+  if(d.termover!==undefined){e.stopImmediatePropagation();const ac=ACC?.convite?.termos_aceitos_em;window.termoTeste?.abrir({somenteLeitura:true,aceitoEm:ac?new Date(ac).toLocaleString("pt-BR",{dateStyle:"short",timeStyle:"short"}):""});return;}
   if(d.paycheck!==undefined){conferirPagamento(false);return;}
   if(d.paycancel!==undefined){if(t.dataset.confirm!=="1"){t.dataset.confirm="1";t.textContent="Confirmar cancelamento?";setTimeout(()=>{t.dataset.confirm="";t.textContent="Cancelar renovação";},4000);return;}
     t.disabled=true;pagamentoAPI({acao:"cancelar"}).then(r=>{if(r.assinatura){ACC.assinatura={...ACC.assinatura,...r.assinatura};toast("Renovação cancelada. Seu acesso continua até o fim do período pago.");}else toast("Não foi possível cancelar agora. Tente de novo.");render();});return;}
@@ -2448,19 +2450,19 @@ function conviteHTML(){
         <p class="cv-desc">Acesso completo à plataforma para você estudar com tudo liberado e nos ajudar a deixar o Easy Study ainda melhor.</p></div>
       <ul><li>Todos os módulos, questões, simulados e rotina</li><li>${PLANS.pro.usos} usos da Easier por mês</li><li>${PLANS.pro.redacoes} correções de redação com a Easier por mês</li><li>Jogos, Foco e tudo que chegar de novo</li></ul>
     </div>
-    <div class="cv-foot"><button class="cv-btn" data-convite>Ativar meu acesso ${svg('<path d="M5 12h14M13 6l6 6-6 6"/>')}</button><span id="cvMsg" class="small"></span></div>
+    <div class="cv-foot"><button class="cv-btn" data-convite>Ativar meu acesso ${svg('<path d="M5 12h14M13 6l6 6-6 6"/>')}</button><span class="cv-note">Antes de ativar, você lê e aceita o termo do teste.</span></div>
   </div>`;
 }
-async function ativarConvite(btn){
-  const msg=document.getElementById("cvMsg");btn.disabled=true;btn.textContent="Ativando…";if(msg)msg.textContent="";
+async function ativarConvite(versao){
+  const T=window.termoTeste;T.ocupado(true);T.mensagem("");
   try{
-    const {data,error}=await sb.rpc("ativar_convite");
-    if(!error&&data?.ok){ACC.assinatura={...ACC.assinatura,...data.assinatura};ACC.convite={convidado:true,usado:true};
-      toast("Bem-vindo(a) ao Easy Pro teste! Tudo liberado.");VIEW="painel";buildNav();paintTop();render();try{history.replaceState(null,"","#painel");}catch(e){}return;}
-    const txt={ja_usado:"Este convite já foi ativado nesta conta.",ja_assinante:"Você já tem uma assinatura ativa.",sem_convite:"Não encontramos um convite para este e-mail."}[data?.code]||"Não foi possível ativar agora. Tente de novo.";
-    if(msg)msg.innerHTML=`<span style="color:var(--bad)">${esc(txt)}</span>`;
-  }catch(e){if(msg)msg.innerHTML=`<span style="color:var(--bad)">Sem conexão. Tente de novo.</span>`;}
-  btn.disabled=false;btn.textContent="Tentar de novo";
+    const {data,error}=await sb.rpc("ativar_convite",{p_termos:versao});
+    if(!error&&data?.ok){ACC.assinatura={...ACC.assinatura,...data.assinatura};ACC.convite={convidado:true,usado:true,termos_aceitos_em:new Date().toISOString()};
+      T.fechar();toast("Bem-vindo(a) ao Easy Pro teste! Tudo liberado.");VIEW="painel";buildNav();paintTop();render();try{history.replaceState(null,"","#painel");}catch(e){}return;}
+    const txt={ja_usado:"Este convite já foi ativado nesta conta.",ja_assinante:"Você já tem uma assinatura ativa.",sem_convite:"Não encontramos um convite para este e-mail.",termos:"Marque o aceite do termo para continuar."}[data?.code]||"Não foi possível ativar agora. Tente de novo.";
+    T.mensagem(esc(txt),true);
+  }catch(e){T.mensagem("Sem conexão. Tente de novo.",true);}
+  T.ocupado(false);
 }
 function usageBars(u,p){
   const b=(n,m,l)=>`<div class="ub"><div class="small" style="display:flex;justify-content:space-between"><span>${l}</span><b class="num">${n}/${m}</b></div><div class="bar"><i style="width:${Math.min(100,n/m*100)}%;${n>=m?"background:var(--bad)":""}"></i></div></div>`;
@@ -2591,6 +2593,7 @@ function vConta(){
     <div class="card form"><h3 style="font-size:17px">Plano e consumo</h3>
       ${p?`<div><span class="chip dark">${ACC?.assinatura?.gateway==="convite"?"Easy Pro teste":esc(p.nome)}</span></div>${usageBars(ACC?.uso||{},p)}`:`<p class="small" style="margin:0">Nenhum plano ativo.</p>`}
       ${renovacaoHTML(true)}
+      ${ACC?.assinatura?.gateway==="convite"?`<button class="btn sm ghost" data-termover style="align-self:flex-start">Ver o termo do teste</button>`:""}
       <button class="btn sm violet" data-go="planos" style="align-self:flex-start">${p?"Ver planos":"Assinar um plano"}</button>
       <h3 style="font-size:17px;margin-top:8px">Acesso</h3>
       <p class="small" style="margin:0">E-mail: <b>${esc(ACC?.user?.email||"")}</b></p>
