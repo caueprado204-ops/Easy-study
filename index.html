@@ -1131,6 +1131,11 @@ ex:["Um viajante diz que a comida de outro país é 'nojenta' por ser diferente 
 <script src="conteudo/fisica-2.js"></script>
 <script src="conteudo/fisica-3.js"></script>
 <script src="conteudo/fisica-4.js"></script>
+<script src="conteudo/linguagens-1.js"></script>
+<script src="conteudo/linguagens-2.js"></script>
+<script src="conteudo/linguagens-3.js"></script>
+<script src="conteudo/filosofia-1.js"></script>
+<script src="conteudo/sociologia-1.js"></script>
 <script src="conteudo/extras-natureza.js"></script>
 <script src="conteudo/extras-exatas-linguagens.js"></script>
 <script src="conteudo/extras-humanas.js"></script>
@@ -1201,6 +1206,20 @@ const FIS_MAPA={0:5,1:9,2:13,3:31,4:26,5:20,6:15};
   const ord=["vetores","mu","muv","lancamentos","mcu",0,"newton","atrito","centripeta",1,"trabalho","energia","impulso",2,"estatica",6,"gravitacao","termometria","calorimetria","gases",5,"optgeo","espelhos","refracao","ondas","interferencia",4,"eletrostatica","corrente","circuitos","potencia",3,"magnetismo","forcafio","inducao","moderna"];
   const novo=ord.map(k=>typeof k==="number"?Object.assign(o[k],ren[k]?{t:ren[k]}:{}):N[k]);
   if(novo.every(Boolean))MOD["Física"]=novo;})();
+// Linguagens completa: 19 módulos novos intercalados com os 8 originais
+const LIN_MAPA={0:0,1:6,2:5,3:8,4:3,5:18,6:22,7:13};
+(function(){const N=window.LIN_NOVOS,o=MOD["Linguagens"];if(!N||!o||o.length!==8)return;
+  const ren={5:"Literatura: do Quinhentismo ao Simbolismo (revisão geral)",6:"Literatura: Modernismo e contemporâneos (revisão geral)"};
+  const ord=[0,"inferencia","semantica",4,"intertexto",2,1,"digital",3,"classes","sintaxe","pontuacao","concordancia",7,"colonial","romantismo","realismo","simbolismo",5,"modernismo1","modernismo2","contemporanea",6,"artes","corpo","ingles","espanhol"];
+  const novo=ord.map(k=>typeof k==="number"?Object.assign(o[k],ren[k]?{t:ren[k]}:{}):N[k]);
+  if(novo.every(Boolean))MOD["Linguagens"]=novo;})();
+// Filosofia e Sociologia completa: 14 módulos novos intercalados com os 5 originais
+const FIL_MAPA={0:3,1:8,2:13,3:10,4:18};
+(function(){const N=window.FILSOC_NOVOS,o=MOD["Filosofia e Sociologia"];if(!N||!o||o.length!==5)return;
+  const ren={0:"Filosofia antiga: revisão geral",1:"Filosofia moderna e política: revisão geral",2:"Sociologia clássica: revisão geral",3:"Pensamento contemporâneo: revisão geral"};
+  const ord=["presocraticos","socrates","aristoteles",0,"medieval","conhecimento","politicafil","etica",1,"contemporanea",3,"durkheimweber","marx",2,"cultura","estado","brasilsoc","globalizacao",4];
+  const novo=ord.map(k=>typeof k==="number"?Object.assign(o[k],ren[k]?{t:ren[k]}:{}):N[k]);
+  if(novo.every(Boolean))MOD["Filosofia e Sociologia"]=novo;})();
 function migrarMods(st,subj,mapa,flag,minLen){ // remapeia o progresso salvo quando a ordem dos módulos de uma matéria muda
   if(!st||st[flag]>=2)return; st[flag]=2; if((MOD[subj]||[]).length<minLen)return;
   const re=new RegExp("^"+subj+"#(\\d+)(\\|.*)?$");
@@ -1211,7 +1230,7 @@ function migrarMods(st,subj,mapa,flag,minLen){ // remapeia o progresso salvo qua
   if(st.fc&&st.fc.ai)st.fc.ai=remap(st.fc.ai);
   if(st.lastMod)st.lastMod=mv(st.lastMod);
 }
-function migrarBio(st){migrarMods(st,"Biologia",BIO_MAPA,"bioV",23);migrarMods(st,"História",HIS_MAPA,"hisV",23);migrarMods(st,"Matemática",MAT_MAPA,"matV",20);migrarMods(st,"Química",QUI_MAPA,"quiV",27);migrarMods(st,"Geografia",GEO_MAPA,"geoV",26);migrarMods(st,"Física",FIS_MAPA,"fisV",36);}
+function migrarBio(st){migrarMods(st,"Biologia",BIO_MAPA,"bioV",23);migrarMods(st,"História",HIS_MAPA,"hisV",23);migrarMods(st,"Matemática",MAT_MAPA,"matV",20);migrarMods(st,"Química",QUI_MAPA,"quiV",27);migrarMods(st,"Geografia",GEO_MAPA,"geoV",26);migrarMods(st,"Física",FIS_MAPA,"fisV",36);migrarMods(st,"Linguagens",LIN_MAPA,"linV",27);migrarMods(st,"Filosofia e Sociologia",FIL_MAPA,"filV",19);}
 // Redação: módulos e seções da Cartilha do Participante 2025 (no fim da lista, sem mudar a ordem dos antigos)
 (function(){const o=MOD["Redação"],N=window.RED_NOVOS,X=window.RED_EXTRA||{};if(!o)return;
   for(const [pref,secs] of Object.entries(X)){const m=o.find(x=>x.t.startsWith(pref));if(m)m.s=m.s.concat(secs);}

@@ -141,7 +141,7 @@ window.EXTRA = window.EXTRA || {};
   };
 
   /* ===================== FILOSOFIA E SOCIOLOGIA ===================== */
-  E["Filosofia e Sociologia#0"] = {
+  E["Filosofia e Sociologia#3"] = {
     s: [["O mito da caverna em 4 passos", "1) Prisioneiros acorrentados desde a infância veem apenas sombras projetadas na parede e acham que elas são a realidade. 2) Um deles se liberta, sai da caverna e, depois de se acostumar com a luz, vê o mundo real e o Sol. 3) Ele volta para libertar os outros, mas é ridicularizado e ameaçado. 4) A caverna representa o **mundo sensível** (aparências); o exterior, o **mundo inteligível** (das ideias); o Sol, a ideia de Bem.\n\nA alegoria trata de educação, conhecimento e política: o filósofo, que conhece a verdade, deveria guiar a cidade. O ENEM costuma relacioná-la a fake news e redes sociais."]],
     fig: [{ id: "filosofos", at: 0, cap: "Da filosofia antiga à moderna (ilustração Easy Study)." }],
     tab: [{ at: 3, title: "Platão x Aristóteles", head: ["", "Platão", "Aristóteles"], rows: [["Realidade verdadeira", "mundo das ideias", "as próprias coisas (substância)"], ["Conhecimento", "razão, lembrança das ideias", "parte dos sentidos e da experiência"], ["Ética", "virtude é conhecer o Bem", "virtude é o meio-termo; fim é a felicidade"], ["Política", "governo dos filósofos", "o ser humano é um animal político"]] }],
@@ -150,7 +150,7 @@ window.EXTRA = window.EXTRA || {};
     ler: [W("Alegoria da caverna"), W("Aristóteles"), DOMINIO]
   };
 
-  E["Filosofia e Sociologia#1"] = {
+  E["Filosofia e Sociologia#8"] = {
     s: [["Ética de Kant na prática", "Para Kant, uma ação é moral quando é feita **por dever**, seguindo a razão, e não por interesse ou medo. O **imperativo categórico** pode ser resumido em duas fórmulas: 'aja de modo que sua regra possa valer para todos' e 'trate a humanidade sempre como fim, nunca apenas como meio'.\n\nTeste: mentir para escapar de um problema pode ser universalizado? Se todos mentissem, ninguém acreditaria em promessas, então mentir não passa no teste. O ENEM costuma contrastar a ética kantiana com a utilitarista (que julga pelas consequências)."]],
     tab: [{ at: 2, title: "Contratualistas", head: ["Pensador", "Estado de natureza", "Contrato"], rows: [["Hobbes", "guerra de todos contra todos", "poder absoluto ao soberano (Leviatã)"], ["Locke", "relativa paz, com direitos naturais", "governo protege vida, liberdade e propriedade; direito de resistência"], ["Rousseau", "bom selvagem, corrompido pela propriedade", "vontade geral, soberania do povo"]] }],
     sabia: "A frase 'os fins justificam os meios' nunca aparece em O Príncipe, de Maquiavel. Ela é um resumo popular, e simplificado, das ideias dele.",
@@ -158,7 +158,7 @@ window.EXTRA = window.EXTRA || {};
     ler: [W("Imperativo categórico"), W("Contratualismo"), DOMINIO]
   };
 
-  E["Filosofia e Sociologia#2"] = {
+  E["Filosofia e Sociologia#13"] = {
     s: [["Aplicando os clássicos hoje", "**Durkheim**: o aumento de casos de ansiedade numa sociedade em transformação rápida pode ser lido como **anomia**, a perda de referências e normas. **Weber**: a burocracia de um aplicativo de banco é um exemplo de **racionalização**, o mundo organizado por regras e eficiência. **Marx**: um entregador de aplicativo que trabalha muitas horas sem direitos ilustra a **exploração** e a precarização do trabalho.\n\nUsar esses conceitos para explicar fatos atuais é exatamente o que as provas pedem, e também é um ótimo repertório para a redação."]],
     fig: [{ id: "sociologos", at: 3, cap: "Os três clássicos da Sociologia e seus conceitos centrais (ilustração Easy Study)." }, { id: "dominacao", at: 1, cap: "Tipos de dominação legítima segundo Weber (ilustração Easy Study)." }],
     sabia: "Durkheim fez um dos primeiros estudos estatísticos da Sociologia, O Suicídio (1897), para mostrar que até um ato que parece individual tem causas sociais.",
@@ -166,7 +166,7 @@ window.EXTRA = window.EXTRA || {};
     ler: [W("Émile Durkheim"), W("Max Weber"), W("Karl Marx")]
   };
 
-  E["Filosofia e Sociologia#3"] = {
+  E["Filosofia e Sociologia#10"] = {
     s: [["Tecnologia, redes e sociedade", "Pensadores contemporâneos ajudam a entender a vida digital. A **indústria cultural** (Adorno e Horkheimer) mostra como a cultura vira mercadoria padronizada, e os algoritmos de recomendação podem ser lidos assim. **Foucault** fala em vigilância e controle: câmeras, dados pessoais e redes sociais ampliam o 'panóptico'.\n\n**Bauman** descreve a 'modernidade líquida', com relações frágeis e passageiras. **Byung-Chul Han** fala da 'sociedade do cansaço', em que as pessoas se exploram a si mesmas em busca de desempenho. Esses autores são repertório produtivo em redações sobre tecnologia e saúde mental."]],
     tab: [{ at: 0, title: "Autores contemporâneos e conceitos", head: ["Autor", "Conceito"], rows: [["Adorno e Horkheimer", "indústria cultural"], ["Hannah Arendt", "banalidade do mal"], ["Michel Foucault", "poder disciplinar, panóptico"], ["Simone de Beauvoir", "'não se nasce mulher, torna-se'"], ["Zygmunt Bauman", "modernidade líquida"], ["Pierre Bourdieu", "capital cultural, violência simbólica"]] }],
     sabia: "Hannah Arendt criou a expressão 'banalidade do mal' ao acompanhar o julgamento de Adolf Eichmann, um burocrata nazista que dizia apenas 'cumprir ordens'.",
@@ -174,7 +174,7 @@ window.EXTRA = window.EXTRA || {};
     ler: [W("Escola de Frankfurt"), W("Hannah Arendt"), W("Michel Foucault")]
   };
 
-  E["Filosofia e Sociologia#4"] = {
+  E["Filosofia e Sociologia#18"] = {
     s: [["Cidadania no Brasil", "O historiador José Murilo de Carvalho mostrou que, no Brasil, a ordem dos direitos foi diferente da inglesa: os **direitos sociais** (trabalhistas, com Vargas) vieram antes da consolidação dos **direitos políticos** e **civis**, muitas vezes concedidos 'de cima para baixo'.\n\nA Constituição de 1988 ampliou direitos, mas há distância entre o que está escrito e a realidade. Movimentos sociais (negro, feminista, indígena, LGBTQIA+, sem-terra, por moradia) atuam para reduzir essa distância. As provas pedem para relacionar os direitos às lutas que os conquistaram."]],
     tab: [{ at: 1, title: "Gerações de direitos (T. H. Marshall)", head: ["Direitos", "Exemplos", "Na Inglaterra"], rows: [["Civis", "liberdade, propriedade, igualdade perante a lei", "século XVIII"], ["Políticos", "votar e ser votado", "século XIX"], ["Sociais", "educação, saúde, trabalho, previdência", "século XX"]] }],
     sabia: "A Lei 10.639/2003 tornou obrigatório o ensino de história e cultura afro-brasileira nas escolas; em 2008, a Lei 11.645 incluiu também a cultura indígena.",

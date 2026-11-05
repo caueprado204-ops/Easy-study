@@ -107,7 +107,7 @@ window.EXTRA = window.EXTRA || {};
     ler: [W("Interpretação de texto"), ["INEP: provas anteriores do ENEM", "https://www.gov.br/inep/pt-br/areas-de-atuacao/avaliacao-e-exames-educacionais/enem/provas-e-gabaritos"]]
   };
 
-  E["Linguagens#1"] = {
+  E["Linguagens#6"] = {
     s: [
       ["Gêneros digitais", "A internet criou e transformou gêneros: **post, meme, thread, comentário, podcast, vlog, e-mail, mensagem instantânea**. Cada um tem linguagem e finalidade próprias.\n\nO meme, por exemplo, combina imagem e texto curto com humor e intertextualidade, e só funciona se o leitor reconhecer a referência. O ENEM pergunta muito sobre a função social desses gêneros e sobre como eles mudam a forma de nos comunicarmos (mais rápida, multimodal, informal)."],
       ["Como identificar um gênero", "Faça três perguntas: **Onde circula?** (jornal, rede social, livro didático, embalagem). **Para quê?** (informar, convencer, instruir, divertir, emocionar). **Como está escrito?** (verbos no imperativo indicam instrução; primeira pessoa e opinião indicam artigo ou crônica; dados e fontes indicam notícia ou reportagem).\n\nReceita, bula, manual e regulamento são **injuntivos**: dizem o que fazer. Editorial, artigo de opinião e resenha são **argumentativos**: defendem uma ideia."]
@@ -118,7 +118,7 @@ window.EXTRA = window.EXTRA || {};
     ler: [W("Gênero textual"), W("Crônica"), DOMINIO]
   };
 
-  E["Linguagens#2"] = {
+  E["Linguagens#5"] = {
     s: [
       ["Mais de uma função no mesmo texto", "Um texto quase sempre tem várias funções, mas uma é **predominante**. Um anúncio publicitário pode ter função poética (rima, jogo de palavras) e referencial (informações do produto), mas o objetivo principal é convencer: função conativa.\n\nPara decidir, pergunte: qual é o **objetivo principal** do texto? Se é informar, referencial. Se é expressar sentimentos do autor, emotiva. Se é convencer o leitor a agir, conativa. Se é testar o canal de comunicação, fática. Se fala da própria linguagem, metalinguística. Se o foco é a forma da mensagem, poética."],
       ["Exemplos rápidos", "**Referencial**: \"A temperatura média do planeta subiu cerca de 1,1 °C desde a era pré-industrial.\"\n\n**Emotiva**: \"Que saudade imensa eu sinto da minha cidade!\"\n\n**Conativa**: \"Vacine-se. Proteja quem você ama.\"\n\n**Fática**: \"Alô? Está me ouvindo? Alô?\"\n\n**Metalinguística**: um poema sobre o ato de escrever poemas, ou um verbete de dicionário.\n\n**Poética**: \"Vi, vivi, venci a vida\", em que o som e a repetição chamam atenção para a própria mensagem."]
@@ -129,7 +129,7 @@ window.EXTRA = window.EXTRA || {};
     ler: [W("Funções da linguagem"), W("Roman Jakobson")]
   };
 
-  E["Linguagens#3"] = {
+  E["Linguagens#8"] = {
     s: [
       ["Norma-padrão e adequação", "A norma-padrão é a variedade usada em textos formais, documentos e na redação do vestibular. Ela não é 'a língua certa', mas a **adequada** a certas situações. Falar de forma muito formal numa conversa entre amigos também é inadequado.\n\nA ideia central é a **adequação linguística**: escolher a variedade que combina com a situação, o interlocutor e o gênero. Na redação do ENEM, a norma-padrão é obrigatória (Competência 1); num diálogo de um romance, a fala popular de um personagem é um recurso expressivo."],
       ["A língua muda", "O português vem do latim falado e mudou ao longo dos séculos: 'vossa mercê' virou 'vosmecê', depois 'você' e hoje 'cê' na fala. Palavras entram (estrangeirismos como 'deletar', 'mouse') e outras caem em desuso.\n\nO português brasileiro recebeu influências de línguas indígenas (jabuticaba, capivara, Ipiranga) e africanas (samba, cafuné, moleque, quitanda). Reconhecer essas contribuições faz parte do combate ao preconceito linguístico, assunto que o ENEM cobra com frequência."]
@@ -140,7 +140,7 @@ window.EXTRA = window.EXTRA || {};
     ler: [W("Variação linguística"), W("Preconceito linguístico"), W("Línguas indígenas do Brasil")]
   };
 
-  E["Linguagens#4"] = {
+  E["Linguagens#3"] = {
     s: [
       ["Metáfora x comparação x metonímia", "**Comparação** usa conectivo: \"Seus olhos são como estrelas\". **Metáfora** é a comparação sem conectivo: \"Seus olhos são estrelas\". **Metonímia** troca uma palavra por outra com relação de proximidade, sem comparar: \"Li Machado de Assis\" (o autor pela obra), \"Bebeu um copo\" (o recipiente pelo conteúdo), \"O Planalto decidiu\" (o lugar pela instituição).\n\nDica: se dá para colocar 'como', é metáfora ou comparação; se é uma substituição por algo relacionado, é metonímia."],
       ["Ironia, eufemismo e hipérbole", "**Ironia** diz o contrário do que se pensa, para criticar ou fazer humor: \"Que belo trabalho!\", diante de algo malfeito. É muito usada em charges e tirinhas.\n\n**Eufemismo** suaviza uma ideia desagradável: \"ele partiu\" em vez de \"ele morreu\". **Hipérbole** exagera para dar ênfase: \"já falei isso um milhão de vezes\". **Antítese** junta ideias opostas (\"o riso e o choro\"); **paradoxo** junta opostos na mesma ideia, de forma aparentemente impossível (\"é ferida que dói e não se sente\")."]
@@ -151,7 +151,7 @@ window.EXTRA = window.EXTRA || {};
     ler: [W("Figura de linguagem"), W("Metonímia"), W("Ironia")]
   };
 
-  E["Linguagens#5"] = {
+  E["Linguagens#18"] = {
     s: [
       ["Linha do tempo e contexto", "Cada escola literária responde ao seu tempo. O **Barroco** (século XVII) reflete a tensão religiosa da Contrarreforma: conflito entre fé e prazer, corpo e alma. O **Arcadismo** (século XVIII) acompanha o Iluminismo: razão, simplicidade e vida no campo. O **Romantismo** (século XIX) nasce com a Independência: nacionalismo, indianismo e sentimentalismo.\n\nO **Realismo** reage ao Romantismo com crítica social e análise psicológica, num Brasil que discute a abolição. Entender o contexto ajuda a reconhecer o estilo mesmo em textos que você nunca leu."],
       ["Autores que mais caem", "**Gregório de Matos** (Barroco): poesia satírica, o 'Boca do Inferno'. **Tomás Antônio Gonzaga** (Arcadismo): Marília de Dirceu. **José de Alencar** (Romantismo): Iracema, O Guarani, Senhora. **Gonçalves Dias**: Canção do Exílio. **Castro Alves**: poesia abolicionista, Navio Negreiro. **Machado de Assis** (Realismo): Memórias Póstumas de Brás Cubas, Dom Casmurro. **Aluísio Azevedo** (Naturalismo): O Cortiço. **Cruz e Sousa** (Simbolismo): Broquéis.\n\nTodas essas obras estão em domínio público e podem ser lidas de graça no portal Domínio Público e na Brasiliana da USP."]
@@ -163,7 +163,7 @@ window.EXTRA = window.EXTRA || {};
     ler: [DOMINIO, BBM, FUVEST, W("Literatura do Brasil")]
   };
 
-  E["Linguagens#6"] = {
+  E["Linguagens#22"] = {
     s: [
       ["A Semana de 22 e suas ideias", "A Semana de Arte Moderna (1922, no Theatro Municipal de São Paulo) propunha **romper com o academicismo** e criar uma arte brasileira moderna. Os modernistas defendiam verso livre, linguagem coloquial, humor, crítica social e valorização da cultura popular.\n\nO **Manifesto Antropófago** (1928), de Oswald de Andrade, propõe 'devorar' a cultura estrangeira e transformá-la em algo brasileiro. 'Tupi or not tupi, that is the question' resume a ideia com ironia."],
       ["Leituras essenciais", "**Mário de Andrade**: Macunaíma, 'o herói sem nenhum caráter'. **Manuel Bandeira**: Vou-me embora pra Pasárgada. **Carlos Drummond de Andrade**: No meio do caminho, José. **Graciliano Ramos**: Vidas Secas, sobre a seca e a desumanização. **Rachel de Queiroz**: O Quinze. **Jorge Amado**: Capitães da Areia. **Cecília Meireles** e **Vinicius de Moraes** na poesia.\n\nNa terceira geração: **Clarice Lispector** (A Hora da Estrela), **Guimarães Rosa** (Grande Sertão: Veredas) e **João Cabral de Melo Neto** (Morte e Vida Severina). Entre os contemporâneos, aparecem Conceição Evaristo e Carolina Maria de Jesus."]
@@ -174,7 +174,7 @@ window.EXTRA = window.EXTRA || {};
     ler: [W("Semana de Arte Moderna"), W("Modernismo no Brasil"), FUVEST]
   };
 
-  E["Linguagens#7"] = {
+  E["Linguagens#13"] = {
     s: [
       ["Conectivos e o sentido", "Trocar o conectivo muda o sentido do texto. \"Estudou, **mas** não passou\" (oposição) é diferente de \"Estudou, **por isso** passou\" (conclusão). Questões pedem com frequência qual conectivo pode substituir outro **sem alterar o sentido**.\n\nGrupos principais: **adição** (e, além disso, também); **oposição** (mas, porém, contudo, entretanto, no entanto); **causa** (porque, já que, visto que); **conclusão** (portanto, logo, por isso); **concessão** (embora, ainda que, mesmo que); **condição** (se, caso); **finalidade** (para que, a fim de que)."],
       ["Vírgula: as regras que mais caem", "**Use** vírgula para: separar itens de uma enumeração; isolar o vocativo (\"Maria, venha cá\"); isolar o aposto (\"São Paulo, a maior cidade do país, ...\"); separar adjunto adverbial deslocado e longo; isolar conjunções intercaladas (\"Ele, porém, não veio\").\n\n**Não use** vírgula entre o sujeito e o verbo (\"Os alunos, estudaram\" está errado) nem entre o verbo e seus complementos. Esse é o erro mais comum nas redações."]
