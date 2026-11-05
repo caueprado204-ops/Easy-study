@@ -242,6 +242,9 @@
     ["Redação", "C3 na prática", [["Redação", "Competência 3"]]],
     ["Redação", "C4 na prática", [["Redação", "Competência 4"]]],
     ["Redação", "C5 na prática", [["Redação", "Competência 5"]]],
+    ["Redação", "Enem 2025: regras", [["Redação", "As 5 competências"]]],
+    ["Redação", "Repertório de bolso", [["Redação", "Repertório sociocultural"]]],
+    ["Redação", "Lendo a proposta", [["Redação", "Competência 2"]]],
   ];
   let PRE = null, POS = null;
   function pre() {

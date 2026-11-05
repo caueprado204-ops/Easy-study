@@ -1125,6 +1125,7 @@ ex:["Um viajante diz que a comida de outro país é 'nojenta' por ser diferente 
 <script src="conteudo/geografia-2.js"></script>
 <script src="conteudo/geografia-3.js"></script>
 <script src="conteudo/geografia-4.js"></script>
+<script src="conteudo/redacao-2025.js"></script>
 <script src="conteudo/extras-natureza.js"></script>
 <script src="conteudo/extras-exatas-linguagens.js"></script>
 <script src="conteudo/extras-humanas.js"></script>
@@ -1199,6 +1200,10 @@ function migrarMods(st,subj,mapa,flag,minLen){ // remapeia o progresso salvo qua
   if(st.lastMod)st.lastMod=mv(st.lastMod);
 }
 function migrarBio(st){migrarMods(st,"Biologia",BIO_MAPA,"bioV",23);migrarMods(st,"História",HIS_MAPA,"hisV",23);migrarMods(st,"Matemática",MAT_MAPA,"matV",20);migrarMods(st,"Química",QUI_MAPA,"quiV",27);migrarMods(st,"Geografia",GEO_MAPA,"geoV",26);}
+// Redação: módulos e seções da Cartilha do Participante 2025 (no fim da lista, sem mudar a ordem dos antigos)
+(function(){const o=MOD["Redação"],N=window.RED_NOVOS,X=window.RED_EXTRA||{};if(!o)return;
+  for(const [pref,secs] of Object.entries(X)){const m=o.find(x=>x.t.startsWith(pref));if(m)m.s=m.s.concat(secs);}
+  if(N&&o.length===15)N.forEach(m=>o.push(m));})();
 // Conteúdo extra dos módulos (seções, figuras, tabelas, como cai na prova, fontes abertas)
 (function(){const EX=window.EXTRA||{};for(const s of Object.keys(MOD))MOD[s].forEach((m,i)=>{const x=EX[s+"#"+i]||EX[s+":"+m.t];if(!x)return;
   if(x.s)m.s=m.s.concat(x.s);if(x.fig)m.fig=[].concat(x.fig);if(x.tab)m.tab=[].concat(x.tab);if(x.prova)m.prova=x.prova;if(x.ler)m.ler=x.ler;if(x.sabia)m.sabia=x.sabia;});})();
