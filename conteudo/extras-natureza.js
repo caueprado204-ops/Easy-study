@@ -180,7 +180,7 @@ window.EXTRA = window.EXTRA || {};
   };
 
   /* ===================== FÍSICA ===================== */
-  E["Física#0"] = {
+  E["Física#5"] = {
     s: [
       ["Lendo gráficos de movimento", "No gráfico **posição × tempo**, a inclinação é a velocidade: reta inclinada é MU, curva é MUV, reta horizontal é repouso. No gráfico **velocidade × tempo**, a inclinação é a aceleração e a **área sob a curva é o deslocamento**.\n\nUm truque: se a área ficar abaixo do eixo do tempo, o deslocamento é negativo (o corpo voltou). No ENEM, muitas questões de cinemática são, na verdade, questões de leitura de gráfico, então treine identificar o que cada eixo e cada inclinação representam."],
       ["Velocidade relativa e encontros", "Quando dois carros andam no **mesmo sentido**, a velocidade de um em relação ao outro é a diferença; em **sentidos opostos**, é a soma. Para saber quando dois móveis se encontram, escreva a função horária de cada um (s = s₀ + v·t) e iguale as posições.\n\nExemplo: carro A sai do km 0 a 80 km/h; carro B sai do km 120 em sentido contrário a 40 km/h. Velocidade relativa = 120 km/h, distância = 120 km, então se encontram em 1 h, no km 80."]
@@ -192,7 +192,7 @@ window.EXTRA = window.EXTRA || {};
     ler: [W("Cinemática"), W("Movimento retilíneo uniformemente variado"), PHET, KHAN_FIS]
   };
 
-  E["Física#1"] = {
+  E["Física#9"] = {
     s: [
       ["Diagrama de forças: o método", "Quase todo problema de dinâmica se resolve em quatro passos: 1) desenhe o corpo isolado; 2) desenhe **todas** as forças (peso para baixo, normal perpendicular à superfície, tração ao longo do fio, atrito contra o movimento); 3) escolha os eixos; 4) aplique **F resultante = m · a** em cada eixo.\n\nSe o corpo está parado ou em velocidade constante, a resultante é zero. Erro comum: colocar uma 'força do movimento' que não existe. Um corpo em movimento não precisa de força para continuar se movendo (inércia)."],
       ["Impulso e quantidade de movimento", "Quantidade de movimento é **Q = m · v**. Num sistema isolado (como numa colisão ou numa explosão), a quantidade de movimento total se conserva.\n\nImpulso é **I = F · Δt** e é igual à variação de Q. Isso explica o airbag e o capacete: ao aumentar o tempo da colisão, a mesma variação de quantidade de movimento acontece com uma força menor sobre o corpo. Também explica o recuo da arma e o funcionamento de foguetes."]
@@ -204,7 +204,7 @@ window.EXTRA = window.EXTRA || {};
     ler: [W("Leis de Newton"), W("Momento linear"), PHET, KHAN_FIS]
   };
 
-  E["Física#2"] = {
+  E["Física#13"] = {
     s: [
       ["Conservação de energia", "Num sistema sem atrito, a **energia mecânica** (cinética + potencial) se conserva. Uma bola solta de uma altura h chega ao chão com velocidade v = √(2gh), independentemente da massa.\n\nCom atrito, parte da energia mecânica vira **energia térmica** (calor) e som. A energia total sempre se conserva; o que muda é a forma. Essa ideia resolve montanhas-russas, pêndulos, molas e quedas sem precisar das fórmulas de movimento."],
       ["Fontes de energia e o Brasil", "A matriz elétrica brasileira é majoritariamente **renovável**, com destaque para hidrelétricas, e com crescimento acelerado de energia eólica (Nordeste) e solar. Isso é diferente da média mundial, que depende muito de carvão e gás.\n\nCada fonte tem vantagens e problemas: hidrelétricas alagam áreas e afetam comunidades; eólicas dependem do vento; solares, da luz do dia; termelétricas emitem CO₂; nucleares geram rejeitos radioativos. A prova costuma pedir a comparação entre elas."]
@@ -216,7 +216,7 @@ window.EXTRA = window.EXTRA || {};
     ler: [W("Conservação da energia"), W("Matriz energética do Brasil"), PHET, KHAN_FIS]
   };
 
-  E["Física#3"] = {
+  E["Física#31"] = {
     s: [
       ["Calculando a conta de luz", "A energia consumida é **E = P · t**. Se a potência estiver em kW e o tempo em horas, o resultado sai em kWh, a unidade da conta de luz.\n\nExemplo: um chuveiro de 5.000 W (5 kW) ligado 30 minutos por dia durante 30 dias: 5 kW × 0,5 h × 30 = 75 kWh. Com a tarifa a R$ 0,80 por kWh, são R$ 60 só de chuveiro. O chuveiro na posição 'inverno' tem resistência menor, por isso puxa mais corrente e dissipa mais potência (P = U²/R)."],
       ["Magnetismo e indução", "Corrente elétrica cria campo magnético (experimento de Oersted), e campo magnético variável cria corrente elétrica (**indução de Faraday**). É assim que funcionam os geradores de usinas: turbinas giram ímãs perto de bobinas e geram corrente.\n\nTransformadores usam indução para aumentar ou reduzir tensão, e só funcionam com corrente alternada. Motores elétricos fazem o caminho inverso: corrente + campo magnético geram movimento."]
@@ -228,7 +228,7 @@ window.EXTRA = window.EXTRA || {};
     ler: [W("Lei de Ohm"), W("Indução eletromagnética"), PHET, KHAN_FIS]
   };
 
-  E["Física#4"] = {
+  E["Física#26"] = {
     s: [
       ["Espectro eletromagnético", "Luz visível, rádio, micro-ondas, raios X e raios gama são todos **ondas eletromagnéticas**: viajam no vácuo à velocidade da luz (300.000 km/s). O que muda entre elas é a frequência.\n\nOrdem crescente de frequência (e de energia): ondas de rádio, micro-ondas, infravermelho, luz visível (do vermelho ao violeta), ultravioleta, raios X, raios gama. Quanto maior a frequência, mais energia e maior o potencial de dano às células: por isso usamos protetor solar contra o UV e avental de chumbo nos raios X."],
       ["Fenômenos ondulatórios", "**Reflexão**: a onda bate e volta (eco). **Refração**: muda de meio e de velocidade (canudo 'quebrado' no copo). **Difração**: contorna obstáculos (ouvimos alguém atrás de um muro). **Interferência**: ondas se somam ou se anulam (fones com cancelamento de ruído). **Ressonância**: um corpo vibra forte quando recebe energia na sua frequência natural (taça que quebra com a voz).\n\nO **efeito Doppler** explica por que a sirene da ambulância fica mais aguda quando ela se aproxima e mais grave quando se afasta."]
@@ -240,7 +240,7 @@ window.EXTRA = window.EXTRA || {};
     ler: [W("Espectro eletromagnético"), W("Efeito Doppler"), PHET, KHAN_FIS]
   };
 
-  E["Física#5"] = {
+  E["Física#20"] = {
     s: [
       ["Calor sensível e latente na prática", "**Calor sensível** muda a temperatura: Q = m · c · ΔT. **Calor latente** muda o estado físico sem mudar a temperatura: Q = m · L.\n\nPor isso a água fervendo fica em 100 °C (ao nível do mar) mesmo com o fogo ligado: a energia está sendo usada para transformar líquido em vapor. Na panela de pressão, a pressão maior aumenta a temperatura de ebulição, e a comida cozinha mais rápido. Em altitudes elevadas acontece o contrário: a água ferve abaixo de 100 °C."],
       ["Máquinas térmicas", "Máquinas térmicas (motores, termelétricas) transformam calor em trabalho operando entre uma fonte quente e uma fria. Nenhuma máquina converte 100% do calor em trabalho (**2ª lei da termodinâmica**): parte sempre vai para a fonte fria.\n\nO rendimento é η = trabalho ÷ calor recebido. O máximo teórico é o do **ciclo de Carnot**: η = 1 − T(fria) ÷ T(quente), com temperaturas em kelvin. Geladeiras e ar-condicionado fazem o caminho inverso, gastando trabalho para tirar calor de um lugar frio."]
@@ -252,7 +252,7 @@ window.EXTRA = window.EXTRA || {};
     ler: [W("Calorimetria"), W("Termodinâmica"), W("Ciclo de Carnot"), PHET]
   };
 
-  E["Física#6"] = {
+  E["Física#15"] = {
     s: [
       ["Pressão no corpo humano", "A pressão arterial é medida em mmHg: '12 por 8' significa 120 mmHg na sístole e 80 mmHg na diástole. Pela lei de Stevin, a pressão nos pés de uma pessoa em pé é maior que na cabeça, porque há uma coluna de sangue acima.\n\nMergulhadores sentem a pressão aumentar cerca de 1 atm a cada 10 m de profundidade. O canudinho funciona porque você reduz a pressão dentro da boca, e a pressão atmosférica empurra o líquido para cima."],
       ["Hidrodinâmica básica", "Num cano, a **vazão** (volume por tempo) é constante: Q = A · v. Se o cano estreita, a velocidade aumenta. É o que acontece quando apertamos a ponta da mangueira.\n\nO **princípio de Bernoulli** diz que, onde o fluido se move mais rápido, a pressão é menor. Isso ajuda a explicar a sustentação das asas de avião, o telhado arrancado em vendavais e a cortina do chuveiro que gruda na perna."]

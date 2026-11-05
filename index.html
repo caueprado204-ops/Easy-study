@@ -1126,6 +1126,11 @@ ex:["Um viajante diz que a comida de outro país é 'nojenta' por ser diferente 
 <script src="conteudo/geografia-3.js"></script>
 <script src="conteudo/geografia-4.js"></script>
 <script src="conteudo/redacao-2025.js"></script>
+<script src="conteudo/figuras-fis.js"></script>
+<script src="conteudo/fisica-1.js"></script>
+<script src="conteudo/fisica-2.js"></script>
+<script src="conteudo/fisica-3.js"></script>
+<script src="conteudo/fisica-4.js"></script>
 <script src="conteudo/extras-natureza.js"></script>
 <script src="conteudo/extras-exatas-linguagens.js"></script>
 <script src="conteudo/extras-humanas.js"></script>
@@ -1189,6 +1194,13 @@ const GEO_MAPA={0:1,1:3,2:10,3:13,4:21,5:22};
   const ord=["terra",0,"cartotema",1,"tecton","relevo","solos","hidro","climat","climas",2,"biomasmundo","dominios",3,"ambiente","energia","industria","indbr","agrario","populacao","urbano",4,5,"ordem","conflitos","america"];
   const novo=ord.map(k=>typeof k==="number"?Object.assign(o[k],ren[k]?{t:ren[k]}:{}):N[k]);
   if(novo.every(Boolean))MOD["Geografia"]=novo;})();
+// Física completa: 29 módulos novos intercalados com os 7 originais (que viram revisões)
+const FIS_MAPA={0:5,1:9,2:13,3:31,4:26,5:20,6:15};
+(function(){const N=window.FIS_NOVOS,o=MOD["Física"];if(!N||!o||o.length!==7)return;
+  const ren={0:"Cinemática: revisão geral",1:"Dinâmica: revisão geral",2:"Energia e trabalho: revisão geral",3:"Eletricidade: revisão geral",4:"Ondas e óptica: revisão geral",5:"Termologia: revisão geral",6:"Hidrostática: densidade, pressão e empuxo"};
+  const ord=["vetores","mu","muv","lancamentos","mcu",0,"newton","atrito","centripeta",1,"trabalho","energia","impulso",2,"estatica",6,"gravitacao","termometria","calorimetria","gases",5,"optgeo","espelhos","refracao","ondas","interferencia",4,"eletrostatica","corrente","circuitos","potencia",3,"magnetismo","forcafio","inducao","moderna"];
+  const novo=ord.map(k=>typeof k==="number"?Object.assign(o[k],ren[k]?{t:ren[k]}:{}):N[k]);
+  if(novo.every(Boolean))MOD["Física"]=novo;})();
 function migrarMods(st,subj,mapa,flag,minLen){ // remapeia o progresso salvo quando a ordem dos módulos de uma matéria muda
   if(!st||st[flag]>=2)return; st[flag]=2; if((MOD[subj]||[]).length<minLen)return;
   const re=new RegExp("^"+subj+"#(\\d+)(\\|.*)?$");
@@ -1199,7 +1211,7 @@ function migrarMods(st,subj,mapa,flag,minLen){ // remapeia o progresso salvo qua
   if(st.fc&&st.fc.ai)st.fc.ai=remap(st.fc.ai);
   if(st.lastMod)st.lastMod=mv(st.lastMod);
 }
-function migrarBio(st){migrarMods(st,"Biologia",BIO_MAPA,"bioV",23);migrarMods(st,"História",HIS_MAPA,"hisV",23);migrarMods(st,"Matemática",MAT_MAPA,"matV",20);migrarMods(st,"Química",QUI_MAPA,"quiV",27);migrarMods(st,"Geografia",GEO_MAPA,"geoV",26);}
+function migrarBio(st){migrarMods(st,"Biologia",BIO_MAPA,"bioV",23);migrarMods(st,"História",HIS_MAPA,"hisV",23);migrarMods(st,"Matemática",MAT_MAPA,"matV",20);migrarMods(st,"Química",QUI_MAPA,"quiV",27);migrarMods(st,"Geografia",GEO_MAPA,"geoV",26);migrarMods(st,"Física",FIS_MAPA,"fisV",36);}
 // Redação: módulos e seções da Cartilha do Participante 2025 (no fim da lista, sem mudar a ordem dos antigos)
 (function(){const o=MOD["Redação"],N=window.RED_NOVOS,X=window.RED_EXTRA||{};if(!o)return;
   for(const [pref,secs] of Object.entries(X)){const m=o.find(x=>x.t.startsWith(pref));if(m)m.s=m.s.concat(secs);}
