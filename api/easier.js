@@ -206,8 +206,9 @@ const PROVIDERS = {
         tried.push(`gemini ${model}/${api}:${r.status}`);
         if (r.ok && r.body) return { ok: true, provider: "gemini", response: r, extract: geminiText };
         last = { ok: false, status: r.status, detail: await r.text().catch(() => "") };
-        // sem cota: não adianta tentar outros modelos do mesmo projeto
-        if (r.status === 429) return last;
+        // sem cota neste modelo: no plano gratuito cada modelo tem a própria cota,
+        // então pula para o próximo modelo (a outra API do mesmo modelo também estaria sem cota)
+        if (r.status === 429) break;
       }
     }
     return last;
@@ -215,23 +216,30 @@ const PROVIDERS = {
 
   /* ---------- Groq (API compatível com OpenAI) ---------- */
   async groq(prompt, tried, system) {
-    const model = process.env.GROQ_MODEL || "openai/gpt-oss-120b";
-    const r = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-      method: "POST",
-      headers: { "content-type": "application/json", authorization: `Bearer ${process.env.GROQ_API_KEY}` },
-      body: JSON.stringify({
-        model,
-        stream: true,
-        max_tokens: MAX_TOKENS,
-        messages: [
-          { role: "system", content: system },
-          { role: "user", content: prompt },
-        ],
-      }),
-    });
-    tried.push(`groq ${model}:${r.status}`);
-    if (r.ok && r.body) return { ok: true, provider: "groq", response: r, extract: openaiText };
-    return { ok: false, status: r.status, detail: await r.text().catch(() => "") };
+    // No plano gratuito do Groq cada modelo tem limites próprios: se um estiver sem cota
+    // (429) ou o pedido for grande demais para ele (413), tenta o próximo.
+    const models = [...new Set([process.env.GROQ_MODEL, "openai/gpt-oss-120b", "llama-3.3-70b-versatile", "openai/gpt-oss-20b", "llama-3.1-8b-instant"].filter(Boolean))];
+    let last = { ok: false, status: 502, detail: "" };
+    for (const model of models) {
+      const r = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+        method: "POST",
+        headers: { "content-type": "application/json", authorization: `Bearer ${process.env.GROQ_API_KEY}` },
+        body: JSON.stringify({
+          model,
+          stream: true,
+          max_tokens: MAX_TOKENS,
+          messages: [
+            { role: "system", content: system },
+            { role: "user", content: prompt },
+          ],
+        }),
+      });
+      tried.push(`groq ${model}:${r.status}`);
+      if (r.ok && r.body) return { ok: true, provider: "groq", response: r, extract: openaiText };
+      last = { ok: false, status: r.status, detail: await r.text().catch(() => "") };
+      if (r.status === 401 || r.status === 403) return last; // chave inválida: nenhum modelo vai funcionar
+    }
+    return last;
   },
 
   /* ---------- Grok, da xAI (API compatível com OpenAI) ---------- */
