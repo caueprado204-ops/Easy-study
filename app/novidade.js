@@ -1,9 +1,10 @@
-// Pop-up de novidade: Unesp no banco de questões (1ª e 2ª fase). Aparece uma vez por aluno, ao entrar na plataforma.
+// Pop-up de novidade: Unesp no banco de questões (1ª e 2ª fase). Aparece toda vez que a plataforma é aberta, até 26/11/2026.
 // Usa globais do app (go, qMode, qf, rebuildQ, render, discClick).
 (function () {
-  const KEY = "es_novidade_unesp_v1";
-  const visto = () => { try { return localStorage.getItem(KEY) === "1"; } catch (e) { return false; } };
-  const marcar = () => { try { localStorage.setItem(KEY, "1"); } catch (e) {} };
+  const ATE = new Date("2026-11-27T00:00:00-03:00"); // último dia: 26/11, horário de Brasília
+  let mostrado = false; // uma vez por abertura da plataforma
+  const visto = () => mostrado || Date.now() >= ATE.getTime();
+  const marcar = () => { mostrado = true; };
   const STAR = (c, s, pos, delay) => `<svg class="nv-st" style="width:${s}px;height:${s}px;${pos};animation-delay:${delay}s" viewBox="0 0 40 40" aria-hidden="true"><path d="M20 0C22 14 26 18 40 20 26 22 22 26 20 40 18 26 14 22 0 20 14 18 18 14 20 0z" fill="${c}"/></svg>`;
 
   const css = `
@@ -49,6 +50,7 @@
 
   function abrir() {
     if (visto() || document.getElementById("nvOv")) return;
+    mostrado = true;
     if (!document.getElementById("nvCss")) {
       const st = document.createElement("style"); st.id = "nvCss"; st.textContent = css; document.head.appendChild(st);
     }
