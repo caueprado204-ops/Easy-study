@@ -8,7 +8,7 @@
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://easystudy.space/">
 <meta property="og:title" content="Easy Study: estude para o curso dos seus sonhos">
-<meta property="og:description" content="Módulos, questões de FUVEST, Unicamp, ENEM e Provão Paulista, simulados, redação com IA e jogos para revisar.">
+<meta property="og:description" content="Módulos, questões de FUVEST, Unicamp, Unesp, ENEM e Provão Paulista, simulados, redação com IA e jogos para revisar.">
 <meta property="og:locale" content="pt_BR">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' rx='10' fill='%234E3DF2'/%3E%3Cg fill='%23DFF24B'%3E%3Crect x='17' y='6' width='6' height='28' rx='3'/%3E%3Crect x='17' y='6' width='6' height='28' rx='3' transform='rotate(60 20 20)'/%3E%3Crect x='17' y='6' width='6' height='28' rx='3' transform='rotate(120 20 20)'/%3E%3C/g%3E%3C/svg%3E">
 <style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
@@ -1262,9 +1262,10 @@ const SIMS=[
  {id:"hum",name:"Humanas + Linguagens",desc:"No estilo do 1º dia do ENEM.",n:20,min:60,cls:"c-pink",f:q=>(q.v||"ENEM")==="ENEM"&&(q.a==="ciencias-humanas"||q.a==="linguagens")},
  {id:"fuv",name:"Estilo FUVEST",desc:"Questões reais da 1ª fase da FUVEST, de todas as matérias.",n:30,min:90,cls:"c-lime",f:q=>q.v==="FUVEST"},
  {id:"uni",name:"Estilo Unicamp",desc:"Questões reais da 1ª fase da Unicamp, de todas as matérias.",n:24,min:72,cls:"c-pink",f:q=>q.v==="Unicamp"},
+ {id:"unesp",name:"Estilo Unesp",desc:"Questões reais da 1ª fase da Unesp (Vunesp), de todas as matérias.",n:30,min:90,cls:"c-ink",f:q=>q.v==="Unesp"},
  {id:"pp",name:"Provão Paulista",desc:"Questões reais das provas seriadas da 1ª, 2ª e 3ª série do ensino médio.",n:24,min:72,cls:"c-violet",f:q=>q.v==="Provão Paulista"},
- {id:"med",name:"Turbo Natureza",desc:"Biologia, Química e Física de ENEM, FUVEST e Unicamp, o peso maior nos cursos de saúde.",n:15,min:45,cls:"c-lime",f:q=>q.a==="ciencias-natureza"},
- {id:"mat",name:"Maratona de Matemática",desc:"Matemática de ENEM, FUVEST e Unicamp, com tempo apertado.",n:15,min:40,cls:"c-ink",f:q=>q.a==="matematica"}
+ {id:"med",name:"Turbo Natureza",desc:"Biologia, Química e Física de ENEM, FUVEST, Unicamp e Unesp, o peso maior nos cursos de saúde.",n:15,min:45,cls:"c-lime",f:q=>q.a==="ciencias-natureza"},
+ {id:"mat",name:"Maratona de Matemática",desc:"Matemática de ENEM, FUVEST, Unicamp e Unesp, com tempo apertado.",n:15,min:40,cls:"c-ink",f:q=>q.a==="matematica"}
 ];
 const DEFAULT_EXAMS=[{n:"FUVEST 1ª fase",d:"2026-11-01"},{n:"ENEM 1º dia",d:"2026-11-08"},{n:"ENEM 2º dia",d:"2026-11-15"},{n:"Unesp 1ª fase",d:"2026-11-22"},{n:"FUVEST 2ª fase",d:"2026-12-06"},{n:"Unesp 2ª fase",d:"2026-12-13"},{n:"Unicamp 1ª fase",d:""},{n:"Provão Paulista",d:""}];
 const PLAYLISTS=[{n:"Lo-fi para estudar",q:"lofi study",c:"var(--lilac)"},{n:"Clássica para foco",q:"classical music for studying",c:"var(--butter)"},{n:"Piano tranquilo",q:"peaceful piano",c:"var(--sky)"},{n:"Chuva e ruído branco",q:"rain sounds study",c:"var(--mint)"}];
@@ -1332,7 +1333,7 @@ function renderLanding(){
         <p>Foco em USP (FUVEST), Unicamp, Unesp, ENEM e Provão Paulista: módulos completos, questões reais, a Easier e uma rotina que cabe na sua semana.</p>
         <button class="l-cta" ${ACC?"data-enter":"data-enter-signup"}>${ACC?"Continuar estudando":"Criar minha conta"}</button>
       </div>
-      <div class="l-small"><span>60 módulos em<br>9 matérias</span><hr><span>${nq} questões reais de ENEM, FUVEST, Unicamp e Provão Paulista</span></div>
+      <div class="l-small"><span>60 módulos em<br>9 matérias</span><hr><span>${nq} questões reais de ENEM, FUVEST, Unicamp, Unesp e Provão Paulista</span></div>
       <div class="l-photo" aria-hidden="true">
         ${SPARK("#DFF24B",34,"left:18px","top:22px")}
         <div class="phone">
@@ -1402,7 +1403,7 @@ function renderLanding(){
     ${planCardsHTML(true)}
 
     <div class="l-final">${SPARK("#FF44C9",30,"right:30px","top:16px")}<h2 class="h-big">Sua vaga começa <em>hoje</em></h2><button class="l-cta" data-enter>Entrar na plataforma</button></div>
-    <div class="l-foot"><span>Easy Study · questões do ENEM via projeto aberto enem-api; FUVEST e Unicamp via conjunto aberto BLUEX; Provão Paulista a partir das provas da Seduc-SP</span><span>Feito para quem sonha com USP, Unicamp, Unesp e federais</span></div>
+    <div class="l-foot"><span>Easy Study · questões do ENEM via projeto aberto enem-api; FUVEST e Unicamp via conjunto aberto BLUEX; Unesp a partir dos cadernos oficiais da Vunesp; Provão Paulista a partir das provas da Seduc-SP</span><span>Feito para quem sonha com USP, Unicamp, Unesp e federais</span></div>
   </div>`;
 }
 
@@ -1430,12 +1431,12 @@ function toast(msg,acao,fn){const t=document.getElementById("toast");t.textConte
 
 /* ---------- questões ---------- */
 let Q=[],QMAP={},QREADY=false;
-Promise.all([fetch("questoes.json").then(r=>r.json()),...["questoes-vest.json","questoes-provao.json"].map(f=>fetch(f).then(r=>r.ok?r.json():[]).catch(()=>[]))]).then(([d,...extra])=>{d.forEach(q=>{q.v=q.v||"ENEM";});Q=d.concat(...extra);Q.forEach(q=>QMAP[q.id]=q);
+Promise.all([fetch("questoes.json").then(r=>r.json()),...["questoes-vest.json","questoes-unesp.json","questoes-provao.json"].map(f=>fetch(f).then(r=>r.ok?r.json():[]).catch(()=>[]))]).then(([d,...extra])=>{d.forEach(q=>{q.v=q.v||"ENEM";});Q=d.concat(...extra);Q.forEach(q=>QMAP[q.id]=q);
   // provas que só informam a área: estima a matéria pelo assunto do módulo mais próximo
   Q.forEach(q=>{if((q.s==="Ciências da Natureza"||q.s==="Ciências Humanas")&&q.v!=="ENEM"&&window.GPS&&GPS.topicOf){const t=GPS.topicOf(q);if(t&&MODMAP[t])q.s=MODMAP[t].s;}});
   QREADY=true;if(!document.getElementById("app").hidden)render();}).catch(()=>{QREADY="erro";if(!document.getElementById("app").hidden)render();});
 const md=s=>esc(s).replace(/\*\*(.+?)\*\*/g,"<strong>$1</strong>").replace(/(^|[^*])\*(?!\s)(.+?)\*/g,"$1<em>$2</em>").replace(/\\([\[\]\-_*().!])/g,"$1");
-const PROVAS=["ENEM","FUVEST","Unicamp","Provão Paulista"]; // Unesp entra aqui quando o banco for carregado
+const PROVAS=["ENEM","FUVEST","Unicamp","Unesp","Provão Paulista"];
 const qProva=q=>q.v||"ENEM";
 const qImg=(q,i)=>q.im&&q.im[i]?`<img class="qimg" src="${q.im[i]}" alt="Figura ${+i+1} da questão" loading="lazy">`:"";
 const qmd=(t,q)=>md(String(t||"").replace(/\n*(\[IMAGE \d+\])\n*/g,"$1")).replace(/\[IMAGE (\d+)\]/g,(m,i)=>qImg(q,i));
@@ -1557,7 +1558,7 @@ function vPainel(){
     </div>
     <div class="dark-card">
       <div class="small" style="opacity:.8">Questão do dia · Ciências da Natureza</div>
-      ${dq?`<span class="chip" style="align-self:flex-start;background:var(--butter);color:var(--ink)">${qProva(dq)} ${dq.y} · Q${dq.n}</span><h3>${esc(qPlain(dq.q||dq.c).slice(0,140))}${(dq.q||dq.c).length>140?"…":""}</h3><div class="small" style="opacity:.8">${S.ans[dq.id]!==undefined?(S.ans[dq.id]===dq.k?"Você acertou esta.":"Você errou esta. Veja a explicação."):"Ainda não respondida."}</div><button class="btn" data-openq="${dq.id}">Resolver agora</button>`:`<h3>${QREADY==="erro"?"Não foi possível carregar o banco de questões.":"Carregando o banco de questões…"}</h3>`}
+      ${dq?`<span class="chip" style="align-self:flex-start;background:var(--butter);color:var(--ink)">${qProva(dq)} ${dq.y} · Q${dq.n}</span><h3>${esc(qPlain(dq.q||dq.tx||dq.c).slice(0,140))}${(dq.q||dq.tx||dq.c).length>140?"…":""}</h3><div class="small" style="opacity:.8">${S.ans[dq.id]!==undefined?(S.ans[dq.id]===dq.k?"Você acertou esta.":"Você errou esta. Veja a explicação."):"Ainda não respondida."}</div><button class="btn" data-openq="${dq.id}">Resolver agora</button>`:`<h3>${QREADY==="erro"?"Não foi possível carregar o banco de questões.":"Carregando o banco de questões…"}</h3>`}
     </div>
   </div>
   <div class="row-head"><h2 class="h-sec">Constância</h2><span class="small muted">últimas 16 semanas</span></div>
@@ -1827,7 +1828,7 @@ function vSimulados(){
   if(S.sim&&S.sim.done&&simView==="result")return simResult();
   const years=[...new Set(Q.map(q=>q.y))].sort((a,b)=>b-a);
   return `<h1 class="h-big" style="font-size:clamp(28px,5vw,46px);margin:6px 0 4px">Simulados<br><span style="color:var(--violet)">contra o relógio</span></h1>
-  <p class="muted" style="max-width:60ch">Questões reais do ENEM, da FUVEST, da Unicamp e do Provão Paulista sorteadas do banco. O tempo segue a média de 3 minutos por questão.</p>
+  <p class="muted" style="max-width:60ch">Questões reais do ENEM, da FUVEST, da Unicamp, da Unesp e do Provão Paulista sorteadas do banco. O tempo segue a média de 3 minutos por questão.</p>
   ${QREADY!==true?`<div class="empty">Carregando questões…</div>`:`
   <div class="grid programs" style="margin-top:16px">${SIMS.map(s=>`<div class="prog ${s.cls}"><div class="tags"><span>${s.n} questões</span><span>${s.min} min</span></div><h3>${s.name}</h3><p>${s.desc}</p><button class="btn" data-startsim="${s.id}">Começar</button></div>`).join("")}</div>
   <div class="row-head"><h2 class="h-sec">Provas anteriores por ano</h2></div>
@@ -1835,7 +1836,7 @@ function vSimulados(){
     <select id="yearProva" aria-label="Prova">${PROVAS.map(p=>`<option>${p}</option>`).join("")}</select><select id="yearSel" aria-label="Ano da prova">${years.map(y=>`<option>${y}</option>`).join("")}</select>
     <select id="yearArea" aria-label="Área"><option value="">Prova completa (em texto)</option><option value="ciencias-natureza">Ciências da Natureza</option><option value="matematica">Matemática</option><option value="ciencias-humanas">Ciências Humanas</option><option value="linguagens">Linguagens</option></select>
     <button class="btn" data-startyear>Fazer prova</button>
-    <span class="note" style="flex-basis:100%">ENEM de 2016 a 2023 (questões em texto), FUVEST e Unicamp de 2018 a 2024 e Provão Paulista de 2024 e 2025 (com figuras). Para a prova original completa, use os links oficiais abaixo.</span></div>`}
+    <span class="note" style="flex-basis:100%">ENEM de 2016 a 2023 (questões em texto), FUVEST e Unicamp de 2018 a 2024, Unesp de 2023 a 2026 e Provão Paulista de 2024 e 2025 (com figuras). Para a prova original completa, use os links oficiais abaixo.</span></div>`}
   ${S.sims.length?`<div class="row-head"><h2 class="h-sec">Histórico</h2></div><div class="card"><table><thead><tr><th>Simulado</th><th>Data</th><th>Acertos</th></tr></thead><tbody>${S.sims.slice().reverse().slice(0,8).map(h=>`<tr><td>${esc(h.name)}</td><td class="num">${new Date(h.date).toLocaleDateString("pt-BR")}</td><td class="num"><b>${h.ok}/${h.n}</b> (${Math.round(h.ok/h.n*100)}%)</td></tr>`).join("")}</tbody></table></div>`:""}
   <div class="row-head"><h2 class="h-sec">Provas oficiais anteriores</h2></div>
   <div class="grid links">${[["ENEM","Provas e gabaritos do INEP","https://www.gov.br/inep/pt-br/areas-de-atuacao/avaliacao-e-exames-educacionais/enem/provas-e-gabaritos"],["FUVEST","USP: provas e resoluções","https://www.fuvest.br/"],["Unicamp","Comvest: provas anteriores","https://www.comvest.unicamp.br/"],["Unesp","Vunesp: vestibular Unesp","https://www.vunesp.com.br/"],["Provão Paulista","Seriado da rede estadual de SP","https://provaopaulista.vunesp.com.br/"]].map(([a,b,u])=>`<a class="link-card" href="${u}" target="_blank" rel="noopener"><b>${a}</b><span class="small muted">${b}</span></a>`).join("")}</div>`;
@@ -2291,7 +2292,7 @@ async function explainQ(id){
   const q=QMAP[id],box=document.getElementById("exp-"+id);if(!box)return;const sample=await getSample();
   if(!sample){box.innerHTML=`<div class="explain">A Easier está indisponível agora. Tente de novo em instantes.</div>`;return;}
   ezStart("exp:"+id,"explicar");box.innerHTML=`<div id="expL-${id}">${ezLoader("exp:"+id,"explicar")}</div><div class="explain" id="expT-${id}" hidden></div>`;const mostra=()=>{document.getElementById("expL-"+id)?.remove();const el=document.getElementById("expT-"+id);if(el)el.hidden=false;return el;};const chosen=S.ans[id]??S.sim?.ans?.[id];
-  const prompt=`Seu nome é Easier, a tutora de IA da plataforma Easy Study, professora de cursinho pré-vestibular. ${cursoAluno()} Explique a resolução desta questão da prova ${qProva(q)} ${q.y}${q.im?" (a questão tem figuras que você não vê; se precisar, explique o raciocínio geral)":""} de forma clara e curta (até 180 palavras), em português do Brasil, em texto simples sem markdown. Diga por que a alternativa correta está certa, por que a alternativa marcada pelo aluno está errada (se errou) e termine com uma dica de conteúdo para revisar.\n\nTexto-base: ${q.c}\nEnunciado: ${q.q}\nAlternativas:\n${q.o.map((o,i)=>"ABCDE"[i]+") "+o).join("\n")}\nGabarito: ${"ABCDE"[q.k]}\nAlternativa marcada pelo aluno: ${chosen===undefined?"nenhuma":"ABCDE"[chosen]}`;
+  const prompt=`Seu nome é Easier, a tutora de IA da plataforma Easy Study, professora de cursinho pré-vestibular. ${cursoAluno()} Explique a resolução desta questão da prova ${qProva(q)} ${q.y}${q.im?" (a questão tem figuras que você não vê; se precisar, explique o raciocínio geral)":""} de forma clara e curta (até 180 palavras), em português do Brasil, em texto simples sem markdown. Diga por que a alternativa correta está certa, por que a alternativa marcada pelo aluno está errada (se errou) e termine com uma dica de conteúdo para revisar.\n\nTexto-base: ${q.tx||q.c}\nEnunciado: ${q.q}\nAlternativas:\n${q.o.map((o,i)=>"ABCDE"[i]+") "+o).join("\n")}\nGabarito: ${"ABCDE"[q.k]}\nAlternativa marcada pelo aluno: ${chosen===undefined?"nenhuma":"ABCDE"[chosen]}`;
   try{const {text}=await sample(prompt,{modelTier:"default",onText:({text})=>{const el=mostra();if(el)el.textContent=text;}});qExplain[id]=text;ezDone("exp:"+id,true);const el=mostra();if(el)el.textContent=text;}
   catch(err){ezDone("exp:"+id,false);const el=mostra();if(el)el.textContent=err&&err.text?err.text:errMsg(err);}
 }
