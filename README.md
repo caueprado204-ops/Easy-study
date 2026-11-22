@@ -9,9 +9,10 @@ index.html        landing page + plataforma (tudo em um arquivo)
 questoes.json     876 questões reais do ENEM 2016–2023 (projeto aberto enem-api)
 questoes-vest.json 1.257 questões da FUVEST e da Unicamp 2018–2024 (conjunto aberto BLUEX)
 questoes-unesp.json 360 questões da 1ª fase da Unesp 2023–2026 (cadernos oficiais da Vunesp)
+questoes-unesp-2fase.json 226 dissertativas reais da 2ª fase da Unesp 2015–2025 (enunciados; a resolução é feita pela Easier)
 questoes-provao.json 366 questões do Provão Paulista 2024–2025 (provas seriadas da Seduc-SP)
 img/              figuras das questões da FUVEST, da Unicamp, da Unesp e do Provão Paulista (webp)
-scripts/          build_unesp.py: gera questoes-unesp.json e img/unesp/
+scripts/          build_unesp.py e build_unesp_2fase.py: geram os arquivos da Unesp
 api/easier.js     função serverless que conversa com a IA (a chave fica no servidor)
 app/gps-lab.js    GPS de Estudos + Laboratório de Erros
 conteudo/         textos dos módulos, figuras e conteúdos extras

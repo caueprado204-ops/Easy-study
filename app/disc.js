@@ -3,8 +3,17 @@
 // Usa globais do app (S, save, render, esc, toast, getSample, errMsg, addXP, ALL_MODS, subjColor, cursoAluno).
 (function () {
   const L = "abcdefgh";
-  const df = { s: "Todas", est: "Todas", pend: false };
-  let list = [], idx = 0, built = false, busy = null, self = {};
+  const df = { s: "Todas", est: "Todas", y: "Todos", pend: false };
+  let list = [], idx = 0, built = false, busy = null, resolBusy = null, self = {};
+  const ESTS = ["Todas", "FUVEST", "Unicamp", "Unesp"];
+
+  // Questões reais da 2ª fase da Unesp (enunciados das provas; a resolução de referência é da Easier)
+  fetch("questoes-unesp-2fase.json").then((r) => (r.ok ? r.json() : [])).then((j) => {
+    if (!Array.isArray(j) || !j.length) return;
+    window.DISC = (window.DISC || []).concat(j);
+    built = false;
+    if (typeof VIEW !== "undefined" && VIEW === "questoes" && typeof render === "function") render();
+  }).catch(() => {});
 
   const st = () => (S.disc = S.disc || {});
   const reg = (id) => (st()[id] = st()[id] || { resp: [] });
@@ -14,13 +23,14 @@
 
   function modDe(d) {
     if (d._mod !== undefined) return d._mod;
+    if (!d.mt) return (d._mod = null);
     const m = (typeof ALL_MODS !== "undefined" ? ALL_MODS : []).find((m) => m.s === d.s && norm(m.t).startsWith(norm(d.mt)));
     return (d._mod = m || null);
   }
 
   function rebuild(keepId) {
     const D = window.DISC || [];
-    list = D.filter((d) => (df.s === "Todas" || d.s === df.s) && (df.est === "Todas" || d.est === df.est) && (!df.pend || st()[d.id]?.nota === undefined));
+    list = D.filter((d) => (df.s === "Todas" || d.s === df.s) && (df.est === "Todas" || d.est === df.est) && (df.y === "Todos" || String(d.ed) === df.y) && (!df.pend || st()[d.id]?.nota === undefined));
     idx = keepId ? Math.max(0, list.findIndex((d) => d.id === keepId)) : 0;
     built = true;
   }
@@ -52,7 +62,20 @@
     </div>`;
   }
 
+  function resolHTML(d, r) {
+    if (r.resol) return `<p class="small muted" style="margin:0 0 6px">Resolução comentada da Easier (a Unesp não divulga gabarito oficial da 2ª fase).</p><div class="explain" style="white-space:pre-wrap;margin:0 0 10px">${esc(r.resol)}</div>`;
+    if (resolBusy === d.id) return ezLoader("resol:" + d.id, "explicar");
+    return `<p class="small muted" style="margin:0 0 6px">A Unesp não divulga gabarito oficial da 2ª fase. A Easier resolve a questão para você comparar.</p>
+      <button class="btn sm violet" data-discresol="${d.id}" ${resolBusy ? "disabled" : ""}>Ver resolução da Easier</button>${r.resolErro ? `<p class="small" style="color:var(--bad)">${esc(r.resolErro)}</p>` : ""}`;
+  }
+
   function esperadaHTML(d, r, modoSelf) {
+    if (d.real) return `<div class="desp"><h3 style="font-size:15px;margin:0 0 6px">Resolução${modoSelf ? " e critérios" : ""}</h3>
+      ${resolHTML(d, r)}
+      ${d.itens.map((it, i) => `<div class="desp-it"><b>${L[i]})</b>
+        ${modoSelf ? `<div class="dcrit">${it.crit.map((c, j) => `<label><input type="checkbox" data-disccrit="${d.id}|${i}|${j}" ${self[d.id]?.[i]?.[j] ? "checked" : ""}> ${esc(c)}</label>`).join("")}</div>`
+          : `<ul class="small dcrit-l">${it.crit.map((c) => `<li>${esc(c)}</li>`).join("")}</ul>`}</div>`).join("")}
+      ${modoSelf ? `<button class="btn sm" data-discselfsave="${d.id}">Salvar minha nota</button> <button class="btn sm ghost" data-discselfclose="${d.id}">Fechar</button>` : ""}</div>`;
     return `<div class="desp"><h3 style="font-size:15px;margin:0 0 6px">Resposta esperada${modoSelf ? " e critérios" : ""}</h3>
       ${d.itens.map((it, i) => `<div class="desp-it"><b>${L[i]})</b> ${esc(it.esp)}
         ${modoSelf ? `<div class="dcrit">${it.crit.map((c, j) => `<label><input type="checkbox" data-disccrit="${d.id}|${i}|${j}" ${self[d.id]?.[i]?.[j] ? "checked" : ""}> ${esc(c)}</label>`).join("")}</div>`
@@ -64,19 +87,19 @@
     const r = reg(d.id), m = modDe(d), modoSelf = !!self[d.id];
     const corrigido = r.nota !== undefined;
     return `<article class="qcard dcard">
-      <div class="qmeta"><span class="chip dark">Estilo ${esc(d.est)} · 2ª fase</span><span class="chip" style="background:${subjColor(d.s)}">${esc(d.s)}</span><span class="chip">${total(d)} pontos</span><span class="chip">Questão autoral</span></div>
+      <div class="qmeta"><span class="chip dark">${d.real ? `${esc(d.est)} ${esc(d.ed)} · 2ª fase` : `Estilo ${esc(d.est)} · 2ª fase`}</span>${d.real ? `<span class="chip">Questão ${d.n}</span>` : ""}<span class="chip" style="background:${subjColor(d.s)}">${esc(d.s)}</span><span class="chip">${total(d)} pontos</span><span class="chip">${d.real ? "Questão real da prova" : "Questão autoral"}</span></div>
       <div class="qctx">${esc(d.c)}</div>
       ${d.itens.map((it, i) => `<div class="ditem"><div class="qintro" style="margin:14px 0 8px">${L[i]}) ${esc(it.q)} <span class="small muted num" style="font-weight:500">(${it.pts} pts)</span></div>
         <textarea class="sheet dta" rows="4" data-discresp="${d.id}|${i}" placeholder="Escreva sua resposta do item ${L[i]}. Mostre o raciocínio e as contas, como na prova.">${esc(r.resp[i] || "")}</textarea></div>`).join("")}
       <div class="dbtns">
         <button class="btn ink" data-disccorr="${d.id}" ${busy ? "disabled" : ""}>${busy === d.id ? "A Easier está corrigindo…" : corrigido ? "Corrigir de novo com a Easier" : "Corrigir com a Easier"}</button>
-        <button class="btn ghost" data-discself="${d.id}" ${busy ? "disabled" : ""}>Ver resposta esperada e me autoavaliar</button>
+        <button class="btn ghost" data-discself="${d.id}" ${busy ? "disabled" : ""}>${d.real ? "Ver resolução e me autoavaliar" : "Ver resposta esperada e me autoavaliar"}</button>
         ${m ? `<button class="btn ghost sm" data-mod="${m.id}">Estudar: ${esc(m.t)}</button>` : ""}
       </div>
       ${busy === d.id ? ezLoader("disc:" + d.id, "disc") : ""}
       ${r.erro ? `<div class="explain" style="border-color:var(--bad)">${esc(r.erro)}</div>` : ""}
       ${resultadoHTML(d, r)}
-      ${modoSelf ? esperadaHTML(d, r, true) : corrigido ? `<details class="ddet"><summary>Ver a resposta esperada</summary>${esperadaHTML(d, r, false)}</details>` : ""}
+      ${modoSelf ? esperadaHTML(d, r, true) : corrigido ? `<details class="ddet"><summary>${d.real ? "Ver a resolução" : "Ver a resposta esperada"}</summary>${esperadaHTML(d, r, false)}</details>` : ""}
     </article>`;
   }
 
@@ -84,10 +107,12 @@
     if (!built) rebuild();
     const D = window.DISC || [], d = list[idx], s = stats();
     const subjs = ["Todas", ...new Set(D.map((d) => d.s))];
-    return `<div class="row-head" style="margin-top:4px"><h1 class="h-sec">Dissertativas · 2ª fase</h1><span class="small muted num">${D.length} questões no estilo FUVEST e Unicamp</span></div>
-    <p class="note" style="margin:0 0 10px;max-width:80ch">Questões autorais do Easy Study, no formato das provas discursivas. Escreva sua resposta e a Easier corrige comparando com a resposta esperada e os critérios de correção. Sem a Easier, você pode ver a resposta esperada e se autoavaliar.</p>
-    <div class="pills" style="margin:0 0 10px">${["Todas", "FUVEST", "Unicamp"].map((p) => `<button class="pill ${df.est === p ? "on" : ""}" data-discest="${p}">${p === "Todas" ? "Todos os estilos" : "Estilo " + p}</button>`).join("")}</div>
+    const nReal = D.filter((d) => d.real).length;
+    return `<div class="row-head" style="margin-top:4px"><h1 class="h-sec">Dissertativas · 2ª fase</h1><span class="small muted num">${D.length} questões: ${nReal} reais da Unesp e ${D.length - nReal} autorais no estilo FUVEST e Unicamp</span></div>
+    <p class="note" style="margin:0 0 10px;max-width:80ch">Escreva sua resposta e a Easier corrige como a banca. Nas questões autorais ela compara com a resposta esperada e os critérios; nas questões reais da 2ª fase da Unesp, que não têm gabarito oficial, ela resolve a questão e corrige. Sem a Easier, você pode ver a resolução e se autoavaliar.</p>
+    <div class="pills" style="margin:0 0 10px">${ESTS.map((p) => `<button class="pill ${df.est === p ? "on" : ""}" data-discest="${p}">${p === "Todas" ? "Todas" : p === "Unesp" ? "Unesp (provas reais)" : "Estilo " + p}</button>`).join("")}</div>
     <div class="filters"><select id="dfS" aria-label="Matéria">${subjs.map((x) => `<option ${x === df.s ? "selected" : ""}>${x}</option>`).join("")}</select>
+      ${df.est === "Unesp" ? `<select id="dfY" aria-label="Edição">${["Todos", ...new Set(D.filter((d) => d.real).map((d) => String(d.ed)))].map((y) => `<option ${y === df.y ? "selected" : ""} value="${y}">${y === "Todos" ? "Todas as edições" : "Unesp " + y}</option>`).join("")}</select>` : ""}
       <label class="small" style="display:flex;gap:6px;align-items:center"><input type="checkbox" id="dfP" ${df.pend ? "checked" : ""}> Só não corrigidas</label>
       <span class="small muted num" style="margin-left:auto">${list.length ? idx + 1 + " de " + list.length : "0 questões"}</span></div>
     <div class="qwrap"><div>${d ? cardHTML(d) : `<div class="empty">Nenhuma questão com esses filtros.</div>`}
@@ -109,17 +134,17 @@
     if (!d.itens.some((_, i) => (r.resp[i] || "").trim().length >= 3)) { toast("Escreva sua resposta antes de pedir a correção."); return; }
     busy = id; r.erro = null; ezStart("disc:" + id, "disc"); render();
     const sample = await getSample();
-    const prompt = `Seu nome é Easier, a corretora de IA da plataforma Easy Study. Corrija a resposta de um aluno a uma QUESTÃO DISSERTATIVA de 2ª fase de vestibular (estilo ${d.est}), como um corretor da banca: compare com a resposta esperada e os critérios, aceite respostas equivalentes com outras palavras ou caminhos corretos, e desconte erros conceituais, contas erradas e respostas incompletas. Seja justo e objetivo. ${typeof cursoAluno === "function" ? cursoAluno() : ""}
+    const prompt = `Seu nome é Easier, a corretora de IA da plataforma Easy Study. Corrija a resposta de um aluno a uma QUESTÃO DISSERTATIVA de 2ª fase de vestibular (${d.real ? `questão real da prova da ${d.est} ${d.ed}` : `estilo ${d.est}`}), como um corretor da banca: ${d.real ? "não há gabarito oficial, então resolva antes cada item com rigor e use essa resolução como resposta esperada; " : ""}compare com a resposta esperada e os critérios, aceite respostas equivalentes com outras palavras ou caminhos corretos, e desconte erros conceituais, contas erradas e respostas incompletas. Seja justo e objetivo. ${typeof cursoAluno === "function" ? cursoAluno() : ""}
 
 Matéria: ${d.s}
 Contexto da questão: ${d.c}
 
 ${d.itens.map((it, i) => `ITEM ${L[i]}) (vale ${it.pts} pontos) ${it.q}
-Resposta esperada: ${it.esp}
+Resposta esperada: ${it.esp || (r.resol ? "veja a resolução de referência abaixo" : "(resolva você mesma)")}
 Critérios (cada um vale uma parte igual da nota do item): ${it.crit.map((c, j) => `(${j + 1}) ${c}`).join(" ")}
 Resposta do aluno: """${(r.resp[i] || "").trim() || "(em branco)"}"""`).join("\n\n")}
 
-Responda SOMENTE com JSON neste formato, com um objeto por item, na ordem:
+${d.real && r.resol ? `Resolução de referência (feita antes pela Easier):\n${r.resol}\n\n` : ""}Responda SOMENTE com JSON neste formato, com um objeto por item, na ordem:
 {"itens":${itensJSON(d, d.itens.length)},"resumo":"uma frase de avaliação geral","dica":"uma dica curta e concreta para responder melhor esse tipo de questão"}
 "nota" de cada item vai de 0 até o valor do item, em múltiplos de 0,5. "comentario" explica a nota em até 3 frases, falando com o aluno. "acertos" e "faltou" são listas curtas dos critérios cumpridos e não cumpridos. Item em branco ou fora do assunto vale 0.`;
     try {
@@ -141,6 +166,24 @@ Responda SOMENTE com JSON neste formato, com um objeto por item, na ordem:
     if (VIEW === "questoes") render();
   }
 
+  async function resolver(id) {
+    const d = (window.DISC || []).find((x) => x.id === id); if (!d || resolBusy) return;
+    const r = reg(id); resolBusy = id; delete r.resolErro; ezStart("resol:" + id, "explicar"); render();
+    const sample = await getSample();
+    const prompt = `Seu nome é Easier, a tutora de IA da plataforma Easy Study, professora de cursinho pré-vestibular. ${typeof cursoAluno === "function" ? cursoAluno() : ""} Resolva esta questão dissertativa REAL da 2ª fase da ${d.est} ${d.ed} (${d.s}), como uma resposta modelo que tiraria nota máxima na banca. Para cada item, escreva "a)", "b)"... seguido da resposta completa, objetiva e correta, com as contas quando houver, em português do Brasil, em texto simples sem markdown. Depois de todos os itens, escreva uma linha começando com "Para tirar nota máxima:" com o que o corretor espera ver. Se não tiver certeza de algum dado, diga isso em vez de inventar.
+
+Texto da questão: ${d.c}
+
+${d.itens.map((it, i) => `${L[i]}) ${it.q}`).join("\n")}`;
+    try {
+      if (!sample) throw { code: "server" };
+      const { text } = await sample(prompt, { modelTier: "default" });
+      r.resol = String(text || "").trim().slice(0, 6000); save(); ezDone("resol:" + id, true);
+    } catch (e) { ezDone("resol:" + id, false); r.resolErro = typeof errMsg === "function" ? errMsg(e) : "A Easier não conseguiu resolver agora."; }
+    resolBusy = null;
+    if (VIEW === "questoes") render();
+  }
+
   function salvarSelf(id) {
     const d = (window.DISC || []).find((x) => x.id === id); if (!d) return;
     const r = reg(id), sel = self[id] || {};
@@ -157,7 +200,8 @@ Responda SOMENTE com JSON neste formato, com um objeto por item, na ordem:
 
   // eventos (retorna true quando tratou o evento)
   window.discClick = function (d) {
-    if (d.discest) { df.est = d.discest; rebuild(); render(); return true; }
+    if (d.discest) { df.est = d.discest; df.y = "Todos"; rebuild(); render(); return true; }
+    if (d.discresol) { resolver(d.discresol); return true; }
     if (d.discmove) { idx = Math.max(0, Math.min(list.length - 1, idx + +d.discmove)); render(); scrollTo({ top: 0 }); return true; }
     if (d.discrand !== undefined) { idx = Math.floor(Math.random() * list.length); render(); return true; }
     if (d.disccorr) { corrigir(d.disccorr); return true; }
@@ -168,6 +212,7 @@ Responda SOMENTE com JSON neste formato, com um objeto por item, na ordem:
   };
   window.discChange = function (t) {
     if (t.id === "dfS") { df.s = t.value; rebuild(); render(); return true; }
+    if (t.id === "dfY") { df.y = t.value; rebuild(); render(); return true; }
     if (t.id === "dfP") { df.pend = t.checked; rebuild(); render(); return true; }
     if (t.dataset.disccrit) { const [id, i, j] = t.dataset.disccrit.split("|"); const o = (self[id] = self[id] || {}); (o[i] = o[i] || {})[j] = t.checked; return true; }
     return false;
