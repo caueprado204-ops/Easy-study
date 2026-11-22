@@ -394,8 +394,8 @@ select,.inp{border:1.5px solid var(--line);border-radius:10px;padding:7px 10px;b
 .pomo{background:var(--violet);border-radius:24px;color:var(--white);padding:24px;display:flex;flex-direction:column;align-items:center;gap:14px;position:relative;overflow:hidden}
 .ring{position:relative;width:min(260px,70vw);aspect-ratio:1;max-width:100%}
 .ring svg{width:100%;height:100%;transform:rotate(-90deg)}
-.ring .tt{position:absolute;inset:0;display:grid;place-items:center;text-align:center}
-.ring .tt b{font-family:var(--display);font-weight:900;font-size:clamp(40px,10vw,58px);display:block;line-height:1}
+.ring .pomo-tt{position:absolute;inset:0;display:grid;place-items:center;text-align:center}
+.ring .pomo-tt b{font-family:var(--display);font-weight:900;font-size:clamp(40px,10vw,58px);display:block;line-height:1}
 .pomo .pills .pill{background:transparent;color:var(--white);border-color:var(--white)}
 .pomo select,.pomo .inp{color:var(--ink);background:var(--white);font-weight:600}.pomo select option{color:var(--ink);background:var(--white)}
 .pomo .pills .pill.on{background:var(--lime);color:var(--ink);border-color:var(--lime)}
@@ -2211,7 +2211,7 @@ document.addEventListener("click",e=>{const t=e.target.closest("[data-fcflip],[d
 function vFoco(){return `<div class="row-head" style="margin-top:4px"><h1 class="h-sec">Foco e música</h1><span class="small muted">Cada 25 min de foco valem +20 XP e mantêm sua ofensiva</span></div>
   <div class="focus"><div class="pomo">${STAR("var(--lime)",44,"left:20px","top:20px",10)}${STAR("var(--pink)",30,"right:26px","bottom:30px",-20)}
     <div class="pills">${[[25,5],[50,10],[90,15]].map(([f,b])=>`<button class="pill ${pomo.mode===f?"on":""}" data-pmode="${f}-${b}">${f}/${b}</button>`).join("")}</div>
-    <div class="ring"><svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="52" fill="none" stroke="rgba(255,255,255,.2)" stroke-width="10"/><circle id="pArc" cx="60" cy="60" r="52" fill="none" stroke="#DFF24B" stroke-width="10" stroke-linecap="round" stroke-dasharray="326.7" stroke-dashoffset="0"/></svg><div class="tt"><div><b class="num" id="pTime">25:00</b><span id="pPhase" class="small">Foco</span></div></div></div>
+    <div class="ring"><svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="52" fill="none" stroke="rgba(255,255,255,.2)" stroke-width="10"/><circle id="pArc" cx="60" cy="60" r="52" fill="none" stroke="#DFF24B" stroke-width="10" stroke-linecap="round" stroke-dasharray="326.7" stroke-dashoffset="0"/></svg><div class="pomo-tt"><div><b class="num" id="pTime">25:00</b><span id="pPhase" class="small">Foco</span></div></div></div>
     <label class="small" style="display:flex;gap:8px;align-items:center">Estudando<select id="pSubj" class="inp">${[...SUBJECT_KEYS,"Simulado","Revisão"].map(s=>`<option ${s===pomo.subj?"selected":""}>${s}</option>`).join("")}</select></label>
     <div style="display:flex;gap:10px"><button class="btn lime" data-ptoggle>${pomo.running?"Pausar":"Iniciar"}</button><button class="btn ghost" data-preset>Zerar</button></div>
     <div class="small num">Hoje: ${S.act[todayKey()]?.min||0} min de foco</div></div>
