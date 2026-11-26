@@ -250,7 +250,7 @@
 .som-b{display:flex;gap:6px;align-items:center;background:transparent;border:0;font:inherit;font-weight:700;font-size:14px;padding:2px;text-align:left;cursor:pointer;color:var(--ink)}
 .som input[type=range]{width:100%;accent-color:var(--violet)}
 @keyframes mp-pulse{50%{transform:scale(1.4)}}
-@media (max-width:760px){.mp-dock{bottom:calc(76px + env(safe-area-inset-bottom,0px));right:12px;width:min(340px,calc(100vw - 24px))}}
+@media (max-width:760px){.mp-dock{bottom:calc(var(--navh,0px) + 12px + env(safe-area-inset-bottom,0px));right:12px;width:min(340px,calc(100vw - 24px))}}
 `;
   const st = document.createElement("style");
   st.textContent = css;

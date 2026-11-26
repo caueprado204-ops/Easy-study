@@ -108,6 +108,8 @@ h1,h2,h3{margin:0;text-wrap:balance}
 .nav .tip{position:absolute;left:52px;background:var(--ink);color:var(--white);font-size:12px;padding:3px 8px;border-radius:6px;white-space:nowrap;opacity:0;pointer-events:none;transition:.15s;z-index:5}
 .nav button:hover .tip{opacity:1}
 .nav .sep{flex:1}
+.menu-btn,.nav-hd,.nav-scrim,.nav-tab{display:none}
+:root{--navh:0px}
 .panel{background:var(--panel);border-radius:26px;padding:22px 26px 30px;min-width:0;min-height:80vh}
 .top{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:20px}
 .brand{font-size:13px;color:var(--muted);margin-right:auto;background:none;border:0;padding:0;text-align:left}
@@ -532,9 +534,26 @@ select,.inp{border:1.5px solid var(--line);border-radius:10px;padding:7px 10px;b
   .lime-band{padding:28px 18px 0} .lb-grid{grid-template-columns:1fr}
   .progs{grid-template-columns:1fr;margin:30px -18px 0}
   .frame{grid-template-columns:1fr;background:transparent;padding:0;border-radius:0}
-  .panel{border-radius:0;padding:16px 16px calc(96px + env(safe-area-inset-bottom,0px));min-height:100vh}
-  .nav{position:fixed;left:0;right:0;bottom:0;z-index:20;flex-direction:row;padding:8px 10px calc(8px + env(safe-area-inset-bottom,0px));background:var(--shell);overflow-x:auto;justify-content:flex-start;gap:4px}
-  .nav .tip,.nav .sep{display:none}
+  .panel{border-radius:0;padding:16px 16px calc(28px + env(safe-area-inset-bottom,0px));min-height:100vh}
+  .nav{position:fixed;top:0;bottom:0;left:0;z-index:70;width:min(300px,84vw);flex-direction:column;align-items:stretch;gap:2px;padding:calc(14px + env(safe-area-inset-top,0px)) 12px calc(14px + env(safe-area-inset-bottom,0px));background:var(--shell);overflow-y:auto;overscroll-behavior:contain;border-radius:0 24px 24px 0;transform:translateX(-102%);visibility:hidden;transition:transform .28s cubic-bezier(.2,.8,.2,1),visibility 0s .28s}
+  body.nav-open .nav{transform:none;visibility:visible;transition:transform .28s cubic-bezier(.2,.8,.2,1);box-shadow:14px 0 44px -12px rgba(0,0,0,.55)}
+  body.nav-open{overflow:hidden}
+  .nav button{width:100%;height:46px;flex:none;display:flex;align-items:center;justify-content:flex-start;gap:14px;padding:0 12px;text-align:left}
+  .nav button:hover{background:transparent}.nav button.on:hover{background:var(--butter)}
+  .nav .tip,.nav button:hover .tip{position:static;opacity:1;background:none;color:inherit;padding:0;font-size:15px;font-weight:600;border-radius:0;pointer-events:none}
+  .nav .sep{display:block;flex:1 0 12px}
+  .nav-hd{display:flex;align-items:center;gap:10px;padding:2px 2px 14px;margin-bottom:8px;border-bottom:1.5px solid rgba(255,255,255,.12);color:var(--white)}
+  .nav-hd .avatar{flex:none}.nav-who{flex:1;min-width:0}
+  .nav-who strong{display:block;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .nav-who small{display:flex;align-items:center;gap:6px;color:#BDB6AA;font-size:12.5px;margin-top:2px}
+  .nav-who small b{background:var(--lime);color:var(--ink);border-radius:99px;padding:0 8px;font-size:11.5px}
+  .nav .nav-x{width:38px;height:38px;flex:none;justify-content:center;padding:0;border:1.5px solid rgba(255,255,255,.25);border-radius:12px;color:var(--white)}
+  .menu-btn{display:grid;place-items:center;width:42px;height:42px;flex:none;border-radius:12px;border:1.5px solid var(--line);background:var(--white);color:var(--ink);padding:0}
+  .nav-scrim{display:block;position:fixed;inset:0;z-index:65;background:rgba(20,18,30,.5);opacity:0;pointer-events:none;transition:opacity .25s}
+  body.nav-open .nav-scrim{opacity:1;pointer-events:auto}
+  .nav-tab{display:grid;place-items:center;position:fixed;left:0;top:50%;z-index:30;width:18px;height:68px;margin-top:-34px;border:1.5px solid var(--line);border-left:0;border-radius:0 14px 14px 0;background:var(--shell);color:var(--lime);padding:0;box-shadow:3px 4px 14px -6px rgba(0,0,0,.45);transition:opacity .2s,width .15s}
+  .nav-tab:active{width:24px}
+  body.nav-open .nav-tab{opacity:0;pointer-events:none}
   .hero,.subjects{grid-template-columns:1fr}.reader{grid-template-columns:minmax(0,1fr)}
   .toc{position:static;flex-direction:row;overflow-x:auto;padding-bottom:4px} .toc button{flex:none}
   .search{order:5;width:100%}
@@ -543,6 +562,7 @@ select,.inp{border:1.5px solid var(--line);border-radius:10px;padding:7px 10px;b
   .lesson-card{padding:18px}
   .mod{grid-template-columns:44px minmax(0,1fr)} .mod .n{width:44px;height:44px;font-size:17px} .mod>.btn{grid-column:1/-1}
 }
+@media (max-width:420px){.brand-hi{display:none}.brand{font-size:0}.brand b{font-size:20px}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style>
 
@@ -553,7 +573,8 @@ select,.inp{border:1.5px solid var(--line);border-radius:10px;padding:7px 10px;b
     <nav class="nav" id="nav" aria-label="Seções"></nav>
     <main class="panel">
       <header class="top">
-        <button class="brand" data-landing>Bem-vindo ao <b>Easy Study</b></button>
+        <button class="menu-btn" data-menu aria-label="Abrir menu" aria-controls="nav" aria-expanded="false"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h10"/></svg></button>
+        <button class="brand" data-landing><span class="brand-hi">Bem-vindo ao </span><b>Easy Study</b></button>
         <form class="search" id="searchForm" role="search">
           <input id="searchInput" placeholder="Buscar módulo (ex.: genética)" aria-label="Buscar módulo">
           <button aria-label="Buscar"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></button>
@@ -564,6 +585,8 @@ select,.inp{border:1.5px solid var(--line);border-radius:10px;padding:7px 10px;b
       <section id="view"></section>
     </main>
   </div>
+  <div class="nav-scrim" data-navclose></div>
+  <button class="nav-tab" data-menu aria-label="Abrir menu" aria-controls="nav" aria-expanded="false"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg></button>
 </div>
 <div class="vmodal" id="vmodal" hidden role="dialog" aria-modal="true" aria-label="Videoaula"><div class="vbox" id="vbox"></div></div>
 <div class="toast" id="toast" hidden></div>
@@ -1416,7 +1439,7 @@ function showLanding(on){
   window.scrollTo({top:0});
 }
 const NAV_ORDER=["painel","gps","modulos","aulas","flash","questoes","erros","simulados","redacao","rotina","foco","jogos","planos","conta"];
-function buildNav(){const livre=!ACC||planoAtual();document.getElementById("nav").innerHTML=NAV_ORDER.filter(k=>livre||VIEWS_SEM_PLANO.includes(k)).map(k=>`<button data-go="${k}" aria-label="${LABEL[k]}" class="${k===VIEW?"on":""}">${svg(I[k])}<span class="tip">${LABEL[k]}</span></button>`).join("")+`<span class="sep"></span><button class="navbtn" data-logout aria-label="Sair da conta">${svg('<path d="M15 4h4v16h-4"/><path d="M10 8l-4 4 4 4M6 12h10"/>')}<span class="tip">Sair da conta</span></button>`;}
+function buildNav(){const livre=!ACC||planoAtual();const nome=(S.name||"Estudante").trim(),sq=streak();document.getElementById("nav").innerHTML=`<div class="nav-hd"><span class="avatar" aria-hidden="true">${esc(nome[0].toUpperCase())}</span><div class="nav-who"><strong>${esc(nome)}</strong><small><b>${sq} ${sq===1?"dia":"dias"}</b>seguidos</small></div><button class="nav-x" data-navclose aria-label="Fechar menu">${svg('<path d="M6 6l12 12M18 6 6 18"/>')}</button></div>`+NAV_ORDER.filter(k=>livre||VIEWS_SEM_PLANO.includes(k)).map(k=>`<button data-go="${k}" aria-label="${LABEL[k]}" class="${k===VIEW?"on":""}">${svg(I[k])}<span class="tip">${LABEL[k]}</span></button>`).join("")+`<span class="sep"></span><button class="navbtn" data-logout aria-label="Sair da conta">${svg('<path d="M15 4h4v16h-4"/><path d="M10 8l-4 4 4 4M6 12h10"/>')}<span class="tip">Sair da conta</span></button>`;}
 function go(v){if(ACC&&!planoAtual()&&!VIEWS_SEM_PLANO.includes(v)){toast("Assine um plano para liberar a plataforma.");v="planos";}VIEW=v;buildNav();render();try{history.replaceState(null,"","#"+v);}catch(e){}window.scrollTo({top:0});}
 function paintTop(){
   const el=document.getElementById("topStreak"); if(!el) return;
@@ -2678,5 +2701,6 @@ async function aoMudarSessao(ev,session){
 </script>
 
 <script src="app/novidade.js"></script>
+<script src="app/menu-lateral.js"></script>
 </body>
 </html>
