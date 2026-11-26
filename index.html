@@ -1171,6 +1171,7 @@ ex:["Um viajante diz que a comida de outro país é 'nojenta' por ser diferente 
 <script src="app/disc.js"></script>
 <script src="app/cartoes.js"></script>
 <script src="app/termo-teste.js"></script>
+<script src="app/simulado-tri.js"></script>
 <script>
 /* ---------- matérias ---------- */
 const SUBJ = {
@@ -1523,6 +1524,7 @@ function render(){
   const map={planos:vPlanos,conta:vConta,painel:vPainel,gps:()=>window.vGPS(),erros:()=>window.vErros(),modulos:vModulos,aulas:vAulas,flash:vFlash,questoes:vQuestoes,simulados:vSimulados,redacao:vRedacao,rotina:vRotina,foco:vFoco,jogos:()=>window.vJogos()};
   document.getElementById("view").innerHTML=map[VIEW]();
   if(VIEW==="foco")paintPomo();
+  if(window.triPos)triPos();
   if(VIEW==="aulas")prepararThumbs();
   if(VIEW==="modulos"&&modState.id&&MODMAP[modState.id]&&!VCACHE[modState.id])getVideos(modState.id).then(c=>{const el=document.querySelector(".vprev[data-play]");if(c&&el&&el.dataset.play===modState.id)el.outerHTML=vPrevHTML(modState.id);});
 }
@@ -1849,9 +1851,11 @@ let simView=null;
 function vSimulados(){
   if(S.sim&&!S.sim.done)return simRun();
   if(S.sim&&S.sim.done&&simView==="result")return simResult();
+  const tri=window.vSimTRI&&triAtivo();
+  if(tri&&triTab()==="tri")return vSimTRI();
   const years=[...new Set(Q.map(q=>q.y))].sort((a,b)=>b-a);
-  return `<h1 class="h-big" style="font-size:clamp(28px,5vw,46px);margin:6px 0 4px">Simulados<br><span style="color:var(--violet)">contra o relógio</span></h1>
-  <p class="muted" style="max-width:60ch">Questões reais do ENEM, da FUVEST, da Unicamp, da Unesp e do Provão Paulista sorteadas do banco. O tempo segue a média de 3 minutos por questão.</p>
+  return `<h1 class="h-big" style="font-size:clamp(28px,5vw,46px);margin:6px 0 4px">Simulados<br><span style="color:var(--violet)">contra o relógio</span></h1>${tri?triAbas():""}
+  <p class="muted" style="max-width:60ch">Questões reais do ENEM, da FUVEST, da Unicamp, da Unesp e do Provão Paulista sorteadas do banco. O tempo segue a média de 3 minutos por questão.</p>${tri?triBanner():""}
   ${QREADY!==true?`<div class="empty">Carregando questões…</div>`:`
   <div class="grid programs" style="margin-top:16px">${SIMS.map(s=>`<div class="prog ${s.cls}"><div class="tags"><span>${s.n} questões</span><span>${s.min} min</span></div><h3>${s.name}</h3><p>${s.desc}</p><button class="btn" data-startsim="${s.id}">Começar</button></div>`).join("")}</div>
   <div class="row-head"><h2 class="h-sec">Provas anteriores por ano</h2></div>
@@ -2701,6 +2705,7 @@ async function aoMudarSessao(ev,session){
 </script>
 
 <script src="app/novidade.js"></script>
+<script src="app/novidade-tri.js"></script>
 <script src="app/menu-lateral.js"></script>
 </body>
 </html>

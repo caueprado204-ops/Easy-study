@@ -14,6 +14,9 @@ questoes-provao.json 366 questões do Provão Paulista 2024–2025 (provas seria
 img/              figuras das questões da FUVEST, da Unicamp, da Unesp e do Provão Paulista (webp)
 scripts/          build_unesp.py e build_unesp_2fase.py: geram os arquivos da Unesp
 app/novidade.js   pop-up de novidade (aparece toda vez que a plataforma abre, até 26/11)
+app/simulado-tri.js aba "Simulado TRI" em Simulados: questões reais do ENEM por área, nota pela TRI com os parâmetros oficiais do INEP e correção "A Easier explica" (liberada a partir de 27/11)
+app/novidade-tri.js pop-up do Simulado TRI (27/11 a 10/12; some depois do primeiro Simulado TRI)
+simulados-tri.json 60 questões do ENEM 2016–2023 (15 por área) com parâmetros TRI do INEP e resoluções escritas
 api/easier.js     função serverless que conversa com a IA (a chave fica no servidor)
 app/gps-lab.js    GPS de Estudos + Laboratório de Erros
 conteudo/         textos dos módulos, figuras e conteúdos extras
