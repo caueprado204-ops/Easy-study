@@ -42,6 +42,7 @@
 .nv-b3{background:#fff;color:var(--ink)}
 .nv-b2{background:transparent;border:0;color:var(--muted);font-size:13.5px;font-weight:500;padding:4px;cursor:pointer}
 .nv-x{position:absolute;top:12px;right:12px;width:32px;height:32px;border-radius:50%;background:#fff;border:1.5px solid var(--line);display:grid;place-items:center;font-size:18px;line-height:1;color:var(--ink);z-index:2;cursor:pointer}
+@media (max-width:760px) and (max-height:780px){.nv-bd{display:none}.nv-hd{padding:18px 18px 14px}.nv-tt{font-size:26px;margin-top:10px}.nv-gr{padding:12px 18px 0;gap:8px}.nv-ac{padding:14px 18px 16px}.nv-rg{margin-top:10px}}
 @media (prefers-reduced-motion:reduce){.nv-pp,.nv-hd::after,.nv-b1::after,.nv-tt em,.nv-st{animation:none!important}.nv-hd::after,.nv-b1::after{display:none}}`;
 
   // régua decorativa: bolinhas = questões em ordem de dificuldade, faixa = o aluno
