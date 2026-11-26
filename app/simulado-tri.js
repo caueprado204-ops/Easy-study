@@ -78,7 +78,7 @@
 .tri-qg::-webkit-scrollbar{display:none}.tri-qg button{flex:none;width:40px;height:40px}
 .tri-run .qcard{padding:16px}.tri-run .qmeta [data-trev]{margin-left:0!important}
 .tri-arow{gap:5px}.tri-cut{width:40px;border-radius:12px}
-.qnav.tri-nav{position:sticky;bottom:calc(68px + env(safe-area-inset-bottom,0px));z-index:3;background:var(--panel);margin:12px -16px 0;padding:10px 16px;border-top:1.5px solid var(--hair);flex-wrap:nowrap}
+.qnav.tri-nav{position:sticky;bottom:calc(var(--navh,68px) + env(safe-area-inset-bottom,0px));z-index:3;background:var(--panel);margin:12px -16px 0;padding:10px 16px;border-top:1.5px solid var(--hair);flex-wrap:nowrap}
 .tri-nav .btn,.tri-nav2 .btn{flex:1;justify-content:center;min-height:46px}.tri-nav .small{display:none}
 .tri-run .side{gap:10px}.tri-run .side .card{padding:14px}
 .tri-areas{grid-template-columns:1fr 1fr!important;gap:10px}
