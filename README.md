@@ -17,6 +17,10 @@ app/novidade.js   pop-up de novidade (aparece toda vez que a plataforma abre, at
 app/simulado-tri.js aba "Simulado TRI" em Simulados: questões reais do ENEM por área, nota pela TRI com os parâmetros oficiais do INEP e correção "A Easier explica" (liberada a partir de 27/11)
 app/novidade-tri.js pop-up do Simulado TRI (27/11 a 10/12; some depois do primeiro Simulado TRI)
 simulados-tri.json 60 questões do ENEM 2016–2023 (15 por área) com parâmetros TRI do INEP e resoluções escritas
+app/calculadora-tri.js aba "Calculadora TRI": cartão-resposta do ENEM 2020–2025, nota de cada área igual à do INEP e chance de aprovação nos cursos do SISU
+calc-tri.json     cadernos regulares do ENEM 2020–2025 (gabarito e parâmetros a, b, c de cada questão, por cor) + nota provável por acertos
+sisu-cortes.json  6.404 cursos do SISU 2025: pesos, notas mínimas, nota de corte final de cada modalidade, vagas e inscritos
+scripts/build_calc_tri.py gera calc-tri.json e sisu-cortes.json
 api/easier.js     função serverless que conversa com a IA (a chave fica no servidor)
 app/gps-lab.js    GPS de Estudos + Laboratório de Erros
 conteudo/         textos dos módulos, figuras e conteúdos extras
@@ -170,3 +174,21 @@ Para ligar:
 3. Faça um redeploy.
 
 A liberação manual por Pix (SQL acima) continua funcionando para quem preferir.
+
+## Calculadora TRI
+
+Fica no menu (Calculadora TRI) e tem um atalho em Simulados. Três modos:
+
+- **Cartão-resposta** (ENEM 2020 a 2025): o aluno escolhe a cor do caderno de cada dia e a língua, marca as respostas e corrige. A nota usa o mesmo método do INEP: modelo de 3 parâmetros, θ por EAP com priori N(0,1) numa grade de 40 pontos em [−4, 4], questões anuladas fora da conta e escala fixa por área. Conferido com 960 participantes reais dos microdados de 2020 a 2025: a nota bate com a oficial até a 1ª casa decimal (só 1 caso com 0,1 de diferença, por arredondamento).
+- **ENEM 2026 (por acertos)**: os parâmetros das questões só saem com os microdados. Até lá, a nota provável e a faixa (percentis 10 e 90) vêm de uma simulação com as provas azuis de 2023 a 2025.
+- **Já tenho as notas**: digita as notas para ver as chances.
+
+**Chances no SISU**: média ponderada com os pesos do curso, comparada com a nota de corte final da chamada regular do SISU 2025 na modalidade escolhida. A chance é Φ((média − corte)/σ), com σ juntando a variação típica do corte de um ano para o outro (17 pontos, desvio robusto medido em 5.787 cursos entre 2024 e 2025), a incerteza da redação estimada (40 pontos × peso) e, no modo por acertos, a faixa da nota. USP, Unicamp e Unesp não estão no SISU.
+
+Para atualizar (ex.: microdados do ENEM 2026 ou SISU 2026), baixe os arquivos e rode:
+
+```bash
+python3 scripts/build_calc_tri.py PASTA_ITENS PASTA_SISU [exemplos_microdados.json]
+```
+
+`PASTA_ITENS` tem `<ano>/ITENS_PROVA_<ano>.csv` (microdados do INEP; uma cópia organizada está em github.com/HenriqueLindemann/analise-enem). `PASTA_SISU` é a pasta `data` de github.com/maiakanegae/sisu-data (relatório oficial do SISU + pesos coletados do sistema). Novos cadernos entram no dicionário `PROVAS` do script.

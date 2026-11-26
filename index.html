@@ -1172,6 +1172,7 @@ ex:["Um viajante diz que a comida de outro país é 'nojenta' por ser diferente 
 <script src="app/cartoes.js"></script>
 <script src="app/termo-teste.js"></script>
 <script src="app/simulado-tri.js"></script>
+<script src="app/calculadora-tri.js"></script>
 <script>
 /* ---------- matérias ---------- */
 const SUBJ = {
@@ -1322,12 +1323,13 @@ const I={
  flash:'<rect x="6" y="3" width="14" height="17" rx="3"/><path d="M4 7v12a2 2 0 0 0 2 2h10"/><path d="M10 9h6M10 13h4"/>',
  questoes:'<rect x="4" y="3" width="16" height="18" rx="3"/><path d="m8 12 3 3 5-6"/>',
  simulados:'<path d="M9 3h6M12 3v3"/><circle cx="12" cy="14" r="7"/><path d="M12 10v4l3 2"/>',
+ calc:'<rect x="5" y="2.5" width="14" height="19" rx="3"/><path d="M8.5 6.5h7v3h-7zM8.5 13h.01M12 13h.01M15.5 13h.01M8.5 17h.01M12 17h.01M15.5 17h.01"/>',
  redacao:'<path d="M4 20h4L19 9l-4-4L4 16z"/><path d="m13 7 4 4"/>',
  rotina:'<rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/>',
  foco:'<path d="M9 18V6l11-2v12"/><circle cx="6" cy="18" r="3"/><circle cx="17" cy="16" r="3"/>',
  jogos:'<rect x="2.5" y="7" width="19" height="11" rx="5"/><path d="M7 10.5v4M5 12.5h4"/><circle cx="15.5" cy="11.5" r="1"/><circle cx="18" cy="13.5" r="1"/>'
 };
-const LABEL={jogos:"Jogos",planos:"Planos",conta:"Minha conta",painel:"Painel",gps:"GPS de Estudos",erros:"Laboratório de Erros",modulos:"Módulos",aulas:"Videoaulas",flash:"Flashcards",questoes:"Questões",simulados:"Simulados e provas",redacao:"Redação",rotina:"Rotina e calendário",foco:"Foco e música"};
+const LABEL={jogos:"Jogos",planos:"Planos",conta:"Minha conta",painel:"Painel",gps:"GPS de Estudos",erros:"Laboratório de Erros",modulos:"Módulos",aulas:"Videoaulas",flash:"Flashcards",questoes:"Questões",simulados:"Simulados e provas",calc:"Calculadora TRI",redacao:"Redação",rotina:"Rotina e calendário",foco:"Foco e música"};
 const svg=(p,s=21)=>`<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${p}</svg>`;
 const FLAME='<svg viewBox="0 0 24 24"><path d="M12 2c1 4 5 5.5 5 11a5 5 0 0 1-10 0c0-2.5 1.2-4 2.5-5 .2 2 1.2 3 2.5 3-1.5-3 0-6 0-9z" fill="#FF5B37" stroke="#1C1B1A" stroke-width="1.5" stroke-linejoin="round"/></svg>';
 const STAR=(c,s,x,y,r=0)=>`<svg class="star" style="width:${s}px;height:${s}px;${x};${y};transform:rotate(${r}deg)" viewBox="0 0 40 40"><g fill="${c}">${[0,45,90,135].map(a=>`<rect x="17" y="2" width="6" height="36" rx="3" transform="rotate(${a} 20 20)"/>`).join("")}</g></svg>`;
@@ -1439,7 +1441,7 @@ function showLanding(on){
   if(on) renderLanding();
   window.scrollTo({top:0});
 }
-const NAV_ORDER=["painel","gps","modulos","aulas","flash","questoes","erros","simulados","redacao","rotina","foco","jogos","planos","conta"];
+const NAV_ORDER=["painel","gps","modulos","aulas","flash","questoes","erros","simulados","calc","redacao","rotina","foco","jogos","planos","conta"];
 function buildNav(){const livre=!ACC||planoAtual();const nome=(S.name||"Estudante").trim(),sq=streak();document.getElementById("nav").innerHTML=`<div class="nav-hd"><span class="avatar" aria-hidden="true">${esc(nome[0].toUpperCase())}</span><div class="nav-who"><strong>${esc(nome)}</strong><small><b>${sq} ${sq===1?"dia":"dias"}</b>seguidos</small></div><button class="nav-x" data-navclose aria-label="Fechar menu">${svg('<path d="M6 6l12 12M18 6 6 18"/>')}</button></div>`+NAV_ORDER.filter(k=>livre||VIEWS_SEM_PLANO.includes(k)).map(k=>`<button data-go="${k}" aria-label="${LABEL[k]}" class="${k===VIEW?"on":""}">${svg(I[k])}<span class="tip">${LABEL[k]}</span></button>`).join("")+`<span class="sep"></span><button class="navbtn" data-logout aria-label="Sair da conta">${svg('<path d="M15 4h4v16h-4"/><path d="M10 8l-4 4 4 4M6 12h10"/>')}<span class="tip">Sair da conta</span></button>`;}
 function go(v){if(ACC&&!planoAtual()&&!VIEWS_SEM_PLANO.includes(v)){toast("Assine um plano para liberar a plataforma.");v="planos";}VIEW=v;buildNav();render();try{history.replaceState(null,"","#"+v);}catch(e){}window.scrollTo({top:0});}
 function paintTop(){
@@ -1521,7 +1523,7 @@ function mdBlock(t){
 
 /* ---------- render ---------- */
 function render(){
-  const map={planos:vPlanos,conta:vConta,painel:vPainel,gps:()=>window.vGPS(),erros:()=>window.vErros(),modulos:vModulos,aulas:vAulas,flash:vFlash,questoes:vQuestoes,simulados:vSimulados,redacao:vRedacao,rotina:vRotina,foco:vFoco,jogos:()=>window.vJogos()};
+  const map={planos:vPlanos,conta:vConta,painel:vPainel,gps:()=>window.vGPS(),erros:()=>window.vErros(),modulos:vModulos,aulas:vAulas,flash:vFlash,questoes:vQuestoes,simulados:vSimulados,calc:()=>window.vCalcTRI(),redacao:vRedacao,rotina:vRotina,foco:vFoco,jogos:()=>window.vJogos()};
   document.getElementById("view").innerHTML=map[VIEW]();
   if(VIEW==="foco")paintPomo();
   if(window.triPos)triPos();
@@ -1856,6 +1858,7 @@ function vSimulados(){
   const years=[...new Set(Q.map(q=>q.y))].sort((a,b)=>b-a);
   return `<h1 class="h-big" style="font-size:clamp(28px,5vw,46px);margin:6px 0 4px">Simulados<br><span style="color:var(--violet)">contra o relógio</span></h1>${tri?triAbas():""}
   <p class="muted" style="max-width:60ch">Questões reais do ENEM, da FUVEST, da Unicamp, da Unesp e do Provão Paulista sorteadas do banco. O tempo segue a média de 3 minutos por questão.</p>${tri?triBanner():""}
+  <div class="card" style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:12px;background:var(--lav)"><div style="flex:1 1 280px"><b>Fez o ENEM?</b> <span class="small">Marque suas respostas no cartão-resposta, veja a nota TRI e sua chance de passar no curso que você quer.</span></div><button class="btn sm" data-go="calc">Calculadora TRI</button></div>
   ${QREADY!==true?`<div class="empty">Carregando questões…</div>`:`
   <div class="grid programs" style="margin-top:16px">${SIMS.map(s=>`<div class="prog ${s.cls}"><div class="tags"><span>${s.n} questões</span><span>${s.min} min</span></div><h3>${s.name}</h3><p>${s.desc}</p><button class="btn" data-startsim="${s.id}">Começar</button></div>`).join("")}</div>
   <div class="row-head"><h2 class="h-sec">Provas anteriores por ano</h2></div>
