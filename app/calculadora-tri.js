@@ -261,28 +261,64 @@
     const aviso = falta.length ? `<div class="ct-info" style="margin:12px 0">Para calcular as chances, complete ${falta.map((a) => a === "RED" ? "a redação" : AR[a].n).join(", ")} na etapa <button class="btn ghost sm" data-cab="nota">1. Sua nota</button></div>` : "";
     if (!SI) return aviso + `<div class="empty" style="margin-top:16px">${erroS ? "Não foi possível carregar as notas de corte. Recarregue a página." : "Carregando as notas de corte do SISU…"}</div>`;
     if (c.alvo) { const cur = SI.cursos.find((x) => x[0] === c.alvo); if (cur && !falta.length) return vCurso(cur, N); c.alvo = null; }
-    const ufs = [...new Set(SI.cursos.map((x) => x[6]))].sort();
-    return `${aviso}<p class="muted" style="max-width:70ch">Busque o curso e veja sua chance em cada faculdade, com os pesos e a nota de corte de cada uma no ${esc(SI.meta.edicao.replace(/ \(.*/, ""))}.</p>
-      <div class="ct-search"><input type="search" placeholder="Curso ou faculdade (ex.: Medicina, Direito UFMG)" data-cq value="${esc(c.busca)}" aria-label="Buscar curso ou faculdade"><select data-cset="uf"><option value="">Todo o Brasil</option>${ufs.map((u) => `<option ${u === c.uf ? "selected" : ""}>${u}</option>`).join("")}</select></div>
-      <div id="ctLista">${vLista()}</div>
-      <p class="note" style="margin-top:14px">USP, Unicamp e Unesp não participam do SISU e por isso não aparecem aqui: elas têm processos seletivos próprios.</p>`;
+    const ufs = [...new Set(SI.cursos.map((x) => x[6]))].sort(), por = c.por || "curso";
+    const alterna = `<div><div class="qmode" role="tablist" aria-label="Buscar por" style="margin:14px 0 4px"><button class="${por === "curso" ? "on" : ""}" data-cpor="curso" role="tab">Buscar por curso</button><button class="${por === "ies" ? "on" : ""}" data-cpor="ies" role="tab">Buscar por universidade</button></div></div>`;
+    const rodape = `<p class="note" style="margin-top:14px">USP, Unicamp e Unesp não participam do SISU e por isso não aparecem aqui: elas têm processos seletivos próprios.</p>`;
+    const selUF = `<select data-cset="uf" aria-label="Estado"><option value="">Todo o Brasil</option>${ufs.map((u) => `<option ${u === c.uf ? "selected" : ""}>${u}</option>`).join("")}</select>`;
+    if (por === "ies") {
+      const ies = c.ies != null ? SI.ies.findIndex((x) => x[0] === c.ies) : -1;
+      if (ies < 0) return `${aviso}${alterna}<p class="muted" style="max-width:70ch">Pesquise a universidade, selecione e depois escolha o curso.</p>
+        <div class="ct-search"><input type="search" placeholder="Universidade (ex.: UFMG, Federal de Santa Catarina, Recife)" data-cqi value="${esc(c.buscaIes || "")}" aria-label="Buscar universidade">${selUF}</div>
+        <div id="ctLista">${vListaIes()}</div>${rodape}`;
+      const I = SI.ies[ies], n = SI.cursos.filter((x) => x[4] === ies).length;
+      return `${aviso}${alterna}<div class="card" style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:12px 0"><div style="flex:1 1 260px"><span class="small muted">Universidade selecionada</span><br><b style="font-size:17px">${esc(I[0])}</b> <span class="muted">${esc(I[1])}</span><br><span class="small muted">${n} curso${n > 1 ? "s" : ""} no SISU 2025</span></div><button class="btn ghost sm" data-cies="">Trocar universidade</button></div>
+        <div class="ct-search" style="grid-template-columns:minmax(0,1fr)"><input type="search" placeholder="Filtrar curso (ex.: Medicina, Engenharia)" data-cqc value="${esc(c.buscaCursoIes || "")}" aria-label="Buscar curso nesta universidade"></div>
+        <div id="ctLista">${vListaCursosIes()}</div>`;
+    }
+    return `${aviso}${alterna}<p class="muted" style="max-width:70ch">Busque o curso e veja sua chance em cada faculdade, com os pesos e a nota de corte de cada uma no ${esc(SI.meta.edicao.replace(/ \(.*/, ""))}.</p>
+      <div class="ct-search"><input type="search" placeholder="Curso ou faculdade (ex.: Medicina, Direito UFMG)" data-cq value="${esc(c.busca)}" aria-label="Buscar curso ou faculdade">${selUF}</div>
+      <div id="ctLista">${vLista()}</div>${rodape}`;
+  }
+
+  function vListaIes() {
+    const c = st(), pal = norm(c.buscaIes).split(/\s+/).filter(Boolean).map((p) => " " + p);
+    const info = SI.ies.map((I, i) => {
+      const cs = SI.cursos.filter((x) => x[4] === i), cid = [...new Set(cs.map((x) => x[5] + "/" + x[6]))];
+      return { I, i, n: cs.length, cid, ufs: new Set(cs.map((x) => x[6])), k: " " + norm(I[0] + " " + I[1] + " " + cid.join(" ")).replace(/[\/-]/g, " ") };
+    });
+    let r = info.filter((o) => o.n && (!c.uf || o.ufs.has(c.uf)) && pal.every((p) => o.k.includes(p)));
+    const q = norm(c.buscaIes).replace(/\s+/g, ""), peso = (o) => (q && norm(o.I[0]).replace(/\s+/g, "") === q ? 0 : q && norm(o.I[0]).replace(/\s+/g, "").startsWith(q) ? 1 : 2) * 2 + (/^universidade/i.test(o.I[1]) ? 0 : 1);
+    r.sort((a, b) => peso(a) - peso(b) || a.I[0].localeCompare(b.I[0], "pt-BR"));
+    if (!r.length) return `<div class="empty">Nenhuma universidade do SISU encontrada com essa busca.</div>`;
+    return `<p class="small muted" style="margin:0 0 8px">${r.length} universidade${r.length > 1 ? "s" : ""}${pal.length || c.uf ? "" : " no SISU 2025"}</p><div class="ct-list">${r.map((o) => `<button class="ct-item" data-cies="${esc(o.I[0])}"><span><b>${esc(o.I[0])}</b> <span class="s">${esc(o.I[1])}</span><br><span class="s">${esc(o.cid.slice(0, 4).join(" · "))}${o.cid.length > 4 ? ` e mais ${o.cid.length - 4}` : ""}</span></span><span class="ct-pill">${o.n} curso${o.n > 1 ? "s" : ""}</span></button>`).join("")}</div>`;
+  }
+
+  function vListaCursosIes() {
+    const c = st(), ies = SI.ies.findIndex((x) => x[0] === c.ies), pal = norm(c.buscaCursoIes).split(/\s+/).filter(Boolean).map((p) => " " + p);
+    const r = SI.cursos.filter((x) => x[4] === ies && pal.every((p) => (" " + x.k).includes(p) || (" " + norm(x[5] + " " + x[7])).includes(p)));
+    if (!r.length) return `<div class="empty">Nenhum curso com esse nome nesta universidade.</div>`;
+    r.sort((a, b) => a[1].localeCompare(b[1], "pt-BR") || a[5].localeCompare(b[5], "pt-BR") || a[3].localeCompare(b[3], "pt-BR"));
+    return itensHTML(r, false, 400);
+  }
+
+  function itensHTML(lista, ordenar, lim) {
+    const N = notas(), ok = ORD.concat("RED").every((a) => N[a]), tot = lista.length;
+    let r = lista.map((x) => { const m = ok ? media(x, N) : null, corte = x[10][0][2]; const ch = m && !m.falta.length ? chance(m.m, corte, m.sdUser) : null; return { x, m, ch, corte }; });
+    if (ordenar) r.sort((a, b) => (b.ch ? Math.round(b.ch.p * 100) : 0) - (a.ch ? Math.round(a.ch.p * 100) : 0) || (a.ch ? a.corte - b.corte : b.corte - a.corte));
+    return `<p class="small muted" style="margin:0 0 8px">${tot} opç${tot > 1 ? "ões" : "ão"}${tot > lim ? ` · mostrando as ${lim} primeiras` : ""}${ok && ordenar ? " · ordenadas pela sua chance (ampla concorrência)" : ""}</p><div class="ct-list">${r.slice(0, lim).map(({ x, m, ch, corte }) => {
+      const ies = SI.ies[x[4]], rt = ch ? rotulo(ch.p) : null;
+      return `<button class="ct-item" data-calvo="${x[0]}"><span><b>${esc(x[1])}</b> <span class="s">${esc(x[2])} · ${esc(x[3])}</span><br><span class="s">${esc(ies[0])} · ${esc(x[7] && !/^(unidade sede|sede|campus sede)$/i.test(x[7]) ? x[7] + " · " : "")}${esc(x[5])}/${esc(x[6])} · corte ${f1(corte)}${m && !m.falta.length ? ` · sua média ${f1(m.m)}` : ""}</span></span>${ch ? `<span class="ct-pill num" style="background:${rt[1]};${ch.p >= 0.85 || ch.p < 0.15 ? "color:#fff" : ""}">${Math.round(ch.p * 100)}%</span>` : `<span class="ct-pill">ver</span>`}</button>`;
+    }).join("")}</div>`;
   }
 
   function vLista() {
-    const c = st(), N = notas(), q = norm(c.busca), pal = q.split(/\s+/).filter(Boolean);
+    const c = st(), q = norm(c.busca), pal = q.split(/\s+/).filter(Boolean);
     if (!pal.length) return `<div class="empty">Digite o nome de um curso para começar.</div>`;
-    const ok = ORD.concat("RED").every((a) => N[a]);
     const pal2 = pal.map((p) => " " + p), noCurso = (x) => pal2.some((p) => (" " + x.k).includes(p));
     let r = SI.cursos.filter((x) => (!c.uf || x[6] === c.uf) && pal2.every((p) => (" " + x.k).includes(p) || (" " + x.ki).includes(p)));
     if (r.some(noCurso)) r = r.filter(noCurso); // "medicina" busca o curso, não a Faculdade de Medicina
-    const tot = r.length;
-    r = r.map((x) => { const m = ok ? media(x, N) : null, corte = x[10][0][2]; const ch = m && !m.falta.length ? chance(m.m, corte, m.sdUser) : null; return { x, m, ch, corte }; });
-    r.sort((a, b) => (b.ch ? Math.round(b.ch.p * 100) : 0) - (a.ch ? Math.round(a.ch.p * 100) : 0) || (a.ch ? a.corte - b.corte : b.corte - a.corte));
-    if (!tot) return `<div class="empty">Nenhum curso encontrado no SISU com essa busca.</div>`;
-    return `<p class="small muted" style="margin:0 0 8px">${tot} opç${tot > 1 ? "ões" : "ão"}${tot > 60 ? " · mostrando as 60 primeiras" : ""}${ok ? " · ordenadas pela sua chance (ampla concorrência)" : ""}</p><div class="ct-list">${r.slice(0, 60).map(({ x, m, ch, corte }) => {
-      const ies = SI.ies[x[4]], rt = ch ? rotulo(ch.p) : null;
-      return `<button class="ct-item" data-calvo="${x[0]}"><span><b>${esc(x[1])}</b> <span class="s">${esc(x[2])} · ${esc(x[3])}</span><br><span class="s">${esc(ies[0])} · ${esc(x[5])}/${esc(x[6])} · corte ${f1(corte)}${m && !m.falta.length ? ` · sua média ${f1(m.m)}` : ""}</span></span>${ch ? `<span class="ct-pill num" style="background:${rt[1]};${ch.p >= 0.85 || ch.p < 0.15 ? "color:#fff" : ""}">${Math.round(ch.p * 100)}%</span>` : `<span class="ct-pill">ver</span>`}</button>`;
-    }).join("")}</div>`;
+    if (!r.length) return `<div class="empty">Nenhum curso encontrado no SISU com essa busca.</div>`;
+    return itensHTML(r, true, 60);
   }
 
   function vCurso(cur, N) {
@@ -295,7 +331,7 @@
     const lo = Math.min(m.m, corte) - 2.2 * sd, hi = Math.max(m.m, corte) + 2.2 * sd, X = (v) => Math.max(0, Math.min(100, ((v - lo) / (hi - lo)) * 100));
     const insc = c.mod === 0 && cur[11] ? cur[11] : 0;
     const nomeA = (a) => a === "RED" ? "Redação" : AR[a].n;
-    return `<button class="btn ghost sm" data-calvo="" style="margin-top:8px">← Voltar para a busca</button>
+    return `<button class="btn ghost sm" data-calvo="" style="margin-top:8px">← ${st().por === "ies" ? "Voltar para os cursos da " + esc(SI.ies[cur[4]][0]) : "Voltar para a busca"}</button>
       <h2 class="h-sec" style="margin:14px 0 2px">${esc(cur[1])} <span class="muted" style="font-size:.7em">${esc(cur[2])} · ${esc(cur[3])}</span></h2>
       <p class="muted" style="margin:0">${esc(ies[1])} (${esc(ies[0])}) · ${esc(cur[7])} · ${esc(cur[5])}/${esc(cur[6])}</p>
       <label style="display:grid;gap:4px;font-size:12.5px;font-weight:700;margin:14px 0 4px;max-width:520px">Modalidade de concorrência<select data-cset="mod">${mods.map((x, i) => `<option value="${i}" ${i === c.mod ? "selected" : ""}>${esc(nomeMod(x[0]))} · corte ${f1(x[2])}</option>`).join("")}</select></label>
@@ -329,10 +365,12 @@
   function rerender(keep) { const y = window.scrollY; render(); if (keep) window.scrollTo({ top: y }); else window.scrollTo({ top: 0 }); }
   document.addEventListener("click", (e) => {
     if (VIEW !== "calc") return;
-    const b = e.target.closest("[data-cab],[data-carea],[data-cb],[data-ccorr],[data-cclear],[data-calvo]");
+    const b = e.target.closest("[data-cab],[data-carea],[data-cb],[data-ccorr],[data-cclear],[data-calvo],[data-cpor],[data-cies]");
     if (!b) return; const d = b.dataset, c = st(); e.preventDefault();
     if (d.cab) { c.aba = d.cab; save(); rerender(); return; }
     if (d.carea) { c.area = d.carea; save(); rerender(true); return; }
+    if (d.cpor) { c.por = d.cpor; c.alvo = null; save(); rerender(true); return; }
+    if (d.cies !== undefined) { c.ies = d.cies || null; c.buscaCursoIes = ""; c.alvo = null; save(); rerender(); return; }
     if (d.calvo !== undefined) { c.alvo = d.calvo || null; c.mod = 0; save(); rerender(); return; }
     if (d.cclear !== undefined) { if (!confirmarLimpar()) return; delete c.resp[chaveResp(c.area)]; delete c.corr[chaveResp(c.area)]; save(); rerender(true); return; }
     if (d.ccorr !== undefined) {
@@ -363,6 +401,8 @@
   document.addEventListener("input", (e) => {
     if (VIEW !== "calc") return;
     const t = e.target, c = st();
+    if (t.matches("[data-cqi]")) { c.buscaIes = t.value; save(); const l = document.getElementById("ctLista"); if (l) l.innerHTML = vListaIes(); return; }
+    if (t.matches("[data-cqc]")) { c.buscaCursoIes = t.value; save(); const l = document.getElementById("ctLista"); if (l) l.innerHTML = vListaCursosIes(); return; }
     if (t.matches("[data-cq]")) { c.busca = t.value; save(); const l = document.getElementById("ctLista"); if (l) l.innerHTML = vLista(); return; }
     if (t.matches("[data-cin]")) {
       const [grp, a] = t.dataset.cin.split(".");
